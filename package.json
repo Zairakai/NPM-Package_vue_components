@@ -125,5 +125,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "outdatedIgnore": []
+  "outdatedIgnore": [],
+  "overrides": {
+    "@asamuzakjp/css-color": "5.0.1"
+  }
 }
