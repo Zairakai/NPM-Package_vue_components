@@ -3,7 +3,7 @@
   import FormLabel from './Label.vue'
 
   export default {
-    name: 'FormSwitch',
+    name: 'FormToggle',
 
     components: {
       FormCheckbox,

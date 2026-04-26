@@ -4,7 +4,7 @@
   import FormInput from '@form/Input.vue'
 
   defineOptions({
-    name: 'FormInputEmail',
+    name: 'FormInputDate',
     inheritAttrs: false,
   })
 
