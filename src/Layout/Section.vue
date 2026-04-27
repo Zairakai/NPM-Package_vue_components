@@ -4,7 +4,7 @@
   import LayoutContainer from '@layout/Container.vue'
 
   defineOptions({
-    name: 'LayoutRow',
+    name: 'LayoutSection',
   })
 
   const props = defineProps({
