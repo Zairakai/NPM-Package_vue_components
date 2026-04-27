@@ -1,6 +1,7 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, inject } from 'vue'
 
+  import { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from '@/config.js'
   import FormInput from '@form/Input.vue'
 
   defineOptions({
@@ -9,6 +10,10 @@
   })
 
   const emit = defineEmits(['update:modelValue', 'isValid'])
+
+  // Read global config provided by VueComponentsPlugin.
+  // Falls back to defaults when the component is used without the plugin.
+  const zkConfig = inject(ZK_CONFIG_KEY, DEFAULT_ZK_CONFIG)
 
   const localValue = computed({
     get: () => props.modelValue,
@@ -20,11 +25,15 @@
       type: [String, Number, Boolean, null],
       default: null,
     },
+    // Explicit pattern prop overrides the config-based default.
     pattern: {
       type: String,
-      default: `^.{${import.meta.env.VITE_AUTH_MIN_CHARACTERS},}`,
+      default: null,
     },
   })
+
+  // Prop takes precedence; otherwise derive pattern from plugin config.
+  const effectivePattern = computed(() => props.pattern ?? `^.{${zkConfig.minPasswordLength},}`)
 </script>
 
 <template>
@@ -32,7 +41,7 @@
     v-bind="$attrs"
     v-model="localValue"
     type="password"
-    :pattern="pattern"
+    :pattern="effectivePattern"
     @is-valid="emit('isValid', $event)"
   />
 </template>
