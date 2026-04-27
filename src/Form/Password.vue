@@ -22,7 +22,8 @@
     },
     pattern: {
       type: String,
-      default: `^.{${import.meta.env.VITE_AUTH_MIN_CHARACTERS},}`,
+      // Fall back to 8 when the env var is not set at package build time.
+      default: `^.{${import.meta.env.VITE_AUTH_MIN_CHARACTERS ?? '8'},}`,
     },
   })
 </script>
