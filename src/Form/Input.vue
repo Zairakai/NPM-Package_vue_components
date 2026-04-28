@@ -133,7 +133,8 @@
   }))
 
   const labelProps = computed(() => ({
-    id: props.id,
+    // Fall back to name when no explicit id — mirrors Blade component behavior
+    id: props.id ?? props.name,
     label: props.label,
     fieldClass: props.fieldClass,
     iconBefore: props.iconBefore,

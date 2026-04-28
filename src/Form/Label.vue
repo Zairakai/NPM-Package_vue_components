@@ -38,7 +38,7 @@
     />
 
     <span
-      v-if="undefined !== label && undefined !== id"
+      v-if="undefined !== label"
       data-content
     >
       <span v-html="label" />
