@@ -197,6 +197,17 @@
           class="msr"
           v-html="iconAfter"
         />
+
+        <!--
+          Unlike iconBefore/iconAfter (also mirrored into FormLabel's
+          labelProps below), this slot renders strictly inside [data-input]
+          — the box around the input alone, never the label and never
+          affected by an error message rendered after this component (see
+          FormAdditional below, a sibling of [data-input], not a child of
+          it). Use it for interactive content (buttons) that a plain
+          label-mirrored icon can't represent.
+        -->
+        <slot name="trailing-content" />
       </div>
     </template>
 
