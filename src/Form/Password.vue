@@ -1,6 +1,7 @@
 <script setup>
-  import { computed, inject } from 'vue'
+  import { computed, inject, ref } from 'vue'
 
+  import { ensureIconSprite } from '@/composables/useIconSprite.js'
   import { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from '@/config.js'
   import FormInput from '@form/Input.vue'
 
@@ -30,18 +31,73 @@
       type: String,
       default: null,
     },
+    // Render a show/hide toggle button inside the field.
+    showToggle: {
+      type: Boolean,
+      default: true,
+    },
+    // aria-label text — override for i18n, no built-in translation here
+    // (unlike the Blade equivalent, this package has no i18n system).
+    labelShow: {
+      type: String,
+      default: 'Show password',
+    },
+    labelHide: {
+      type: String,
+      default: 'Hide password',
+    },
   })
 
   // Prop takes precedence; otherwise derive pattern from plugin config.
   const effectivePattern = computed(() => props.pattern ?? `^.{${zkConfig.minPasswordLength},}`)
+
+  const isVisible = ref(false)
+  const inputType = computed(() => (isVisible.value ? 'text' : 'password'))
+
+  function toggleVisibility() {
+    isVisible.value = !isVisible.value
+  }
+
+  if (props.showToggle) {
+    ensureIconSprite()
+  }
 </script>
 
 <template>
   <FormInput
     v-bind="$attrs"
     v-model="localValue"
-    type="password"
+    :type="inputType"
     :pattern="effectivePattern"
     @is-valid="emit('isValid', $event)"
-  />
+  >
+    <template
+      v-if="showToggle"
+      #trailing-content
+    >
+      <button
+        type="button"
+        data-toggle-visibility
+        :aria-label="isVisible ? labelHide : labelShow"
+        @click="toggleVisibility"
+      >
+        <svg
+          v-if="!isVisible"
+          data-icon-show
+          width="20"
+          height="20"
+        >
+          <use href="#icon-visibility" />
+        </svg>
+        <svg
+          v-else
+          data-icon-hide
+          width="20"
+          height="20"
+        >
+          <use href="#icon-visibility-off" />
+        </svg>
+      </button>
+    </template>
+  </FormInput>
 </template>
