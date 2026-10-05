@@ -1,0 +1,5 @@
+components/
+.vitepress/sidebar.generated.json
+.vitepress/cache/
+.vitepress/dist/
+node_modules/
