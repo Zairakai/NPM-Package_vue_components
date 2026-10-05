@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { toQuery, useRemoteData } from '../../src/composables/useRemoteData'
+import { fetchFetcher, httpFetcher, toQuery, useRemoteData } from '../../src/composables/useRemoteData'
 
 describe('toQuery', () => {
   it('should build a query string and leave out the empty values', () => {
@@ -147,5 +147,58 @@ describe('useRemoteData', () => {
     cancel()
 
     expect(loading.value).toBe(false)
+  })
+})
+
+describe('httpFetcher and fetchFetcher', () => {
+  it('should call the client with the query string and the signal, and return the data', async () => {
+    const get = vi.fn().mockResolvedValue({ data: { items: [1, 2] } })
+    const signal = new AbortController().signal
+    const fetcher = httpFetcher<number[]>({ get }, '/api/users', (data) => (data as { items: number[] }).items)
+
+    expect(await fetcher({ page: 2, tag: ['a', 'b'] }, { signal })).toEqual([1, 2])
+    expect(get).toHaveBeenCalledTimes(1)
+    expect(get.mock.calls[0][0]).toBe('/api/users')
+    expect(get.mock.calls[0][1].params.toString()).toBe('page=2&tag=a&tag=b')
+    expect(get.mock.calls[0][1].signal).toBe(signal)
+  })
+
+  it('should return the whole data without a selector', async () => {
+    const fetcher = httpFetcher({ get: vi.fn().mockResolvedValue({ data: 'raw' }) }, '/x')
+
+    expect(await fetcher({}, { signal: new AbortController().signal })).toBe('raw')
+  })
+
+  it('should use fetch with the query string, the headers and the signal', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ ok: 1 }) })
+
+    vi.stubGlobal('fetch', fetchMock)
+    const signal = new AbortController().signal
+
+    expect(await fetchFetcher('/api/users', { headers: { 'X-A': '1' } })({ q: 'ada' }, { signal })).toEqual({ ok: 1 })
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/users?q=ada',
+      expect.objectContaining({ signal, headers: { Accept: 'application/json', 'X-A': '1' } })
+    )
+    await fetchFetcher('/api/users?v=2')({ q: 'x' }, { signal })
+    expect(fetchMock.mock.calls[1][0]).toBe('/api/users?v=2&q=x')
+    await fetchFetcher('/api/users')({}, { signal })
+    expect(fetchMock.mock.calls[2][0]).toBe('/api/users')
+    vi.unstubAllGlobals()
+  })
+
+  it('should fail for a status that is not ok and pick the data with select', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: false, status: 503 })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ data: [3] }) })
+    )
+    const signal = new AbortController().signal
+
+    await expect(fetchFetcher('/x')({}, { signal })).rejects.toThrow('HTTP 503')
+    expect(await fetchFetcher('/x', {}, (data) => (data as { data: number[] }).data)({}, { signal })).toEqual([3])
+    vi.unstubAllGlobals()
   })
 })

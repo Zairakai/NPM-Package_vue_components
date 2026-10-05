@@ -4,7 +4,18 @@
   import { queryNumber, useQueryParam } from '@/composables/useQueryParam'
   import { getSupport } from '@/composables/useSupport'
   import { useUid } from '@/composables/useUid'
-  import { ariaSort, filterRows, formatCell, nextSort, paginateRows, sortRows } from '@data/table'
+  import {
+    activeFilters,
+    applyFilters,
+    ariaSort,
+    filterRows,
+    formatCell,
+    joinRange,
+    nextSort,
+    paginateRows,
+    parseRange,
+    sortRows,
+  } from '@data/table'
   import NavigationPagination from '@navigation/Pagination.vue'
   import { computed, onMounted, ref, watch } from 'vue'
 
@@ -12,7 +23,14 @@
     name: 'DataTable',
   })
 
-  const emit = defineEmits(['update:sort', 'update:search', 'update:page', 'update:selected', 'query'])
+  const emit = defineEmits([
+    'update:sort',
+    'update:search',
+    'update:page',
+    'update:selected',
+    'update:filters',
+    'query',
+  ])
 
   const props = defineProps({
     id: String,
@@ -45,6 +63,32 @@
     searchable: {
       type: Boolean,
       default: false,
+    },
+    // The value of every column filter, by column key, with v-model:filters. A range is "min..max".
+    filters: {
+      type: Object,
+      default: undefined,
+    },
+    clearFiltersLabel: {
+      type: String,
+      default: 'Clear filters',
+    },
+    // The label of a filter. Use {column}.
+    filterLabel: {
+      type: String,
+      default: 'Filter {column}',
+    },
+    minLabel: {
+      type: String,
+      default: 'from',
+    },
+    maxLabel: {
+      type: String,
+      default: 'to',
+    },
+    allLabel: {
+      type: String,
+      default: 'All',
     },
     searchLabel: {
       type: String,
@@ -112,6 +156,52 @@
 
   const currentSearch = useControllable(props, 'search', emit, '', { param: url('q'), adapter })
 
+  // The column filters: the ones given (v-model:filters), the URL (one parameter per column, f_name) or its own.
+  // The columns that have a filter are read once, when the table is created.
+  const filterable = props.columns.filter((column) => column.filter)
+  const urlFilters =
+    undefined === props.queryPrefix
+      ? null
+      : Object.fromEntries(
+          filterable.map((column) => [column.key, useQueryParam(url(`f_${column.key}`), { default: '', adapter })])
+        )
+  const ownFilters = ref({})
+
+  const currentFilters = computed(() => {
+    if (undefined !== props.filters) {
+      return props.filters
+    }
+
+    return urlFilters
+      ? Object.fromEntries(Object.entries(urlFilters).map(([key, state]) => [key, state.value]))
+      : ownFilters.value
+  })
+
+  function setFilter(key, value) {
+    const next = { ...currentFilters.value, [key]: value }
+
+    if (urlFilters) {
+      urlFilters[key].value = value
+    } else {
+      ownFilters.value = next
+    }
+
+    emit('update:filters', next)
+    currentPage.value = 1
+  }
+
+  function clearFilters() {
+    const next = Object.fromEntries(filterable.map((column) => [column.key, '']))
+
+    filterable.forEach((column) => urlFilters && (urlFilters[column.key].value = ''))
+    ownFilters.value = next
+    emit('update:filters', next)
+    currentPage.value = 1
+  }
+
+  const hasFilters = computed(() => 0 < Object.keys(activeFilters(currentFilters.value)).length)
+  const optionOf = (option) => ('string' === typeof option ? { value: option, label: option } : option)
+
   // The sort: the one given (v-model:sort), the URL (two parameters: the column and the direction) or its own.
   const urlKey = undefined === props.queryPrefix ? null : useQueryParam(url('sort'), { default: '', adapter })
   const urlDirection = undefined === props.queryPrefix ? null : useQueryParam(url('dir'), { default: 'asc', adapter })
@@ -145,7 +235,9 @@
 
   // The rows shown: client side, the filtered, sorted and paginated rows; server side, the rows as given.
   const filtered = computed(() =>
-    props.serverSide ? props.rows : filterRows(props.rows, props.columns, currentSearch.value)
+    props.serverSide
+      ? props.rows
+      : applyFilters(filterRows(props.rows, props.columns, currentSearch.value), props.columns, currentFilters.value)
   )
   const sorted = computed(() =>
     props.serverSide ? filtered.value : sortRows(filtered.value, props.columns, currentSort.value, props.locale)
@@ -171,12 +263,17 @@
       sort: currentSort.value?.key,
       direction: currentSort.value?.direction,
       search: currentSearch.value,
+      filters: activeFilters(currentFilters.value),
     })
   }
 
-  watch([currentPage, currentSort, currentSearch, () => props.pageSize], () => props.serverSide && ask(), {
-    deep: true,
-  })
+  watch(
+    [currentPage, currentSort, currentSearch, currentFilters, () => props.pageSize],
+    () => props.serverSide && ask(),
+    {
+      deep: true,
+    }
+  )
   onMounted(() => props.serverSide && ask())
 
   function keyOf(row) {
@@ -224,7 +321,7 @@
   <div class="data-table-wrapper">
     <component
       :is="searchTag"
-      v-if="searchable"
+      v-if="searchable || 0 < filterable.length"
       class="data-table-search"
       :role="'search' === searchTag ? undefined : 'search'"
     >
@@ -232,14 +329,80 @@
         method="get"
         @submit.prevent
       >
-        <label :for="`${uid}-search`">{{ searchLabel }}</label>
-        <input
-          :id="`${uid}-search`"
-          type="search"
-          name="q"
-          :value="currentSearch"
-          @input="currentSearch = $event.target.value"
-        />
+        <template v-if="searchable">
+          <label :for="`${uid}-search`">{{ searchLabel }}</label>
+          <input
+            :id="`${uid}-search`"
+            type="search"
+            name="q"
+            :value="currentSearch"
+            @input="currentSearch = $event.target.value"
+          />
+        </template>
+        <div
+          v-for="column in filterable"
+          :key="column.key"
+          class="data-table-filter"
+          :data-filter="column.filter"
+        >
+          <label :for="`${uid}-filter-${column.key}`">{{ filterLabel.replace('{column}', column.label) }}</label>
+          <select
+            v-if="'select' === column.filter"
+            :id="`${uid}-filter-${column.key}`"
+            :name="`f_${column.key}`"
+            :value="currentFilters[column.key] ?? ''"
+            @change="setFilter(column.key, $event.target.value)"
+          >
+            <option value="">{{ allLabel }}</option>
+            <option
+              v-for="option in column.options ?? []"
+              :key="optionOf(option).value"
+              :value="optionOf(option).value"
+            >
+              {{ optionOf(option).label }}
+            </option>
+          </select>
+          <span
+            v-else-if="'range' === column.filter"
+            class="data-table-range"
+          >
+            <input
+              :id="`${uid}-filter-${column.key}`"
+              :type="'date' === column.type ? 'date' : 'number'"
+              :name="`f_${column.key}_min`"
+              :aria-label="`${filterLabel.replace('{column}', column.label)} ${minLabel}`"
+              :value="parseRange(currentFilters[column.key] ?? '').min"
+              @input="
+                setFilter(column.key, joinRange($event.target.value, parseRange(currentFilters[column.key] ?? '').max))
+              "
+            />
+            <input
+              :type="'date' === column.type ? 'date' : 'number'"
+              :name="`f_${column.key}_max`"
+              :aria-label="`${filterLabel.replace('{column}', column.label)} ${maxLabel}`"
+              :value="parseRange(currentFilters[column.key] ?? '').max"
+              @input="
+                setFilter(column.key, joinRange(parseRange(currentFilters[column.key] ?? '').min, $event.target.value))
+              "
+            />
+          </span>
+          <input
+            v-else
+            :id="`${uid}-filter-${column.key}`"
+            type="search"
+            :name="`f_${column.key}`"
+            :value="currentFilters[column.key] ?? ''"
+            @input="setFilter(column.key, $event.target.value)"
+          />
+        </div>
+        <button
+          v-if="hasFilters"
+          type="button"
+          class="data-table-clear"
+          @click="clearFilters"
+        >
+          {{ clearFiltersLabel }}
+        </button>
       </form>
     </component>
     <table v-bind="tableProps">

@@ -1,5 +1,7 @@
 <script setup>
   import { useControllable } from '@/composables/useControllable'
+  import { useQueryAdapter } from '@/composables/useQueryAdapter'
+  import { queryList } from '@/composables/useQueryParam'
   import { useUid } from '@/composables/useUid'
   import { ACCORDION_KEY } from '@display/accordion'
   import { computed, provide, ref } from 'vue'
@@ -22,10 +24,16 @@
       type: Boolean,
       default: false,
     },
+    // Keep the open item in this query parameter of the URL (?faq=shipping, or ?faq=a,b when multiple).
+    queryParam: String,
   })
 
   const root = ref(null)
-  const state = useControllable(props, 'modelValue', emit, props.multiple ? [] : null)
+  const state = useControllable(props, 'modelValue', emit, props.multiple ? [] : null, {
+    param: props.queryParam,
+    adapter: useQueryAdapter(),
+    ...(props.multiple ? queryList : {}),
+  })
 
   const openIds = computed(() => {
     const value = state.value
