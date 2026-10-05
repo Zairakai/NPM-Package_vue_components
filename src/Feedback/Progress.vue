@@ -27,6 +27,8 @@
     },
   })
 
+  // Linear: the native <progress> element, its role, value and range are built in.
+  // Circular: there is no native element, so a progressbar around an SVG ring.
   const indeterminate = computed(() => undefined === props.value)
 
   const percent = computed(() => {
@@ -40,20 +42,30 @@
   const progressProps = computed(() => ({
     id: props.id,
     class: `progress ${props.class ?? ''}`.trim(),
-    role: 'progressbar',
     'aria-label': props.label,
-    'aria-valuemin': 0,
-    'aria-valuemax': props.max,
-    'aria-valuenow': indeterminate.value ? undefined : props.value,
     'data-variant': props.variant,
     'data-indeterminate': indeterminate.value ? '' : undefined,
   }))
 </script>
 
 <template>
-  <div v-bind="progressProps">
+  <progress
+    v-if="'linear' === variant"
+    v-bind="progressProps"
+    :value="indeterminate ? undefined : value"
+    :max="max"
+  >
+    <slot />
+  </progress>
+  <div
+    v-else
+    v-bind="progressProps"
+    role="progressbar"
+    aria-valuemin="0"
+    :aria-valuemax="max"
+    :aria-valuenow="indeterminate ? undefined : value"
+  >
     <svg
-      v-if="'circular' === variant"
       viewBox="0 0 36 36"
       aria-hidden="true"
       focusable="false"
@@ -75,11 +87,6 @@
         :stroke-dasharray="`${indeterminate ? 25 : percent} 100`"
       />
     </svg>
-    <div
-      v-else
-      class="progress-bar"
-      :style="indeterminate ? undefined : { width: `${percent}%` }"
-    ></div>
     <slot />
   </div>
 </template>

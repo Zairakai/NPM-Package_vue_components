@@ -18,7 +18,13 @@ describe('useToast', () => {
     const id = add({ message: 'Hello' })
 
     expect(toasts.value).toHaveLength(1)
-    expect(toasts.value[0]).toMatchObject({ id, message: 'Hello', variant: 'default', duration: 5000, dismissible: true })
+    expect(toasts.value[0]).toMatchObject({
+      id,
+      message: 'Hello',
+      variant: 'default',
+      duration: 5000,
+      dismissible: true,
+    })
 
     vi.advanceTimersByTime(5000)
 
@@ -117,6 +123,20 @@ describe('FeedbackToastContainer', () => {
     expect(wrapper.attributes('style')).toContain('right: 1rem')
   })
 
+  it('should be a manual popover so the toasts stay above the modal dialogs', () => {
+    const showPopover = vi.fn()
+
+    HTMLElement.prototype.showPopover = showPopover
+    const wrapper = mount(ToastContainer, { attachTo: document.body })
+
+    expect(wrapper.attributes('popover')).toBe('manual')
+    expect(showPopover).toHaveBeenCalledTimes(1)
+    expect(wrapper.attributes('style')).toContain('inset: auto')
+
+    // @ts-expect-error not available in this environment
+    delete HTMLElement.prototype.showPopover
+  })
+
   it('should center the container horizontally', () => {
     const wrapper = mount(ToastContainer, { props: { position: 'bottom-center' } })
 
@@ -188,7 +208,8 @@ describe('FeedbackToastContainer', () => {
   })
 
   it('should validate the position', () => {
-    const { position } = (ToastContainer as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { position } = (ToastContainer as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
+      .props
 
     expect(position.validator('top-left')).toBe(true)
     expect(position.validator('middle')).toBe(false)
