@@ -16,10 +16,15 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
+        Content: resolve(__dirname, 'src/Content/index.ts'),
+        Data: resolve(__dirname, 'src/Data/index.ts'),
+        Display: resolve(__dirname, 'src/Display/index.ts'),
+        Feedback: resolve(__dirname, 'src/Feedback/index.ts'),
         Form: resolve(__dirname, 'src/Form/index.ts'),
         Layout: resolve(__dirname, 'src/Layout/index.ts'),
-        Content: resolve(__dirname, 'src/Content/index.ts'),
         Medias: resolve(__dirname, 'src/Medias/index.ts'),
+        Navigation: resolve(__dirname, 'src/Navigation/index.ts'),
+        Overlay: resolve(__dirname, 'src/Overlay/index.ts'),
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => {
@@ -44,6 +49,11 @@ export default defineConfig({
       '@layout': resolve(__dirname, 'src/Layout'),
       '@content': resolve(__dirname, 'src/Content'),
       '@medias': resolve(__dirname, 'src/Medias'),
+      '@data': resolve(__dirname, 'src/Data'),
+      '@display': resolve(__dirname, 'src/Display'),
+      '@feedback': resolve(__dirname, 'src/Feedback'),
+      '@navigation': resolve(__dirname, 'src/Navigation'),
+      '@overlay': resolve(__dirname, 'src/Overlay'),
     },
   },
 })
