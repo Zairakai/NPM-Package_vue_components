@@ -25,6 +25,7 @@ export { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from './config.js'
 export type { ZkComponentsConfig } from './config.js'
 
 // Shared composables
+export { useClipboard } from './composables/useClipboard.js'
 export { useControllable } from './composables/useControllable.js'
 export type { ControllableQuery } from './composables/useControllable.js'
 export { computePosition, useFloating } from './composables/useFloating.js'
