@@ -19,6 +19,7 @@ export * from './Layout/index.js'
 export * from './Medias/index.js'
 export * from './Navigation/index.js'
 export * from './Overlay/index.js'
+export * from './Utility/index.js'
 
 // Re-export config so consuming apps can use the injection key if needed.
 export { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from './config.js'

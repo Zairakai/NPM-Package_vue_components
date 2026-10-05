@@ -25,6 +25,7 @@ export default defineConfig({
         Medias: resolve(__dirname, 'src/Medias/index.ts'),
         Navigation: resolve(__dirname, 'src/Navigation/index.ts'),
         Overlay: resolve(__dirname, 'src/Overlay/index.ts'),
+        Utility: resolve(__dirname, 'src/Utility/index.ts'),
       },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => {
@@ -54,6 +55,7 @@ export default defineConfig({
       '@feedback': resolve(__dirname, 'src/Feedback'),
       '@navigation': resolve(__dirname, 'src/Navigation'),
       '@overlay': resolve(__dirname, 'src/Overlay'),
+      '@utility': resolve(__dirname, 'src/Utility'),
     },
   },
 })
