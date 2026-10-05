@@ -103,7 +103,7 @@
     "@vue/language-core": "^3.3.9",
     "@vue/test-utils": "^2.4.0",
     "@vue/tsconfig": "^0.9.0",
-    "@zairakai/js-dev-tools": "^3.0.0",
+    "@zairakai/js-dev-tools": "^3.0.1",
     "jsdom": "^29.0.2",
     "knip": "^6.4.1",
     "sort-package-json": "^4.0.0",
