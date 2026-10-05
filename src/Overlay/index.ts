@@ -3,6 +3,7 @@
  * Overlay components: modal, dialog, drawer, tooltip, popover, dropdown
  */
 
+export { default as OverlayContextMenu } from './ContextMenu.vue'
 export { default as OverlayDialog } from './Dialog.vue'
 export { default as OverlayDrawer } from './Drawer.vue'
 export { default as OverlayDropdown } from './Dropdown.vue'
