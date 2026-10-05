@@ -38,6 +38,7 @@ export default defineConfig({
       '@feedback': path.resolve(__dirname, './src/Feedback'),
       '@navigation': path.resolve(__dirname, './src/Navigation'),
       '@overlay': path.resolve(__dirname, './src/Overlay'),
+      '@utility': path.resolve(__dirname, './src/Utility'),
       '@': path.resolve(__dirname, './src'),
       '@js': path.resolve(__dirname, './tests/mocks'),
     },

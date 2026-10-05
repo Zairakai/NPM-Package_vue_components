@@ -93,6 +93,11 @@
       "types": "./dist/Overlay.d.ts",
       "import": "./dist/Overlay.js",
       "require": "./dist/Overlay.cjs"
+    },
+    "./Utility": {
+      "types": "./dist/Utility.d.ts",
+      "import": "./dist/Utility.js",
+      "require": "./dist/Utility.cjs"
     }
   },
   "main": "./dist/index.cjs",
