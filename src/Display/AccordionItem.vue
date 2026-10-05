@@ -1,7 +1,6 @@
 <script setup>
-  import { useUid } from '@/composables/useUid'
   import { ACCORDION_KEY } from '@display/accordion'
-  import { computed, inject, ref } from 'vue'
+  import { computed, inject, nextTick, ref } from 'vue'
 
   defineOptions({
     name: 'DisplayAccordionItem',
@@ -29,59 +28,63 @@
     },
   })
 
-  const uid = useUid('accordion')
-  const triggerId = `${uid}-trigger`
-  const panelId = `${uid}-panel`
-
   // Standalone (no parent accordion): the item keeps its own state.
   const accordion = inject(ACCORDION_KEY, null)
   const own = ref(false)
+  const details = ref(null)
 
   const open = computed(() => (accordion ? accordion.isOpen(props.id) : own.value))
 
-  function toggle() {
-    if (accordion) {
-      accordion.toggle(props.id)
+  // The browser opens and closes the <details> by itself: follow it.
+  async function onToggle(event) {
+    const isOpen = event.target.open
 
-      return
+    if (accordion) {
+      accordion.setOpen(props.id, isOpen)
+    } else {
+      own.value = isOpen
     }
 
-    own.value = !own.value
+    // A parent that refuses the change (v-model not updated) keeps the DOM in sync.
+    await nextTick()
+    details.value.open = open.value
+  }
+
+  function onSummaryClick(event) {
+    if (props.disabled) {
+      event.preventDefault()
+    }
   }
 
   const itemProps = computed(() => ({
     class: `accordion-item ${props.class ?? ''}`.trim(),
-    'data-open': open.value ? '' : undefined,
+    name: accordion?.name,
+    open: open.value,
+    'data-disabled': props.disabled ? '' : undefined,
   }))
 </script>
 
 <template>
-  <div v-bind="itemProps">
-    <component
-      :is="`h${level}`"
-      class="accordion-header"
+  <details
+    ref="details"
+    v-bind="itemProps"
+    @toggle="onToggle"
+  >
+    <summary
+      class="accordion-trigger"
+      data-accordion-trigger
+      :aria-disabled="disabled ? 'true' : undefined"
+      @click="onSummaryClick"
     >
-      <button
-        :id="triggerId"
-        type="button"
-        class="accordion-trigger"
-        data-accordion-trigger
-        :aria-expanded="open"
-        :aria-controls="panelId"
-        :disabled="disabled"
-        @click="toggle"
+      <component
+        :is="`h${level}`"
+        class="accordion-header"
       >
         <slot name="title">{{ title }}</slot>
-      </button>
-    </component>
-    <div
-      :id="panelId"
-      class="accordion-panel"
-      role="region"
-      :aria-labelledby="triggerId"
-      :hidden="!open"
-    >
+      </component>
+    </summary>
+    <div class="accordion-panel">
       <slot />
     </div>
-  </div>
+  </details>
 </template>

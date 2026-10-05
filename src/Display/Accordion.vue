@@ -1,5 +1,6 @@
 <script setup>
   import { useControllable } from '@/composables/useControllable'
+  import { useUid } from '@/composables/useUid'
   import { ACCORDION_KEY } from '@display/accordion'
   import { computed, provide, ref } from 'vue'
 
@@ -40,21 +41,28 @@
     return openIds.value.includes(id)
   }
 
-  function toggle(id) {
+  function setOpen(id, open) {
+    if (isOpen(id) === open) {
+      return
+    }
+
     if (props.multiple) {
-      state.value = isOpen(id) ? openIds.value.filter((openId) => openId !== id) : [...openIds.value, id]
+      state.value = open ? [...openIds.value, id] : openIds.value.filter((openId) => openId !== id)
 
       return
     }
 
-    state.value = isOpen(id) ? null : id
+    state.value = open ? id : null
   }
 
-  provide(ACCORDION_KEY, { isOpen, toggle })
+  // Native exclusivity: <details> that share a name close each other, no code needed.
+  const name = props.multiple ? undefined : useUid('accordion')
+
+  provide(ACCORDION_KEY, { name, isOpen, setOpen })
 
   // Arrow keys, Home and End move the focus between the headers.
   function onKeydown(event) {
-    const triggers = [...root.value.querySelectorAll('[data-accordion-trigger]:not([disabled])')]
+    const triggers = [...root.value.querySelectorAll('[data-accordion-trigger]:not([aria-disabled="true"])')]
     const index = triggers.indexOf(document.activeElement)
 
     if (-1 === index) {

@@ -18,55 +18,66 @@ function build(props: Record<string, unknown> = {}) {
   )
 }
 
-const triggers = (wrapper: ReturnType<typeof build>) => wrapper.findAll('button.accordion-trigger')
+const detailsOf = (wrapper: ReturnType<typeof build>) => wrapper.findAll('details.accordion-item')
+
+// The browser opens the <details> itself and fires "toggle": do the same.
+async function setOpen(details: HTMLDetailsElement, open: boolean) {
+  details.open = open
+  details.dispatchEvent(new Event('toggle'))
+  await Promise.resolve()
+  await Promise.resolve()
+}
 
 describe('DisplayAccordion', () => {
-  it('should render closed items linked by ARIA', () => {
+  it('should render native closed details with a heading in each summary', () => {
     const wrapper = build()
-    const [first] = triggers(wrapper)
+    const [first] = detailsOf(wrapper)
 
     expect(wrapper.find('.accordion').exists()).toBe(true)
-    expect(first.attributes('aria-expanded')).toBe('false')
-    expect(wrapper.find('.accordion-panel').attributes('hidden')).toBeDefined()
-    expect(wrapper.find('.accordion-panel').attributes('role')).toBe('region')
-    expect(wrapper.find('.accordion-panel').attributes('aria-labelledby')).toBe(first.attributes('id'))
-    expect(first.attributes('aria-controls')).toBe(wrapper.find('.accordion-panel').attributes('id'))
-    expect(wrapper.find('h3.accordion-header').exists()).toBe(true)
+    expect((first.element as HTMLDetailsElement).open).toBe(false)
+    expect(first.find('summary.accordion-trigger h3.accordion-header').text()).toBe('First')
+    expect(first.find('.accordion-panel').text()).toBe('Panel A')
   })
 
-  it('should open one item at a time in single mode, without v-model', async () => {
+  it('should share one name between the items in single mode so the browser closes the others', () => {
+    const names = detailsOf(build()).map((details) => details.attributes('name'))
+
+    expect(names[0]).toBeTruthy()
+    expect(new Set(names).size).toBe(1)
+  })
+
+  it('should not give a name in multiple mode', () => {
+    expect(detailsOf(build({ multiple: true }))[0].attributes('name')).toBeUndefined()
+  })
+
+  it('should follow the browser when an item opens and closes, without v-model', async () => {
     const wrapper = build()
-    const [first, second] = triggers(wrapper)
+    const [first, second] = detailsOf(wrapper).map((details) => details.element as HTMLDetailsElement)
 
-    await first.trigger('click')
+    await setOpen(first, true)
+    expect(first.open).toBe(true)
+    expect(detailsOf(wrapper)[0].attributes('data-open')).toBeUndefined()
 
-    expect(first.attributes('aria-expanded')).toBe('true')
-    expect(wrapper.find('.accordion-item').attributes('data-open')).toBeDefined()
-
-    await second.trigger('click')
-
-    expect(first.attributes('aria-expanded')).toBe('false')
-    expect(second.attributes('aria-expanded')).toBe('true')
-
-    await second.trigger('click')
-
-    expect(second.attributes('aria-expanded')).toBe('false')
+    await setOpen(first, false)
+    await setOpen(second, true)
+    expect(first.open).toBe(false)
+    expect(second.open).toBe(true)
   })
 
   it('should keep several items open in multiple mode', async () => {
     const wrapper = build({ multiple: true })
-    const [first, second] = triggers(wrapper)
+    const [first, second] = detailsOf(wrapper).map((details) => details.element as HTMLDetailsElement)
 
-    await first.trigger('click')
-    await second.trigger('click')
+    await setOpen(first, true)
+    await setOpen(second, true)
 
-    expect(first.attributes('aria-expanded')).toBe('true')
-    expect(second.attributes('aria-expanded')).toBe('true')
+    expect(first.open).toBe(true)
+    expect(second.open).toBe(true)
 
-    await first.trigger('click')
+    await setOpen(first, false)
 
-    expect(first.attributes('aria-expanded')).toBe('false')
-    expect(second.attributes('aria-expanded')).toBe('true')
+    expect(first.open).toBe(false)
+    expect(second.open).toBe(true)
   })
 
   it('should follow and emit the v-model', async () => {
@@ -79,14 +90,20 @@ describe('DisplayAccordion', () => {
             { modelValue: model.value, 'onUpdate:modelValue': (value: string | null) => (model.value = value) },
             () => [h(AccordionItem, { id: 'a', title: 'A' }), h(AccordionItem, { id: 'b', title: 'B' })]
           ),
-      })
+      }),
+      { attachTo: document.body }
     )
+    const [a, b] = wrapper.findAll('details').map((details) => details.element as HTMLDetailsElement)
 
-    expect(wrapper.findAll('button')[1].attributes('aria-expanded')).toBe('true')
+    expect(b.open).toBe(true)
 
-    await wrapper.findAll('button')[0].trigger('click')
+    await setOpen(a, true)
 
     expect(model.value).toBe('a')
+
+    await setOpen(a, false)
+
+    expect(model.value).toBeNull()
   })
 
   it('should accept an array model in multiple mode', async () => {
@@ -96,51 +113,82 @@ describe('DisplayAccordion', () => {
         render: () =>
           h(
             Accordion,
-            {
-              multiple: true,
-              modelValue: model.value,
-              'onUpdate:modelValue': (value: string[]) => (model.value = value),
-            },
+            { multiple: true, modelValue: model.value, 'onUpdate:modelValue': (value: string[]) => (model.value = value) },
             () => [h(AccordionItem, { id: 'a', title: 'A' }), h(AccordionItem, { id: 'b', title: 'B' })]
           ),
-      })
+      }),
+      { attachTo: document.body }
     )
+    const [, b] = wrapper.findAll('details').map((details) => details.element as HTMLDetailsElement)
 
-    await wrapper.findAll('button')[1].trigger('click')
+    await setOpen(b, true)
 
     expect(model.value).toEqual(['a', 'b'])
   })
 
-  it('should not toggle a disabled item', async () => {
+  it('should put the browser back in sync when the parent refuses the change', async () => {
+    const wrapper = mount(
+      defineComponent({
+        render: () =>
+          h(Accordion, { modelValue: null, 'onUpdate:modelValue': () => undefined }, () => [h(AccordionItem, { id: 'a', title: 'A' })]),
+      }),
+      { attachTo: document.body }
+    )
+    const details = wrapper.find('details').element as HTMLDetailsElement
+
+    await setOpen(details, true)
+
+    expect(details.open).toBe(false)
+  })
+
+  it('should not open a disabled item', async () => {
     const wrapper = build()
+    const third = detailsOf(wrapper)[2]
+    const summary = third.find('summary')
+    const event = new MouseEvent('click', { cancelable: true, bubbles: true })
 
-    await triggers(wrapper)[2].trigger('click')
+    summary.element.dispatchEvent(event)
 
-    expect(triggers(wrapper)[2].attributes('aria-expanded')).toBe('false')
+    expect(event.defaultPrevented).toBe(true)
+    expect(summary.attributes('aria-disabled')).toBe('true')
+    expect(third.attributes('data-disabled')).toBeDefined()
+  })
+
+  it('should not stop the click of an enabled item', () => {
+    const summary = detailsOf(build())[0].find('summary')
+    const event = new MouseEvent('click', { cancelable: true, bubbles: true })
+
+    summary.element.dispatchEvent(event)
+
+    expect(event.defaultPrevented).toBe(false)
   })
 
   it('should move the focus with the arrow keys, Home and End and skip disabled items', async () => {
     const wrapper = build()
-    const [first, second] = triggers(wrapper)
+    const [first, second] = wrapper.findAll('summary').map((summary) => summary.element as HTMLElement)
+    const keydown = async (target: HTMLElement, key: string) => {
+      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+      await Promise.resolve()
+    }
 
-    first.element.focus()
-    await first.trigger('keydown', { key: 'ArrowDown' })
-    expect(document.activeElement).toBe(second.element)
+    first.focus()
+    await keydown(first, 'ArrowDown')
+    expect(document.activeElement).toBe(second)
 
-    await second.trigger('keydown', { key: 'ArrowDown' })
-    expect(document.activeElement).toBe(first.element)
+    await keydown(second, 'ArrowDown')
+    expect(document.activeElement).toBe(first)
 
-    await first.trigger('keydown', { key: 'ArrowUp' })
-    expect(document.activeElement).toBe(second.element)
+    await keydown(first, 'ArrowUp')
+    expect(document.activeElement).toBe(second)
 
-    await second.trigger('keydown', { key: 'Home' })
-    expect(document.activeElement).toBe(first.element)
+    await keydown(second, 'Home')
+    expect(document.activeElement).toBe(first)
 
-    await first.trigger('keydown', { key: 'End' })
-    expect(document.activeElement).toBe(second.element)
+    await keydown(first, 'End')
+    expect(document.activeElement).toBe(second)
 
-    await second.trigger('keydown', { key: 'a' })
-    expect(document.activeElement).toBe(second.element)
+    await keydown(second, 'a')
+    expect(document.activeElement).toBe(second)
   })
 
   it('should ignore the keys when the focus is not on a header', async () => {
@@ -156,22 +204,24 @@ describe('DisplayAccordion', () => {
     const wrapper = mount(AccordionItem, {
       props: { id: 'solo', level: 4, class: 'x' },
       slots: { title: '<b>Custom</b>', default: 'Body' },
+      attachTo: document.body,
     })
+    const details = wrapper.find('details').element as HTMLDetailsElement
 
     expect(wrapper.find('h4.accordion-header').exists()).toBe(true)
     expect(wrapper.classes()).toEqual(['accordion-item', 'x'])
-    expect(wrapper.find('button b').exists()).toBe(true)
+    expect(wrapper.find('summary b').exists()).toBe(true)
+    expect(wrapper.attributes('name')).toBeUndefined()
 
-    await wrapper.find('button').trigger('click')
-    expect(wrapper.find('button').attributes('aria-expanded')).toBe('true')
+    await setOpen(details, true)
+    expect(details.open).toBe(true)
 
-    await wrapper.find('button').trigger('click')
-    expect(wrapper.find('button').attributes('aria-expanded')).toBe('false')
+    await setOpen(details, false)
+    expect(details.open).toBe(false)
   })
 
   it('should validate the heading level', () => {
-    const { level } = (AccordionItem as unknown as { props: Record<string, { validator: (v: number) => boolean }> })
-      .props
+    const { level } = (AccordionItem as unknown as { props: Record<string, { validator: (v: number) => boolean }> }).props
 
     expect(level.validator(3)).toBe(true)
     expect(level.validator(1)).toBe(false)
