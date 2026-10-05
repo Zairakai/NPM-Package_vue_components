@@ -230,7 +230,7 @@ describe('DataTable', () => {
     const wrapper = mountTable({ serverSide: true, rows: rows.slice(0, 2), total: 40, pageSize: 10, searchable: true })
 
     expect(wrapper.emitted('query')?.[0]).toEqual([
-      { page: 1, pageSize: 10, sort: undefined, direction: undefined, search: '' },
+      { page: 1, pageSize: 10, sort: undefined, direction: undefined, search: '', filters: {} },
     ])
     expect(names(wrapper)).toEqual(['Charlie', 'alice'])
     expect(wrapper.find('table').attributes('aria-rowcount')).toBe('40')
@@ -241,13 +241,13 @@ describe('DataTable', () => {
       ?.trigger('click')
     await nextTick()
     expect(wrapper.emitted('query')?.at(-1)).toEqual([
-      { page: 2, pageSize: 10, sort: undefined, direction: undefined, search: '' },
+      { page: 2, pageSize: 10, sort: undefined, direction: undefined, search: '', filters: {} },
     ])
 
     await wrapper.findAll('.data-table-sort')[0].trigger('click')
     await nextTick()
     expect(wrapper.emitted('query')?.at(-1)).toEqual([
-      { page: 1, pageSize: 10, sort: 'name', direction: 'asc', search: '' },
+      { page: 1, pageSize: 10, sort: 'name', direction: 'asc', search: '', filters: {} },
     ])
 
     await wrapper.find('input[type="search"]').setValue('x')
@@ -296,5 +296,136 @@ describe('DataTable', () => {
       ?.trigger('click')
 
     expect(window.location.search).toBe('')
+  })
+})
+
+describe('DataTable column filters', () => {
+  const filterColumns = [
+    { key: 'name', label: 'Name', filter: 'text' },
+    { key: 'status', label: 'Status', filter: 'select', options: ['open', { value: 'closed', label: 'Closed' }] },
+    { key: 'age', label: 'Age', type: 'number', filter: 'range' },
+    { key: 'born', label: 'Born', type: 'date', filter: 'range' },
+  ]
+  const people = [
+    { id: 1, name: 'Ada', status: 'open', age: 36, born: '1815-12-10' },
+    { id: 2, name: 'Alan', status: 'closed', age: 41, born: '1912-06-23' },
+    { id: 3, name: 'Grace', status: 'open', age: 85, born: '1906-12-09' },
+  ]
+
+  beforeEach(() => {
+    window.history.replaceState(null, '', '/')
+    setSupport({ search: true })
+  })
+
+  afterEach(() => {
+    document.body.innerHTML = ''
+    resetSupport()
+  })
+
+  const build = (props: Record<string, unknown> = {}) =>
+    mount(Table, {
+      props: { columns: filterColumns, rows: people, locale: 'en-US', ...props },
+      attachTo: document.body,
+    })
+  const names = (wrapper: ReturnType<typeof build>) =>
+    wrapper.findAll('tbody tr:not(.data-table-empty) td:first-child').map((cell) => cell.text())
+
+  it('should show a control for every filter in a search form, labelled', () => {
+    const wrapper = build()
+
+    expect(wrapper.find('search form').exists()).toBe(true)
+    expect(wrapper.findAll('.data-table-filter')).toHaveLength(4)
+    expect(wrapper.find('label[for$="filter-name"]').text()).toBe('Filter Name')
+    expect(
+      wrapper
+        .find('select')
+        .findAll('option')
+        .map((option) => option.text())
+    ).toEqual(['All', 'open', 'Closed'])
+    expect(wrapper.findAll('.data-table-range input')).toHaveLength(4)
+    expect(wrapper.findAll('.data-table-range input')[0].attributes('type')).toBe('number')
+    expect(wrapper.findAll('.data-table-range input')[2].attributes('type')).toBe('date')
+    expect(wrapper.find('.data-table-clear').exists()).toBe(false)
+  })
+
+  it('should filter by text, by choice and by range, and emit the filters', async () => {
+    const wrapper = build()
+
+    await wrapper.find('input[name="f_name"]').setValue('a')
+    expect(names(wrapper)).toEqual(['Ada', 'Alan', 'Grace'])
+    await wrapper.find('select').setValue('open')
+    expect(names(wrapper)).toEqual(['Ada', 'Grace'])
+    await wrapper.find('input[name="f_age_min"]').setValue('50')
+    expect(names(wrapper)).toEqual(['Grace'])
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: 'a', status: 'open', age: '50..' }])
+    await wrapper.find('input[name="f_age_max"]').setValue('90')
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: 'a', status: 'open', age: '50..90' }])
+    await wrapper.find('input[name="f_born_min"]').setValue('1900-01-01')
+    await wrapper.find('input[name="f_born_max"]').setValue('1910-01-01')
+    expect(names(wrapper)).toEqual(['Grace'])
+  })
+
+  it('should clear the filters', async () => {
+    const wrapper = build()
+
+    await wrapper.find('select').setValue('closed')
+    expect(names(wrapper)).toEqual(['Alan'])
+    await wrapper.find('.data-table-clear').trigger('click')
+    expect(names(wrapper)).toEqual(['Ada', 'Alan', 'Grace'])
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: '', status: '', age: '', born: '' }])
+    expect(wrapper.find('.data-table-clear').exists()).toBe(false)
+  })
+
+  it('should follow the filters of the parent', () => {
+    expect(names(build({ filters: { status: 'closed' } }))).toEqual(['Alan'])
+  })
+
+  it('should go back to the first page when a filter changes', async () => {
+    const many = Array.from({ length: 25 }, (_, index) => ({
+      id: index,
+      name: `User ${index}`,
+      status: 0 === index % 2 ? 'open' : 'closed',
+      age: index,
+      born: null,
+    }))
+    const wrapper = build({ rows: many, pageSize: 10 })
+
+    await wrapper
+      .findAll('.pagination-item')
+      .find((item) => '2' === item.text())
+      ?.trigger('click')
+    await wrapper.find('select').setValue('open')
+    expect(wrapper.emitted('update:page')?.at(-1)).toEqual([1])
+  })
+
+  it('should keep the filters in the URL, one parameter per column', async () => {
+    window.history.replaceState(null, '', '/?t_f_status=closed')
+    const wrapper = build({ queryPrefix: 't_' })
+
+    expect(names(wrapper)).toEqual(['Alan'])
+    await wrapper.find('input[name="f_name"]').setValue('al')
+    await nextTick()
+    expect(window.location.search).toContain('t_f_name=al')
+    expect(window.location.search).toContain('t_f_status=closed')
+    await wrapper.find('.data-table-clear').trigger('click')
+    await nextTick()
+    expect(window.location.search).toBe('')
+  })
+
+  it('should send the active filters to the server', async () => {
+    const wrapper = build({ serverSide: true, rows: people, total: 3 })
+
+    expect(wrapper.emitted('query')?.[0][0]).toMatchObject({ filters: {} })
+    await wrapper.find('select').setValue('open')
+    await nextTick()
+    expect(wrapper.emitted('query')?.at(-1)?.[0]).toMatchObject({ filters: { status: 'open' } })
+    expect(names(wrapper)).toEqual(['Ada', 'Alan', 'Grace'])
+  })
+
+  it('should show the search of the filters even without a global search box', () => {
+    const wrapper = build({ searchable: false })
+
+    expect(wrapper.find('input[name="q"]').exists()).toBe(false)
+    expect(wrapper.find('.data-table-search').exists()).toBe(true)
   })
 })

@@ -106,3 +106,47 @@ export function useRemoteData<T, P extends Record<string, unknown>>(
 
   return { data, error, loading, reload: load, cancel }
 }
+
+/** What an HTTP client needs to have to be used here: axios, `@zairakai/js-http-client`, or any client like them. */
+export interface HttpClient {
+  get: (url: string, config: { params?: URLSearchParams; signal?: AbortSignal }) => Promise<{ data: unknown }>
+}
+
+/**
+ * A fetcher for `useRemoteData` that calls an HTTP client (axios, or the client
+ * of `@zairakai/js-http-client`) with the parameters as the query string and the
+ * abort signal. It returns the `data` of the response, or what `select` picks in it.
+ */
+export function httpFetcher<T, P extends Record<string, unknown> = Record<string, unknown>>(
+  client: HttpClient,
+  url: string,
+  select: (data: unknown) => T = (data) => data as T
+): (params: P, context: { signal: AbortSignal }) => Promise<T> {
+  return async (params, { signal }) => {
+    const response = await client.get(url, { params: toQuery(params), signal })
+
+    return select(response.data)
+  }
+}
+
+/** The same with `fetch`: GET with the parameters as the query string, the JSON of the answer, an error for a status that is not ok. */
+export function fetchFetcher<T, P extends Record<string, unknown> = Record<string, unknown>>(
+  url: string,
+  init: RequestInit = {},
+  select: (data: unknown) => T = (data) => data as T
+): (params: P, context: { signal: AbortSignal }) => Promise<T> {
+  return async (params, { signal }) => {
+    const query = toQuery(params).toString()
+    const response = await fetch(query ? `${url}${url.includes('?') ? '&' : '?'}${query}` : url, {
+      ...init,
+      headers: { Accept: 'application/json', ...init.headers },
+      signal,
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    return select(await response.json())
+  }
+}

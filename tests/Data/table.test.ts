@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
+  activeFilters,
+  applyFilters,
   ariaSort,
   filterRows,
   formatCell,
+  joinRange,
   nextSort,
   paginateRows,
+  parseRange,
   sortRows,
   type TableColumn,
 } from '../../src/Data/table'
@@ -116,5 +120,52 @@ describe('paginateRows', () => {
     expect(paginateRows(many, 1, 10)).toHaveLength(10)
     expect(paginateRows(many, 3, 10).map((row) => row['id'])).toEqual([21, 22, 23, 24, 25])
     expect(paginateRows(many, 4, 10)).toEqual([])
+  })
+})
+
+describe('column filters', () => {
+  const filterColumns: TableColumn[] = [
+    { key: 'name', label: 'Name', filter: 'text' },
+    { key: 'status', label: 'Status', filter: 'select' },
+    { key: 'age', label: 'Age', type: 'number', filter: 'range' },
+    { key: 'born', label: 'Born', type: 'date', filter: 'range' },
+  ]
+  const people = [
+    { id: 1, name: 'Ada', status: 'open', age: 36, born: '1815-12-10' },
+    { id: 2, name: 'Alan', status: 'closed', age: 41, born: '1912-06-23' },
+    { id: 3, name: 'Grace', status: 'open', age: null, born: null },
+  ]
+  const ids = (list: Array<Record<string, unknown>>) => list.map((row) => row['id'])
+
+  it('should read and write a range', () => {
+    expect(parseRange('3..9')).toEqual({ min: '3', max: '9' })
+    expect(parseRange('..9')).toEqual({ min: '', max: '9' })
+    expect(parseRange('')).toEqual({ min: '', max: '' })
+    expect(joinRange('3', '9')).toBe('3..9')
+    expect(joinRange('', '')).toBe('')
+    expect(joinRange('3', '')).toBe('3..')
+  })
+
+  it('should keep the filters that have a value', () => {
+    expect(activeFilters({ a: 'x', b: '' })).toEqual({ a: 'x' })
+    expect(activeFilters(undefined)).toEqual({})
+  })
+
+  it('should filter a text by what it contains, a select by its value, a range by its bounds', () => {
+    expect(ids(applyFilters(people, filterColumns, { name: 'AL' }))).toEqual([2])
+    expect(ids(applyFilters(people, filterColumns, { status: 'open' }))).toEqual([1, 3])
+    expect(ids(applyFilters(people, filterColumns, { age: '40..' }))).toEqual([2])
+    expect(ids(applyFilters(people, filterColumns, { age: '..40' }))).toEqual([1])
+    expect(ids(applyFilters(people, filterColumns, { age: '30..40' }))).toEqual([1])
+    expect(ids(applyFilters(people, filterColumns, { born: '1900-01-01..' }))).toEqual([2])
+    expect(ids(applyFilters(people, filterColumns, { born: '..1900-01-01' }))).toEqual([1])
+  })
+
+  it('should combine the filters and ignore an unknown column or an empty value', () => {
+    expect(ids(applyFilters(people, filterColumns, { status: 'open', name: 'a' }))).toEqual([1, 3])
+    expect(ids(applyFilters(people, filterColumns, { status: 'open', name: 'gr' }))).toEqual([3])
+    expect(applyFilters(people, filterColumns, { zzz: 'x' })).toEqual(people)
+    expect(applyFilters(people, filterColumns, { name: '' })).toBe(people)
+    expect(applyFilters(people, filterColumns, undefined)).toBe(people)
   })
 })

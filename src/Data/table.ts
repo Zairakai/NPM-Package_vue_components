@@ -13,7 +13,14 @@ export interface TableColumn {
   type?: 'text' | 'number' | 'date'
   align?: 'start' | 'center' | 'end'
   format?: (value: unknown, row: Record<string, unknown>) => string
+  /** A filter control in the header of the search: a text, a list of choices or a range of numbers or dates. */
+  filter?: 'text' | 'select' | 'range'
+  /** The choices of a select filter: strings or { value, label }. */
+  options?: Array<string | { value: string; label: string }>
 }
+
+/** The value of every active filter, by column key. A range is "min..max", either side may be empty. */
+export type TableFilters = Record<string, string>
 
 type Row = Record<string, unknown>
 
@@ -113,4 +120,61 @@ export function ariaSort(sort: TableSort | null | undefined, key: string): 'asce
   }
 
   return 'asc' === sort.direction ? 'ascending' : 'descending'
+}
+
+/** The two sides of a range filter value. */
+export function parseRange(value: string): { min: string; max: string } {
+  const [min = '', max = ''] = value.split('..')
+
+  return { min, max }
+}
+
+export function joinRange(min: string, max: string): string {
+  return '' === min && '' === max ? '' : `${min}..${max}`
+}
+
+/** Only the filters that have a value. */
+export function activeFilters(filters: TableFilters | undefined): TableFilters {
+  return Object.fromEntries(Object.entries(filters ?? {}).filter(([, value]) => '' !== value))
+}
+
+function matchesFilter(column: TableColumn, row: Row, value: string): boolean {
+  const cell = valueOf(row, column)
+
+  if ('range' === column.filter) {
+    const { min, max } = parseRange(value)
+
+    if (null === cell || undefined === cell || '' === cell) {
+      return false
+    }
+
+    const number = 'date' === column.type ? new Date(cell as string).getTime() : Number(cell)
+    const low = '' === min ? -Infinity : 'date' === column.type ? new Date(min).getTime() : Number(min)
+    const high = '' === max ? Infinity : 'date' === column.type ? new Date(max).getTime() : Number(max)
+
+    return low <= number && number <= high
+  }
+
+  if ('select' === column.filter) {
+    return String(cell ?? '') === value
+  }
+
+  return formatCell(column, row).toLowerCase().includes(value.toLowerCase())
+}
+
+/** Keep the rows that match every active filter. */
+export function applyFilters(rows: Row[], columns: TableColumn[], filters: TableFilters | undefined): Row[] {
+  const active = Object.entries(activeFilters(filters))
+
+  if (0 === active.length) {
+    return rows
+  }
+
+  return rows.filter((row) =>
+    active.every(([key, value]) => {
+      const column = columns.find((candidate) => candidate.key === key)
+
+      return !column || matchesFilter(column, row, value)
+    })
+  )
 }
