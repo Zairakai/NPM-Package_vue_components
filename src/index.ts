@@ -29,6 +29,8 @@ export { useControllable } from './composables/useControllable.js'
 export type { ControllableQuery } from './composables/useControllable.js'
 export { computePosition, useFloating } from './composables/useFloating.js'
 export type { FloatingPlacement } from './composables/useFloating.js'
+export { useToast } from './composables/useToast.js'
+export type { Toast, ToastOptions, ToastVariant } from './composables/useToast.js'
 export { useUid } from './composables/useUid.js'
 
 // Plugin installation options
