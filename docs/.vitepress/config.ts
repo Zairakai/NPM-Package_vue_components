@@ -7,11 +7,11 @@ const here = dirname(fileURLToPath(import.meta.url))
 const generated = join(here, 'sidebar.generated.json')
 const components = existsSync(generated) ? JSON.parse(readFileSync(generated, 'utf8')) : []
 
-// GitLab Pages serves a project of a subgroup under /subgroup/project/.
+// GitLab.com serves the site from the root of a unique domain. Set DOCS_BASE for a path (/group/project/).
 export default defineConfig({
   title: '@zairakai/vue-components',
   description: 'Unstyled, accessible Vue 3 components that use the web platform first.',
-  base: process.env.DOCS_BASE ?? '/npm-packages/vue-components/',
+  base: process.env.DOCS_BASE ?? '/',
   cleanUrls: true,
   lastUpdated: true,
   themeConfig: {
