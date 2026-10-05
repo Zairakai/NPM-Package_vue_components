@@ -9,3 +9,26 @@ include:
 variables:
   CACHE_KEY: "vue-components-v1"
   NPM_PACKAGE_NAME: "@zairakai/vue-components"
+
+# The documentation site, published with GitLab Pages from main.
+# The API pages are generated from the source, so they cannot drift from the code.
+pages:
+  stage: build
+  image: ${NODE_IMAGE}
+  needs: []
+  before_script:
+    - node --version
+  script:
+    - cd docs
+    - npm ci --no-audit --no-fund
+    - npm run build
+    - mv .vitepress/dist ../public
+  # The next jobs of the runner must not find (and lint) the docs dependencies.
+  after_script:
+    - rm -rf docs/node_modules docs/components docs/.vitepress/dist docs/.vitepress/cache
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 week
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
