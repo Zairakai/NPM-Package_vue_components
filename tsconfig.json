@@ -14,7 +14,12 @@
       "@form/*": ["./src/Form/*"],
       "@layout/*": ["./src/Layout/*"],
       "@content/*": ["./src/Content/*"],
-      "@medias/*": ["./src/Medias/*"]
+      "@medias/*": ["./src/Medias/*"],
+      "@data/*": ["./src/Data/*"],
+      "@display/*": ["./src/Display/*"],
+      "@feedback/*": ["./src/Feedback/*"],
+      "@navigation/*": ["./src/Navigation/*"],
+      "@overlay/*": ["./src/Overlay/*"]
     },
     "strict": true,
     "noUnusedLocals": true,

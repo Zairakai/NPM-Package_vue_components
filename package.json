@@ -49,6 +49,26 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./Content": {
+      "types": "./dist/Content.d.ts",
+      "import": "./dist/Content.js",
+      "require": "./dist/Content.cjs"
+    },
+    "./Data": {
+      "types": "./dist/Data.d.ts",
+      "import": "./dist/Data.js",
+      "require": "./dist/Data.cjs"
+    },
+    "./Display": {
+      "types": "./dist/Display.d.ts",
+      "import": "./dist/Display.js",
+      "require": "./dist/Display.cjs"
+    },
+    "./Feedback": {
+      "types": "./dist/Feedback.d.ts",
+      "import": "./dist/Feedback.js",
+      "require": "./dist/Feedback.cjs"
+    },
     "./Form": {
       "types": "./dist/Form.d.ts",
       "import": "./dist/Form.js",
@@ -59,15 +79,20 @@
       "import": "./dist/Layout.js",
       "require": "./dist/Layout.cjs"
     },
-    "./Content": {
-      "types": "./dist/Content.d.ts",
-      "import": "./dist/Content.js",
-      "require": "./dist/Content.cjs"
-    },
     "./Medias": {
       "types": "./dist/Medias.d.ts",
       "import": "./dist/Medias.js",
       "require": "./dist/Medias.cjs"
+    },
+    "./Navigation": {
+      "types": "./dist/Navigation.d.ts",
+      "import": "./dist/Navigation.js",
+      "require": "./dist/Navigation.cjs"
+    },
+    "./Overlay": {
+      "types": "./dist/Overlay.d.ts",
+      "import": "./dist/Overlay.js",
+      "require": "./dist/Overlay.cjs"
     }
   },
   "main": "./dist/index.cjs",

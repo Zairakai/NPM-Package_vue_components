@@ -8,13 +8,24 @@ import { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from './config.js'
 
 // Export all components by category
 export * from './Content/index.js'
+export * from './Data/index.js'
+export * from './Display/index.js'
+export * from './Feedback/index.js'
 export * from './Form/index.js'
 export * from './Layout/index.js'
 export * from './Medias/index.js'
+export * from './Navigation/index.js'
+export * from './Overlay/index.js'
 
 // Re-export config so consuming apps can use the injection key if needed.
 export { DEFAULT_ZK_CONFIG, ZK_CONFIG_KEY } from './config.js'
 export type { ZkComponentsConfig } from './config.js'
+
+// Shared composables
+export { useControllable } from './composables/useControllable.js'
+export { computePosition, useFloating } from './composables/useFloating.js'
+export type { FloatingPlacement } from './composables/useFloating.js'
+export { useUid } from './composables/useUid.js'
 
 // Plugin installation options
 export interface VueComponentsOptions {
