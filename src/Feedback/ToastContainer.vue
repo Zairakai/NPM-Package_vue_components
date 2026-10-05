@@ -1,6 +1,6 @@
 <script setup>
   import { useToast } from '@/composables/useToast'
-  import { computed } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
 
   defineOptions({
     name: 'FeedbackToastContainer',
@@ -27,12 +27,27 @@
   })
 
   const { toasts, remove, pause, resume } = useToast()
+  const root = ref(null)
+
+  // A manual popover lives in the top layer: the toasts stay above the modal dialogs.
+  onMounted(() => {
+    if ('function' === typeof root.value?.showPopover) {
+      root.value.showPopover()
+    }
+  })
 
   // Functional CSS only: the container has to stay on top of the page, in its corner.
   const style = computed(() => {
     const [vertical, horizontal] = props.position.split('-')
 
     return {
+      // Reset what the browser gives to a popover, then pin it in its corner.
+      inset: 'auto',
+      margin: '0',
+      padding: '0',
+      border: '0',
+      background: 'transparent',
+      overflow: 'visible',
       position: 'fixed',
       zIndex: 'var(--zk-z-toast, 1200)',
       [vertical]: '1rem',
@@ -44,6 +59,7 @@
     id: props.id,
     class: `toast-container ${props.class ?? ''}`.trim(),
     role: 'region',
+    popover: 'manual',
     'aria-label': props.label,
     'data-position': props.position,
     style: style.value,
@@ -51,7 +67,10 @@
 </script>
 
 <template>
-  <section v-bind="containerProps">
+  <section
+    ref="root"
+    v-bind="containerProps"
+  >
     <div
       v-for="toast in toasts"
       :key="toast.id"
