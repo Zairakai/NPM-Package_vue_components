@@ -27,10 +27,26 @@ describe('FeedbackProgress', () => {
   })
 
   it('should compute the percentage from a custom maximum and clamp it', () => {
-    expect(mount(Progress, { props: { value: 5, max: 20 } }).find('.progress-bar').attributes('style')).toContain('25%')
-    expect(mount(Progress, { props: { value: 500 } }).find('.progress-bar').attributes('style')).toContain('100%')
-    expect(mount(Progress, { props: { value: -5 } }).find('.progress-bar').attributes('style')).toContain('0%')
-    expect(mount(Progress, { props: { value: 5, max: 0 } }).find('.progress-bar').attributes('style')).toContain('0%')
+    expect(
+      mount(Progress, { props: { value: 5, max: 20 } })
+        .find('.progress-bar')
+        .attributes('style')
+    ).toContain('25%')
+    expect(
+      mount(Progress, { props: { value: 500 } })
+        .find('.progress-bar')
+        .attributes('style')
+    ).toContain('100%')
+    expect(
+      mount(Progress, { props: { value: -5 } })
+        .find('.progress-bar')
+        .attributes('style')
+    ).toContain('0%')
+    expect(
+      mount(Progress, { props: { value: 5, max: 0 } })
+        .find('.progress-bar')
+        .attributes('style')
+    ).toContain('0%')
   })
 
   it('should render a circular progress with a dash length', () => {
@@ -48,7 +64,11 @@ describe('FeedbackProgress', () => {
   })
 
   it('should render the slot', () => {
-    expect(mount(Progress, { props: { value: 1 }, slots: { default: '<span>1%</span>' } }).find('span').exists()).toBe(true)
+    expect(
+      mount(Progress, { props: { value: 1 }, slots: { default: '<span>1%</span>' } })
+        .find('span')
+        .exists()
+    ).toBe(true)
   })
 
   it('should validate the variant', () => {

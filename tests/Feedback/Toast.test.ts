@@ -18,7 +18,13 @@ describe('useToast', () => {
     const id = add({ message: 'Hello' })
 
     expect(toasts.value).toHaveLength(1)
-    expect(toasts.value[0]).toMatchObject({ id, message: 'Hello', variant: 'default', duration: 5000, dismissible: true })
+    expect(toasts.value[0]).toMatchObject({
+      id,
+      message: 'Hello',
+      variant: 'default',
+      duration: 5000,
+      dismissible: true,
+    })
 
     vi.advanceTimersByTime(5000)
 
@@ -188,7 +194,8 @@ describe('FeedbackToastContainer', () => {
   })
 
   it('should validate the position', () => {
-    const { position } = (ToastContainer as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { position } = (ToastContainer as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
+      .props
 
     expect(position.validator('top-left')).toBe(true)
     expect(position.validator('middle')).toBe(false)

@@ -113,7 +113,11 @@ describe('DisplayAccordion', () => {
         render: () =>
           h(
             Accordion,
-            { multiple: true, modelValue: model.value, 'onUpdate:modelValue': (value: string[]) => (model.value = value) },
+            {
+              multiple: true,
+              modelValue: model.value,
+              'onUpdate:modelValue': (value: string[]) => (model.value = value),
+            },
             () => [h(AccordionItem, { id: 'a', title: 'A' }), h(AccordionItem, { id: 'b', title: 'B' })]
           ),
       }),
@@ -130,7 +134,9 @@ describe('DisplayAccordion', () => {
     const wrapper = mount(
       defineComponent({
         render: () =>
-          h(Accordion, { modelValue: null, 'onUpdate:modelValue': () => undefined }, () => [h(AccordionItem, { id: 'a', title: 'A' })]),
+          h(Accordion, { modelValue: null, 'onUpdate:modelValue': () => undefined }, () => [
+            h(AccordionItem, { id: 'a', title: 'A' }),
+          ]),
       }),
       { attachTo: document.body }
     )
@@ -221,7 +227,8 @@ describe('DisplayAccordion', () => {
   })
 
   it('should validate the heading level', () => {
-    const { level } = (AccordionItem as unknown as { props: Record<string, { validator: (v: number) => boolean }> }).props
+    const { level } = (AccordionItem as unknown as { props: Record<string, { validator: (v: number) => boolean }> })
+      .props
 
     expect(level.validator(3)).toBe(true)
     expect(level.validator(1)).toBe(false)
