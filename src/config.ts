@@ -1,10 +1,13 @@
 import type { InjectionKey } from 'vue'
+import type { QueryAdapter } from './composables/useQueryParam'
 
 /**
  * Global configuration provided by the VueComponentsPlugin install.
  */
 export interface ZkComponentsConfig {
   minPasswordLength: number
+  /** Where the components keep the state they put in the URL. The browser History API by default. */
+  queryAdapter?: QueryAdapter
 }
 
 /**
