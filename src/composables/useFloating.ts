@@ -1,7 +1,7 @@
 import { type Ref, onBeforeUnmount, ref, watch } from 'vue'
 
-export type FloatingSide = 'top' | 'bottom' | 'left' | 'right'
-export type FloatingAlign = 'start' | 'center' | 'end'
+type FloatingSide = 'top' | 'bottom' | 'left' | 'right'
+type FloatingAlign = 'start' | 'center' | 'end'
 export type FloatingPlacement = FloatingSide | `${FloatingSide}-${Exclude<FloatingAlign, 'center'>}`
 
 export interface FloatingSize {
