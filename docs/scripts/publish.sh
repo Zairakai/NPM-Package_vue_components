@@ -10,6 +10,13 @@
 # rebuilds the versions from their tags: nothing has to be kept between two runs.
 set -euo pipefail
 
+cd "$(dirname "$0")/../.."
+
+# In CI the checkout belongs to another user than the one of the job: git refuses it otherwise.
+if [ -n "${CI:-}" ]; then
+  git config --global --add safe.directory "$PWD"
+fi
+
 root=$(git rev-parse --show-toplevel)
 out="$root/public"
 work=$(mktemp -d)
