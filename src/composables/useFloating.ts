@@ -155,12 +155,23 @@ export function useFloating(
     style.value = { position: 'fixed', left: `${position.x}px`, top: `${position.y}px` }
   }
 
+  // On the server there is no window: nothing to listen to, and nothing to place.
+  const browser = 'undefined' !== typeof window
+
   function listen(): void {
+    if (!browser) {
+      return
+    }
+
     window.addEventListener('resize', update)
     window.addEventListener('scroll', update, true)
   }
 
   function unlisten(): void {
+    if (!browser) {
+      return
+    }
+
     window.removeEventListener('resize', update)
     window.removeEventListener('scroll', update, true)
   }
