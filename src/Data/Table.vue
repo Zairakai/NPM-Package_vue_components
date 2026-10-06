@@ -306,7 +306,8 @@
   const columnCount = computed(() => props.columns.length + (props.selectable ? 1 : 0))
 
   // <search> is a landmark of its own; a div with the role is the same for the browsers without it.
-  const searchTag = getSupport().search ? 'search' : 'div'
+  // On the server there is no way to know what the browser has, and it will have it: <search>.
+  const searchTag = 'undefined' === typeof document || getSupport().search ? 'search' : 'div'
 
   const tableProps = computed(() => ({
     id: props.id,
