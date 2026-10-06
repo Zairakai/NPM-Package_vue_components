@@ -9,6 +9,8 @@
     "preview": "vitepress preview"
   },
   "devDependencies": {
+    "@zairakai/mithril-scss": "^1.2.0",
+    "sass": "^1.99.0",
     "vitepress": "1.6.4",
     "vue-docgen-api": "4.79.2"
   }

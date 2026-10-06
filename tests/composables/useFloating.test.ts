@@ -61,3 +61,22 @@ describe('computePosition', () => {
     expect(computePosition(farBottom, size, viewport, 'right').y).toBe(256)
   })
 })
+
+describe('useFloating on the server', () => {
+  it('does not touch the window when there is none', async () => {
+    const { ref } = await import('vue')
+    const original = globalThis.window
+
+    // @ts-expect-error simulate a server
+    delete globalThis.window
+
+    try {
+      const { useFloating } = await import('../../src/composables/useFloating')
+
+      expect(() => useFloating(ref(null), ref(null), ref(true))).not.toThrow()
+      expect(() => useFloating(ref(null), ref(null), ref(false))).not.toThrow()
+    } finally {
+      globalThis.window = original
+    }
+  })
+})

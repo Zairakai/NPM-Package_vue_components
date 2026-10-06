@@ -1,6 +1,6 @@
 // Generates the API pages of every component from the source, so that they cannot drift from the code.
 // Run: npm run generate (from docs/). The pages are written in docs/components/ and are not committed.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parse } from 'vue-docgen-api'
@@ -106,6 +106,23 @@ for (const [category, summary] of Object.entries(categories)) {
 
     lines.push('```ts', `import { ${name} } from '@zairakai/vue-components/${category}'`, '```', '')
     lines.push('## Usage', '', '```vue', usage(name, doc.props), '```', '')
+
+    // A live example, when there is one in docs/examples. It is the real component with the styles of
+    // mithril-scss, and the code shown is the file itself, so the two cannot differ.
+    if (existsSync(join(here, '../examples', `${name}.vue`))) {
+      lines.push(
+        '## Example',
+        '',
+        '<script setup>',
+        `import Demo from '../../examples/${name}.vue'`,
+        '</script>',
+        '',
+        '<div class="zk-demo vp-raw"><Demo /></div>',
+        '',
+        `<<< @/examples/${name}.vue`,
+        ''
+      )
+    }
 
     if (doc.props?.length) {
       lines.push('## Props', '', '| Name | Type | Default | Description |', '| :--- | :--- | :--- | :--- |')
