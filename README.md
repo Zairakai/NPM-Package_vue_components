@@ -59,7 +59,7 @@ import { MediaImage, MediaVideo } from '@zairakai/vue-components/Medias'
 
 ## Documentation
 
-The [documentation site](https://vue-components-46b2bb.gitlab.io) has a page for every component (description, usage, props, events and slots, generated from the source), the guides and the theming contract. Build it with `cd docs && npm ci && npm run dev`. It is published with GitLab Pages from `main`.
+The [documentation site](https://vue-components-46b2bb.gitlab.io) has a page for every component (description, usage, props, events and slots, generated from the source), the guides and the theming contract. Build it with `cd docs && npm ci && npm run dev`. It is published with GitLab Pages from `main`, with the documentation of every released version (selector at the top right, `next` is `main`) and the live examples styled with `@zairakai/mithril-scss`.
 
 The components ship no style: they give the markup, the WAI-ARIA, the keyboard and the behaviour, and use the web platform first (native `dialog`, Popover API, `details name`, `progress`, `search`, real links) with a script fallback when the browser lacks a feature. See `docs/theming.md` and `docs/browser-support.md`.
 
