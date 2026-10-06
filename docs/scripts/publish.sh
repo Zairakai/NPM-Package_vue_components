@@ -41,6 +41,8 @@ build() {
     # Content/Link.vue imports vue-router, an optional peer of the library: the docs of the first
     # versions did not list it, and a version is built outside the repository (no root node_modules).
     npm install --no-save --no-audit --no-fund --silent vue-router@^5.0.3
+    # The sources (../src) look for packages upward from their own folder: give them the ones of the docs.
+    ln -sfn "$1/docs/node_modules" "$1/node_modules"
     DOCS_VERSION="$2" DOCS_BASE="$3" DOCS_ROOT=/ npm run build --silent
     rm -rf "$4"
     mkdir -p "$4"
