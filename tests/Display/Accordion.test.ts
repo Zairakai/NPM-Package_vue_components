@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { defineComponent, h, ref } from 'vue'
 import Accordion from '../../src/Display/Accordion.vue'
 import AccordionItem from '../../src/Display/AccordionItem.vue'
@@ -240,5 +240,32 @@ describe('DisplayAccordion', () => {
 
     expect(wrapper.attributes('id')).toBe('acc')
     expect(wrapper.classes()).toEqual(['accordion', 'x'])
+  })
+})
+
+describe('DisplayAccordion in the URL', () => {
+  afterEach(() => {
+    window.history.replaceState(null, '', '/')
+    document.body.innerHTML = ''
+  })
+
+  it('should open the item that the URL names and write the one that is opened', async () => {
+    window.history.replaceState(null, '', '/?faq=b')
+    const wrapper = build({ queryParam: 'faq' })
+
+    expect(detailsOf(wrapper)[1].element.open).toBe(true)
+    expect(detailsOf(wrapper)[0].element.open).toBe(false)
+    await setOpen(detailsOf(wrapper)[0].element, true)
+    expect(window.location.search).toBe('?faq=a')
+  })
+
+  it('should keep several items as a list in the URL', async () => {
+    window.history.replaceState(null, '', '/?faq=a,b')
+    const wrapper = build({ queryParam: 'faq', multiple: true })
+
+    expect(detailsOf(wrapper)[0].element.open).toBe(true)
+    expect(detailsOf(wrapper)[1].element.open).toBe(true)
+    await setOpen(detailsOf(wrapper)[0].element, false)
+    expect(window.location.search).toBe('?faq=b')
   })
 })

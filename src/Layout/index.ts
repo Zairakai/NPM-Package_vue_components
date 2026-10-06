@@ -3,8 +3,10 @@
  * Structural components for page layout and organization
  */
 
+export { default as LayoutAppBar } from './AppBar.vue'
 export { default as LayoutArticle } from './Article.vue'
 export { default as LayoutAside } from './Aside.vue'
+export { default as LayoutBottomNavigation } from './BottomNavigation.vue'
 export { default as LayoutColumn } from './Column.vue'
 export { default as LayoutContainer } from './Container.vue'
 export { default as LayoutFlex } from './Flex.vue'
@@ -18,4 +20,7 @@ export { default as LayoutMain } from './Main.vue'
 export { default as LayoutNav } from './Nav.vue'
 export { default as LayoutRow } from './Row.vue'
 export { default as LayoutSection } from './Section.vue'
+export { default as LayoutSpacer } from './Spacer.vue'
+export { default as LayoutSplitter } from './Splitter.vue'
+export { default as LayoutSticky } from './Sticky.vue'
 export { default as LayoutWrapper } from './Wrapper.vue'

@@ -5,6 +5,7 @@
 [![Coverage][coverage-badge]][coverage-link]
 
 [![npm][npm-badge]][npm-link]
+[![Docs][docs-badge]][docs]
 [![GitLab Release][gitlab-release-badge]][gitlab-release]
 [![License][license-badge]][license]
 
@@ -13,6 +14,8 @@
 [![Prettier][prettier-badge]][prettier]
 
 Collection of reusable Vue 3 components — TypeScript, v-model, WAI-ARIA.
+
+**Documentation: [vue-components-46b2bb.gitlab.io][docs]**
 
 ---
 
@@ -55,14 +58,28 @@ import { MediaImage, MediaVideo } from '@zairakai/vue-components/Medias'
 
 ---
 
+## Documentation
+
+The [documentation site][docs] has a page for every component (description, usage, props, events and slots, generated from the source), the guides and the theming contract. Build it with `cd docs && npm ci && npm run dev`. It is published with GitLab Pages from `main`, with the documentation of every released version (selector at the top right, `next` is `main`) and the live examples styled with `@zairakai/mithril-scss`.
+
+The components ship no style: they give the markup, the WAI-ARIA, the keyboard and the behaviour, and use the web platform first (native `dialog`, Popover API, `details name`, `progress`, `search`, real links) with a script fallback when the browser lacks a feature. See `docs/theming.md` and `docs/browser-support.md`.
+
+---
+
 ## Categories
 
-| Category  | Components                                               |
-| --------- | -------------------------------------------------------- |
-| `Form`    | Input, Button, Select, Textarea, Checkbox, Radio, etc.   |
-| `Layout`  | Container, Grid, Flex, Header, Footer, Nav, etc.         |
-| `Content` | Heading, Paragraph, Link, List, Blockquote, Msr          |
-| `Medias`  | Image, Figure, Audio, Video, Iframe, Canvas, etc.        |
+| Category     | Components                                                                                |
+| ------------ | ----------------------------------------------------------------------------------------- |
+| `Form`       | Inputs, Select, Combobox, MultiSelect, DatePicker, Calendar, Otp, TagsInput, FileDropzone |
+| `Layout`     | Container, Grid, Flex, AppBar, BottomNavigation, Splitter, Sticky                         |
+| `Content`    | Heading, Paragraph, Link, List, CodeBlock, Terminal, JsonViewer, Diff, Markdown           |
+| `Medias`     | Image, LazyImage, Carousel, Lightbox, Player, Audio, Video                                |
+| `Display`    | Card, Badge, Avatar, Accordion, Chip, List, Timeline, Rating, Stat                        |
+| `Feedback`   | Alert, Toast, Progress, Skeleton, Banner, CookieBanner                                    |
+| `Navigation` | Tabs, Pagination, Breadcrumb, Stepper, TreeView, CommandPalette, SkipLink, BackToTop      |
+| `Overlay`    | Modal, Dialog, Drawer, Popover, Dropdown, Tooltip, ContextMenu                            |
+| `Data`       | DataTable (sort, filters, server mode), VirtualScroll, InfiniteScroll, SortableList       |
+| `Utility`    | ThemeSwitcher, ShareButton, Countdown                                                     |
 
 ---
 
@@ -111,3 +128,5 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full development workflow.
 [prettier-badge]: https://img.shields.io/badge/formatter-prettier-F7B93E.svg?logo=prettier
 [prettier]: https://prettier.io
 [ecosystem]: https://gitlab.com/zairakai
+[docs]: https://vue-components-46b2bb.gitlab.io
+[docs-badge]: https://img.shields.io/badge/docs-online-blue

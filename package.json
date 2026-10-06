@@ -14,7 +14,7 @@
     "accessible",
     "wai-aria"
   ],
-  "homepage": "https://gitlab.com/zairakai/npm-packages/vue-components",
+  "homepage": "https://vue-components-46b2bb.gitlab.io",
   "bugs": {
     "url": "https://gitlab.com/zairakai/npm-packages/vue-components/-/issues",
     "email": "contact-project+zairakai-npm-packages-vue-components-80190598-issue-@incoming.gitlab.com"
@@ -93,6 +93,11 @@
       "types": "./dist/Overlay.d.ts",
       "import": "./dist/Overlay.js",
       "require": "./dist/Overlay.cjs"
+    },
+    "./Utility": {
+      "types": "./dist/Utility.d.ts",
+      "import": "./dist/Utility.js",
+      "require": "./dist/Utility.cjs"
     }
   },
   "main": "./dist/index.cjs",

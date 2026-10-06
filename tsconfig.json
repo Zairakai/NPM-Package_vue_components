@@ -19,7 +19,8 @@
       "@display/*": ["./src/Display/*"],
       "@feedback/*": ["./src/Feedback/*"],
       "@navigation/*": ["./src/Navigation/*"],
-      "@overlay/*": ["./src/Overlay/*"]
+      "@overlay/*": ["./src/Overlay/*"],
+      "@utility/*": ["./src/Utility/*"]
     },
     "strict": true,
     "noUnusedLocals": true,
