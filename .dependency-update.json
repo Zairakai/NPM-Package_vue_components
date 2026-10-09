@@ -1,0 +1,8 @@
+{
+  "reject": ["typescript", "vue-tsc", "@vue/language-core"],
+  "cooldown": "3d",
+  "tag": {
+    "when": "runtime",
+    "level": "patch"
+  }
+}
