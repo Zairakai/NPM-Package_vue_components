@@ -126,8 +126,8 @@
     "validate": "make quality"
   },
   "devDependencies": {
-    "@types/node": "^26.6.4",
-    "@vitejs/plugin-vue": "^6.0.9",
+    "@types/node": "^26.6.5",
+    "@vitejs/plugin-vue": "^6.0.10",
     "@vitest/coverage-v8": "^5.0.3",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/language-core": "3.3.10",
