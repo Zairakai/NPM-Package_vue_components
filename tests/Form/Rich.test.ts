@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import Calendar from '../../src/Form/Calendar.vue'
 import Combobox from '../../src/Form/Combobox.vue'
@@ -160,6 +160,15 @@ describe('FormCombobox', () => {
 })
 
 describe('FormCalendar', () => {
+  // Fix the clock so the month shown when nothing is selected does not depend on the day the tests run
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-05T12:00:00Z'))
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   const build = (props: Record<string, unknown> = {}) =>
     mount(Calendar, { props: { locale: 'en-US', modelValue: '2026-10-05', ...props }, attachTo: document.body })
   const day = (wrapper: ReturnType<typeof build>, label: string) =>
