@@ -23,11 +23,20 @@ const many = Array.from({ length: 25 }, (_, index) => ({
   note: '',
 }))
 
-const mountTable = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) =>
-  mount(Table, { props: { columns, rows, locale: 'en-US', ...props }, slots, attachTo: document.body })
+const mountTable = (
+  props: Record<string, unknown> = {},
+  slots: Record<string, string> = {},
+) =>
+  mount(Table, {
+    props: { columns, rows, locale: 'en-US', ...props },
+    slots,
+    attachTo: document.body,
+  })
 
 const names = (wrapper: ReturnType<typeof mountTable>) =>
-  wrapper.findAll('tbody tr:not(.data-table-empty) td:first-child').map((cell) => cell.text())
+  wrapper
+    .findAll('tbody tr:not(.data-table-empty) td:first-child')
+    .map((cell) => cell.text())
 
 describe('DataTable', () => {
   beforeEach(() => {
@@ -46,7 +55,11 @@ describe('DataTable', () => {
     expect(wrapper.find('table').classes()).toEqual(['data-table', 'x'])
     expect(wrapper.find('table').attributes('id')).toBe('t')
     expect(wrapper.find('caption').text()).toBe('Users')
-    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual(['Name', 'Age', 'Note'])
+    expect(wrapper.findAll('thead th').map((cell) => cell.text())).toEqual([
+      'Name',
+      'Age',
+      'Note',
+    ])
     expect(wrapper.findAll('thead th')[0].attributes('scope')).toBe('col')
     expect(names(wrapper)).toEqual(['Charlie', 'alice', 'Bob'])
     expect(wrapper.find('table').attributes('aria-rowcount')).toBe('3')
@@ -60,15 +73,29 @@ describe('DataTable', () => {
   })
 
   it('should show the empty message or slot', () => {
-    expect(mountTable({ rows: [], emptyText: 'No users' }).find('.data-table-empty').text()).toBe('No users')
-    expect(mountTable({ rows: [] }, { empty: '<b>None</b>' }).find('.data-table-empty b').exists()).toBe(true)
-    expect(mountTable({ rows: [] }).find('.data-table-empty td').attributes('colspan')).toBe('3')
+    expect(
+      mountTable({ rows: [], emptyText: 'No users' })
+        .find('.data-table-empty')
+        .text(),
+    ).toBe('No users')
+    expect(
+      mountTable({ rows: [] }, { empty: '<b>None</b>' })
+        .find('.data-table-empty b')
+        .exists(),
+    ).toBe(true)
+    expect(
+      mountTable({ rows: [] })
+        .find('.data-table-empty td')
+        .attributes('colspan'),
+    ).toBe('3')
   })
 
   it('should render a cell slot with the row and the value', () => {
     const wrapper = mountTable(
       {},
-      { 'cell-name': `<template #cell-name="{ row, value }"><b>{{ value }}-{{ row.id }}</b></template>` }
+      {
+        'cell-name': `<template #cell-name="{ row, value }"><b>{{ value }}-{{ row.id }}</b></template>`,
+      },
     )
 
     expect(wrapper.find('tbody tr td b').text()).toBe('Charlie-1')
@@ -86,15 +113,21 @@ describe('DataTable', () => {
     const sort = wrapper.findAll('.data-table-sort')[0]
 
     expect(wrapper.findAll('thead th')[0].attributes('aria-sort')).toBe('none')
-    expect(wrapper.findAll('thead th')[2].attributes('aria-sort')).toBeUndefined()
+    expect(
+      wrapper.findAll('thead th')[2].attributes('aria-sort'),
+    ).toBeUndefined()
 
     await sort.trigger('click')
     expect(names(wrapper)).toEqual(['alice', 'Bob', 'Charlie'])
-    expect(wrapper.findAll('thead th')[0].attributes('aria-sort')).toBe('ascending')
+    expect(wrapper.findAll('thead th')[0].attributes('aria-sort')).toBe(
+      'ascending',
+    )
 
     await sort.trigger('click')
     expect(names(wrapper)).toEqual(['Charlie', 'Bob', 'alice'])
-    expect(wrapper.findAll('thead th')[0].attributes('aria-sort')).toBe('descending')
+    expect(wrapper.findAll('thead th')[0].attributes('aria-sort')).toBe(
+      'descending',
+    )
 
     await sort.trigger('click')
     expect(names(wrapper)).toEqual(['Charlie', 'alice', 'Bob'])
@@ -145,7 +178,9 @@ describe('DataTable', () => {
     setSupport({ search: false })
     const wrapper = mountTable({ searchable: true })
 
-    expect(wrapper.find('div.data-table-search').attributes('role')).toBe('search')
+    expect(wrapper.find('div.data-table-search').attributes('role')).toBe(
+      'search',
+    )
   })
 
   it('should follow the search of the parent', () => {
@@ -161,7 +196,7 @@ describe('DataTable', () => {
 
     await wrapper
       .findAll('.pagination-item')
-      .find((item) => '3' === item.text())
+      .find((item) => item.text() === '3')
       ?.trigger('click')
 
     expect(names(wrapper)[0]).toBe('User 21')
@@ -178,7 +213,7 @@ describe('DataTable', () => {
 
     await wrapper
       .findAll('.pagination-item')
-      .find((item) => '3' === item.text())
+      .find((item) => item.text() === '3')
       ?.trigger('click')
     await wrapper.find('input[type="search"]').setValue('User 01')
     await nextTick()
@@ -197,7 +232,9 @@ describe('DataTable', () => {
 
     await boxes()[0].setValue(true)
     expect(wrapper.emitted('update:selected')?.[0]).toEqual([[1]])
-    expect(wrapper.findAll('tbody tr')[0].attributes('aria-selected')).toBe('true')
+    expect(wrapper.findAll('tbody tr')[0].attributes('aria-selected')).toBe(
+      'true',
+    )
     expect((all().element as HTMLInputElement).indeterminate).toBe(true)
 
     await all().setValue(true)
@@ -219,35 +256,66 @@ describe('DataTable', () => {
 
     const filled = mountTable({ selectable: true, selected: [2] })
 
-    expect(filled.findAll('tbody tr')[1].attributes('aria-selected')).toBe('true')
+    expect(filled.findAll('tbody tr')[1].attributes('aria-selected')).toBe(
+      'true',
+    )
   })
 
   it('should leave the selection attribute out when it cannot be selected', () => {
-    expect(mountTable().find('tbody tr').attributes('aria-selected')).toBeUndefined()
+    expect(
+      mountTable().find('tbody tr').attributes('aria-selected'),
+    ).toBeUndefined()
   })
 
   it('should ask the server for the rows and show the ones it gets', async () => {
-    const wrapper = mountTable({ serverSide: true, rows: rows.slice(0, 2), total: 40, pageSize: 10, searchable: true })
+    const wrapper = mountTable({
+      serverSide: true,
+      rows: rows.slice(0, 2),
+      total: 40,
+      pageSize: 10,
+      searchable: true,
+    })
 
     expect(wrapper.emitted('query')?.[0]).toEqual([
-      { page: 1, pageSize: 10, sort: undefined, direction: undefined, search: '', filters: {} },
+      {
+        page: 1,
+        pageSize: 10,
+        sort: undefined,
+        direction: undefined,
+        search: '',
+        filters: {},
+      },
     ])
     expect(names(wrapper)).toEqual(['Charlie', 'alice'])
     expect(wrapper.find('table').attributes('aria-rowcount')).toBe('40')
 
     await wrapper
       .findAll('.pagination-item')
-      .find((item) => '2' === item.text())
+      .find((item) => item.text() === '2')
       ?.trigger('click')
     await nextTick()
     expect(wrapper.emitted('query')?.at(-1)).toEqual([
-      { page: 2, pageSize: 10, sort: undefined, direction: undefined, search: '', filters: {} },
+      {
+        page: 2,
+        pageSize: 10,
+        sort: undefined,
+        direction: undefined,
+        search: '',
+        filters: {},
+      },
     ])
 
     await wrapper.findAll('.data-table-sort')[0].trigger('click')
     await nextTick()
     expect(wrapper.emitted('query')?.at(-1)).toEqual([
-      { page: 1, pageSize: 10, sort: 'name', direction: 'asc', search: '', filters: {} },
+      {
+        page: 1,
+        pageSize: 10,
+        sort: 'name',
+        direction: 'asc',
+        search: '',
+        filters: {},
+      },
     ])
 
     await wrapper.find('input[type="search"]').setValue('x')
@@ -256,12 +324,21 @@ describe('DataTable', () => {
   })
 
   it('should use the number of rows as the total when the server does not give one', () => {
-    expect(mountTable({ serverSide: true }).find('table').attributes('aria-rowcount')).toBe('3')
+    expect(
+      mountTable({ serverSide: true })
+        .find('table')
+        .attributes('aria-rowcount'),
+    ).toBe('3')
   })
 
   it('should keep the page, the search and the sort in the URL', async () => {
     window.history.replaceState(null, '', '/?t_page=2&t_q=user')
-    const wrapper = mountTable({ rows: many, pageSize: 10, searchable: true, queryPrefix: 't_' })
+    const wrapper = mountTable({
+      rows: many,
+      pageSize: 10,
+      searchable: true,
+      queryPrefix: 't_',
+    })
 
     expect(names(wrapper)[0]).toBe('User 11')
 
@@ -284,7 +361,11 @@ describe('DataTable', () => {
   it('should read the sort from the URL', () => {
     window.history.replaceState(null, '', '/?s_sort=name&s_dir=desc')
 
-    expect(names(mountTable({ queryPrefix: 's_' }))).toEqual(['Charlie', 'Bob', 'alice'])
+    expect(names(mountTable({ queryPrefix: 's_' }))).toEqual([
+      'Charlie',
+      'Bob',
+      'alice',
+    ])
   })
 
   it('should not touch the URL without a prefix', async () => {
@@ -292,7 +373,7 @@ describe('DataTable', () => {
 
     await wrapper
       .findAll('.pagination-item')
-      .find((item) => '2' === item.text())
+      .find((item) => item.text() === '2')
       ?.trigger('click')
 
     expect(window.location.search).toBe('')
@@ -302,7 +383,12 @@ describe('DataTable', () => {
 describe('DataTable column filters', () => {
   const filterColumns = [
     { key: 'name', label: 'Name', filter: 'text' },
-    { key: 'status', label: 'Status', filter: 'select', options: ['open', { value: 'closed', label: 'Closed' }] },
+    {
+      key: 'status',
+      label: 'Status',
+      filter: 'select',
+      options: ['open', { value: 'closed', label: 'Closed' }],
+    },
     { key: 'age', label: 'Age', type: 'number', filter: 'range' },
     { key: 'born', label: 'Born', type: 'date', filter: 'range' },
   ]
@@ -324,11 +410,18 @@ describe('DataTable column filters', () => {
 
   const build = (props: Record<string, unknown> = {}) =>
     mount(Table, {
-      props: { columns: filterColumns, rows: people, locale: 'en-US', ...props },
+      props: {
+        columns: filterColumns,
+        rows: people,
+        locale: 'en-US',
+        ...props,
+      },
       attachTo: document.body,
     })
   const names = (wrapper: ReturnType<typeof build>) =>
-    wrapper.findAll('tbody tr:not(.data-table-empty) td:first-child').map((cell) => cell.text())
+    wrapper
+      .findAll('tbody tr:not(.data-table-empty) td:first-child')
+      .map((cell) => cell.text())
 
   it('should show a control for every filter in a search form, labelled', () => {
     const wrapper = build()
@@ -340,11 +433,15 @@ describe('DataTable column filters', () => {
       wrapper
         .find('select')
         .findAll('option')
-        .map((option) => option.text())
+        .map((option) => option.text()),
     ).toEqual(['All', 'open', 'Closed'])
     expect(wrapper.findAll('.data-table-range input')).toHaveLength(4)
-    expect(wrapper.findAll('.data-table-range input')[0].attributes('type')).toBe('number')
-    expect(wrapper.findAll('.data-table-range input')[2].attributes('type')).toBe('date')
+    expect(
+      wrapper.findAll('.data-table-range input')[0].attributes('type'),
+    ).toBe('number')
+    expect(
+      wrapper.findAll('.data-table-range input')[2].attributes('type'),
+    ).toBe('date')
     expect(wrapper.find('.data-table-clear').exists()).toBe(false)
   })
 
@@ -357,9 +454,13 @@ describe('DataTable column filters', () => {
     expect(names(wrapper)).toEqual(['Ada', 'Grace'])
     await wrapper.find('input[name="f_age_min"]').setValue('50')
     expect(names(wrapper)).toEqual(['Grace'])
-    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: 'a', status: 'open', age: '50..' }])
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([
+      { name: 'a', status: 'open', age: '50..' },
+    ])
     await wrapper.find('input[name="f_age_max"]').setValue('90')
-    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: 'a', status: 'open', age: '50..90' }])
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([
+      { name: 'a', status: 'open', age: '50..90' },
+    ])
     await wrapper.find('input[name="f_born_min"]').setValue('1900-01-01')
     await wrapper.find('input[name="f_born_max"]').setValue('1910-01-01')
     expect(names(wrapper)).toEqual(['Grace'])
@@ -372,7 +473,9 @@ describe('DataTable column filters', () => {
     expect(names(wrapper)).toEqual(['Alan'])
     await wrapper.find('.data-table-clear').trigger('click')
     expect(names(wrapper)).toEqual(['Ada', 'Alan', 'Grace'])
-    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([{ name: '', status: '', age: '', born: '' }])
+    expect(wrapper.emitted('update:filters')?.at(-1)).toEqual([
+      { name: '', status: '', age: '', born: '' },
+    ])
     expect(wrapper.find('.data-table-clear').exists()).toBe(false)
   })
 
@@ -384,7 +487,7 @@ describe('DataTable column filters', () => {
     const many = Array.from({ length: 25 }, (_, index) => ({
       id: index,
       name: `User ${index}`,
-      status: 0 === index % 2 ? 'open' : 'closed',
+      status: index % 2 === 0 ? 'open' : 'closed',
       age: index,
       born: null,
     }))
@@ -392,7 +495,7 @@ describe('DataTable column filters', () => {
 
     await wrapper
       .findAll('.pagination-item')
-      .find((item) => '2' === item.text())
+      .find((item) => item.text() === '2')
       ?.trigger('click')
     await wrapper.find('select').setValue('open')
     expect(wrapper.emitted('update:page')?.at(-1)).toEqual([1])
@@ -418,7 +521,9 @@ describe('DataTable column filters', () => {
     expect(wrapper.emitted('query')?.[0][0]).toMatchObject({ filters: {} })
     await wrapper.find('select').setValue('open')
     await nextTick()
-    expect(wrapper.emitted('query')?.at(-1)?.[0]).toMatchObject({ filters: { status: 'open' } })
+    expect(wrapper.emitted('query')?.at(-1)?.[0]).toMatchObject({
+      filters: { status: 'open' },
+    })
     expect(names(wrapper)).toEqual(['Ada', 'Alan', 'Grace'])
   })
 

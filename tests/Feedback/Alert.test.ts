@@ -15,9 +15,15 @@ describe('FeedbackAlert', () => {
   })
 
   it('should announce warnings and errors as alerts', () => {
-    expect(mount(Alert, { props: { variant: 'error' } }).attributes('role')).toBe('alert')
-    expect(mount(Alert, { props: { variant: 'warning' } }).attributes('role')).toBe('alert')
-    expect(mount(Alert, { props: { variant: 'success' } }).attributes('role')).toBe('status')
+    expect(
+      mount(Alert, { props: { variant: 'error' } }).attributes('role'),
+    ).toBe('alert')
+    expect(
+      mount(Alert, { props: { variant: 'warning' } }).attributes('role'),
+    ).toBe('alert')
+    expect(
+      mount(Alert, { props: { variant: 'success' } }).attributes('role'),
+    ).toBe('status')
   })
 
   it('should render the title, icon and actions', () => {
@@ -34,7 +40,10 @@ describe('FeedbackAlert', () => {
   })
 
   it('should render the title slot instead of the title prop', () => {
-    const wrapper = mount(Alert, { props: { title: 'Prop' }, slots: { title: 'Slot' } })
+    const wrapper = mount(Alert, {
+      props: { title: 'Prop' },
+      slots: { title: 'Slot' },
+    })
 
     expect(wrapper.find('.alert-title').text()).toBe('Slot')
   })
@@ -53,7 +62,9 @@ describe('FeedbackAlert', () => {
   })
 
   it('should follow the v-model and label the close button', async () => {
-    const wrapper = mount(Alert, { props: { modelValue: true, dismissible: true, closeLabel: 'Fermer' } })
+    const wrapper = mount(Alert, {
+      props: { modelValue: true, dismissible: true, closeLabel: 'Fermer' },
+    })
 
     expect(wrapper.find('.alert-close').attributes('aria-label')).toBe('Fermer')
 
@@ -63,7 +74,11 @@ describe('FeedbackAlert', () => {
   })
 
   it('should validate the variant', () => {
-    const { variant } = (Alert as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { variant } = (
+      Alert as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(variant.validator('error')).toBe(true)
     expect(variant.validator('nope')).toBe(false)

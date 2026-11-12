@@ -1,44 +1,35 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'DisplayCard',
-  })
+defineOptions({
+  name: 'DisplayCard',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    as: {
-      type: String,
-      default: 'article',
-    },
-    title: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  as: {
+    type: String,
+    default: 'article',
+  },
+  title: String,
+})
 
-  const cardProps = computed(() => ({
-    id: props.id,
-    class: `card ${props.class ?? ''}`.trim(),
-  }))
+const cardProps = computed(() => ({
+  id: props.id,
+  class: `card ${props.class ?? ''}`.trim(),
+}))
 </script>
 
 <template>
-  <component
-    :is="as"
-    v-bind="cardProps"
-  >
-    <header
-      v-if="$slots.header || title"
-      class="card-header"
-    >
+  <component :is="as" v-bind="cardProps">
+    <header v-if="$slots.header || title" class="card-header">
       <slot name="header">{{ title }}</slot>
     </header>
     <div class="card-body">
       <slot />
     </div>
-    <footer
-      v-if="$slots.footer"
-      class="card-footer"
-    >
+    <footer v-if="$slots.footer" class="card-footer">
       <slot name="footer" />
     </footer>
   </component>

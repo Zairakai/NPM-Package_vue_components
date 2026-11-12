@@ -1,19 +1,19 @@
 <script setup>
-  defineOptions({
-    name: 'FormDatalist',
-  })
+defineOptions({
+  name: 'FormDatalist',
+})
 
-  defineProps({
-    id: {
-      type: String,
-      required: true,
-    },
+defineProps({
+  id: {
+    type: String,
+    required: true,
+  },
 
-    options: {
-      type: Object,
-      required: true,
-    },
-  })
+  options: {
+    type: Object,
+    required: true,
+  },
+})
 </script>
 
 <template>

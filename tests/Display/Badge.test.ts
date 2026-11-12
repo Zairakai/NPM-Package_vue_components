@@ -14,7 +14,15 @@ describe('DisplayBadge', () => {
   })
 
   it('should expose the variant, the size and the dot as data attributes', () => {
-    const wrapper = mount(Badge, { props: { variant: 'success', size: 'small', dot: true, class: 'x', id: 'b' } })
+    const wrapper = mount(Badge, {
+      props: {
+        variant: 'success',
+        size: 'small',
+        dot: true,
+        class: 'x',
+        id: 'b',
+      },
+    })
 
     expect(wrapper.attributes('data-variant')).toBe('success')
     expect(wrapper.attributes('data-size')).toBe('small')
@@ -24,8 +32,11 @@ describe('DisplayBadge', () => {
   })
 
   it('should validate the variant and the size', () => {
-    const { variant, size } = (Badge as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
-      .props
+    const { variant, size } = (
+      Badge as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(variant.validator('error')).toBe(true)
     expect(variant.validator('nope')).toBe(false)

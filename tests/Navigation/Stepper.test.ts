@@ -12,7 +12,9 @@ describe('NavigationStepper', () => {
   beforeEach(() => window.history.replaceState(null, '', '/'))
 
   it('should render an ordered list with the state of every step', () => {
-    const wrapper = mount(Stepper, { props: { steps, modelValue: 1, label: 'Checkout', id: 's', class: 'x' } })
+    const wrapper = mount(Stepper, {
+      props: { steps, modelValue: 1, label: 'Checkout', id: 's', class: 'x' },
+    })
     const items = wrapper.findAll('li.step')
 
     expect(wrapper.element.tagName).toBe('OL')
@@ -20,7 +22,11 @@ describe('NavigationStepper', () => {
     expect(wrapper.classes()).toEqual(['stepper', 'x'])
     expect(wrapper.attributes('id')).toBe('s')
     expect(wrapper.attributes('data-orientation')).toBe('horizontal')
-    expect(items.map((item) => item.attributes('data-state'))).toEqual(['complete', 'current', 'upcoming'])
+    expect(items.map((item) => item.attributes('data-state'))).toEqual([
+      'complete',
+      'current',
+      'upcoming',
+    ])
     expect(items[1].attributes('aria-current')).toBe('step')
     expect(items[0].attributes('aria-current')).toBeUndefined()
   })
@@ -40,7 +46,9 @@ describe('NavigationStepper', () => {
       slots: { marker: `<template #marker="{ state }">{{ state }}</template>` },
     })
 
-    expect(wrapper.findAll('.step-marker').map((marker) => marker.text())).toEqual(['complete', 'current', 'upcoming'])
+    expect(
+      wrapper.findAll('.step-marker').map((marker) => marker.text()),
+    ).toEqual(['complete', 'current', 'upcoming'])
   })
 
   it('should only let a linear stepper go back to a completed step', async () => {
@@ -57,7 +65,9 @@ describe('NavigationStepper', () => {
   })
 
   it('should let a non linear stepper reach any other step', async () => {
-    const wrapper = mount(Stepper, { props: { steps, modelValue: 1, linear: false } })
+    const wrapper = mount(Stepper, {
+      props: { steps, modelValue: 1, linear: false },
+    })
     const triggers = wrapper.findAll('.step-trigger')
 
     expect(triggers[0].element.tagName).toBe('BUTTON')
@@ -89,7 +99,9 @@ describe('NavigationStepper', () => {
 
   it('should keep the current step in a query parameter of the URL', async () => {
     window.history.replaceState(null, '', '/?step=1')
-    const wrapper = mount(Stepper, { props: { steps, queryParam: 'step', linear: false } })
+    const wrapper = mount(Stepper, {
+      props: { steps, queryParam: 'step', linear: false },
+    })
 
     expect(wrapper.findAll('li')[1].attributes('data-state')).toBe('current')
 
@@ -99,13 +111,21 @@ describe('NavigationStepper', () => {
   })
 
   it('should use the index as the key when a step has no id and validate the orientation', () => {
-    const wrapper = mount(Stepper, { props: { steps: [{ label: 'A' }, { label: 'B' }], orientation: 'vertical' } })
+    const wrapper = mount(Stepper, {
+      props: {
+        steps: [{ label: 'A' }, { label: 'B' }],
+        orientation: 'vertical',
+      },
+    })
 
     expect(wrapper.findAll('li')).toHaveLength(2)
     expect(wrapper.attributes('data-orientation')).toBe('vertical')
 
-    const { orientation } = (Stepper as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
-      .props
+    const { orientation } = (
+      Stepper as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(orientation.validator('vertical')).toBe(true)
     expect(orientation.validator('x')).toBe(false)

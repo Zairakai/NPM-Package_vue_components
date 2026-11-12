@@ -13,7 +13,7 @@ function setup(timeout?: number) {
 
         return () => h('div')
       },
-    })
+    }),
   )
 
   return { api, wrapper }
@@ -46,7 +46,9 @@ describe('useClipboard', () => {
   })
 
   it('should restart the confirmation when copying again', async () => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
     setSupport({ clipboard: true })
     const { api } = setup(1000)
 
@@ -72,8 +74,12 @@ describe('useClipboard', () => {
   })
 
   it('should fall back when the Clipboard API refuses', async () => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } })
-    ;(document as unknown as { execCommand: unknown }).execCommand = vi.fn().mockReturnValue(true)
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+    })
+    ;(document as unknown as { execCommand: unknown }).execCommand = vi
+      .fn()
+      .mockReturnValue(true)
     setSupport({ clipboard: true })
     const { api } = setup()
 
@@ -81,7 +87,9 @@ describe('useClipboard', () => {
   })
 
   it('should report a failure and not show a confirmation', async () => {
-    ;(document as unknown as { execCommand: unknown }).execCommand = vi.fn().mockReturnValue(false)
+    ;(document as unknown as { execCommand: unknown }).execCommand = vi
+      .fn()
+      .mockReturnValue(false)
     setSupport({ clipboard: false })
     const { api } = setup()
 
@@ -90,7 +98,9 @@ describe('useClipboard', () => {
   })
 
   it('should stop the timer when it is removed', async () => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
     setSupport({ clipboard: true })
     const { api, wrapper } = setup()
 

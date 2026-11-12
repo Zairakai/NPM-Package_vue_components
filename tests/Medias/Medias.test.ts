@@ -14,7 +14,9 @@ import Video from '../../src/Medias/Video.vue'
 
 describe('MediaImage', () => {
   it('renders <img> with src and alt', () => {
-    const wrapper = mount(Image, { props: { src: '/img/photo.jpg', alt: 'A photo' } })
+    const wrapper = mount(Image, {
+      props: { src: '/img/photo.jpg', alt: 'A photo' },
+    })
     const img = wrapper.find('img')
     expect(img.exists()).toBe(true)
     expect(img.attributes('src')).toBe('/img/photo.jpg')
@@ -23,7 +25,13 @@ describe('MediaImage', () => {
 
   it('passes width, height and loading props', () => {
     const wrapper = mount(Image, {
-      props: { src: '/img/photo.jpg', alt: 'A photo', width: 800, height: 600, loading: 'lazy' },
+      props: {
+        src: '/img/photo.jpg',
+        alt: 'A photo',
+        width: 800,
+        height: 600,
+        loading: 'lazy',
+      },
     })
     const img = wrapper.find('img')
     expect(img.attributes('width')).toBe('800')
@@ -57,7 +65,9 @@ describe('MediaCanvas', () => {
 
 describe('MediaIframe', () => {
   it('renders <iframe> with src prop', () => {
-    const wrapper = mount(Iframe, { props: { src: 'https://example.com', title: 'Example' } })
+    const wrapper = mount(Iframe, {
+      props: { src: 'https://example.com', title: 'Example' },
+    })
     const iframe = wrapper.find('iframe')
     expect(iframe.exists()).toBe(true)
     expect(iframe.attributes('src')).toBe('https://example.com')
@@ -66,21 +76,27 @@ describe('MediaIframe', () => {
 
 describe('MediaObject', () => {
   it('renders <object> element', () => {
-    const wrapper = mount(MediaObject, { props: { data: '/file.pdf', type: 'application/pdf' } })
+    const wrapper = mount(MediaObject, {
+      props: { data: '/file.pdf', type: 'application/pdf' },
+    })
     expect(wrapper.find('object').exists()).toBe(true)
   })
 })
 
 describe('MediaSource', () => {
   it('renders <source> element', () => {
-    const wrapper = mount(Source, { props: { src: '/audio.mp3', type: 'audio/mpeg' } })
+    const wrapper = mount(Source, {
+      props: { src: '/audio.mp3', type: 'audio/mpeg' },
+    })
     expect(wrapper.find('source').exists()).toBe(true)
   })
 })
 
 describe('MediaTrack', () => {
   it('renders <track> element', () => {
-    const wrapper = mount(Track, { props: { src: '/captions.vtt', kind: 'subtitles' } })
+    const wrapper = mount(Track, {
+      props: { src: '/captions.vtt', kind: 'subtitles' },
+    })
     expect(wrapper.find('track').exists()).toBe(true)
   })
 })

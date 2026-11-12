@@ -3,7 +3,7 @@
  * @see https://github.com/webpro/knip
  */
 export default {
-  project: ['src/**/*.ts'],
+  project: ['src/**/*.{ts,vue}'],
   ignoreBinaries: ['make'],
   ignoreDependencies: [
     'sort-package-json',

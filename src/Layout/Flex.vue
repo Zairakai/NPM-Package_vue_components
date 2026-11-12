@@ -1,26 +1,26 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutFlex',
-  })
+defineOptions({
+  name: 'LayoutFlex',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+})
 
-  const flexProps = computed(() => {
-    const result = {}
+const flexProps = computed(() => {
+  const result = {}
 
-    if (props.id) {
-      result.id = props.id
-    }
+  if (props.id) {
+    result.id = props.id
+  }
 
-    result.class = props.class ?? 'flex'
+  result.class = props.class ?? 'flex'
 
-    return result
-  })
+  return result
+})
 </script>
 
 <template>

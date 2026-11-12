@@ -1,19 +1,19 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'MediaFigure',
-  })
+defineOptions({
+  name: 'MediaFigure',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+})
 
-  const figureProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-  }))
+const figureProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+}))
 </script>
 
 <template>

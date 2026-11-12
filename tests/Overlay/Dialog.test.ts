@@ -25,7 +25,10 @@ describe('OverlayDialog', () => {
     resetSupport()
   })
 
-  const mountDialog = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) => {
+  const mountDialog = (
+    props: Record<string, unknown> = {},
+    slots: Record<string, string> = {},
+  ) => {
     const wrapper = mount(Dialog, { props, slots, attachTo: document.body })
 
     mounted.push(wrapper)
@@ -35,15 +38,25 @@ describe('OverlayDialog', () => {
 
   const open = async (wrapper: ReturnType<typeof mountDialog>) => {
     ;(
-      wrapper.findComponent({ name: 'OverlayModal' }).vm.$ as unknown as { exposed: { show: () => void } }
+      wrapper.findComponent({ name: 'OverlayModal' }).vm.$ as unknown as {
+        exposed: { show: () => void }
+      }
     ).exposed.show()
     await nextTick()
     await nextTick()
   }
 
-  const press = async (wrapper: ReturnType<typeof mountDialog>, value: string) => {
-    const submit = wrapper.find(`button[value="${value}"]`).element as HTMLButtonElement
-    const event = new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter: submit })
+  const press = async (
+    wrapper: ReturnType<typeof mountDialog>,
+    value: string,
+  ) => {
+    const submit = wrapper.find(`button[value="${value}"]`)
+      .element as HTMLButtonElement
+    const event = new SubmitEvent('submit', {
+      bubbles: true,
+      cancelable: true,
+      submitter: submit,
+    })
 
     wrapper.find('form').element.dispatchEvent(event)
     await nextTick()
@@ -51,21 +64,32 @@ describe('OverlayDialog', () => {
   }
 
   it('should render a dialog with the message and a confirm and a cancel button', () => {
-    const wrapper = mountDialog({ title: 'Delete?', message: 'This cannot be undone.', class: 'x' })
+    const wrapper = mountDialog({
+      title: 'Delete?',
+      message: 'This cannot be undone.',
+      class: 'x',
+    })
 
     expect(wrapper.find('dialog').classes()).toContain('dialog')
     expect(wrapper.find('dialog').classes()).toContain('x')
     expect(wrapper.find('.modal-title').text()).toBe('Delete?')
-    expect(wrapper.find('.dialog-message').text()).toBe('This cannot be undone.')
+    expect(wrapper.find('.dialog-message').text()).toBe(
+      'This cannot be undone.',
+    )
     expect(wrapper.find('form').attributes('method')).toBe('dialog')
     expect(wrapper.find('button[value="confirm"]').text()).toBe('OK')
-    expect(wrapper.find('button[value="confirm"]').attributes('autofocus')).toBeDefined()
+    expect(
+      wrapper.find('button[value="confirm"]').attributes('autofocus'),
+    ).toBeDefined()
     expect(wrapper.find('button[value="cancel"]').text()).toBe('Cancel')
     expect(wrapper.find('.modal-close').exists()).toBe(false)
   })
 
   it('should use the labels and the default slot as the message', () => {
-    const wrapper = mountDialog({ confirmLabel: 'Supprimer', cancelLabel: 'Annuler' }, { default: '<b>Sure?</b>' })
+    const wrapper = mountDialog(
+      { confirmLabel: 'Supprimer', cancelLabel: 'Annuler' },
+      { default: '<b>Sure?</b>' },
+    )
 
     expect(wrapper.find('button[value="confirm"]').text()).toBe('Supprimer')
     expect(wrapper.find('button[value="cancel"]').text()).toBe('Annuler')
@@ -90,7 +114,9 @@ describe('OverlayDialog', () => {
     expect(wrapper.emitted('confirm')).toHaveLength(1)
     expect(wrapper.emitted('cancel')).toBeUndefined()
     expect(wrapper.emitted('close')?.[0]).toEqual(['confirm'])
-    expect(wrapper.emitted('update:modelValue')?.map((event) => event[0])).toEqual([true, false])
+    expect(
+      wrapper.emitted('update:modelValue')?.map((event) => event[0]),
+    ).toEqual([true, false])
   })
 
   it('should emit cancel when the user cancels', async () => {
@@ -126,7 +152,11 @@ describe('OverlayDialog', () => {
     const wrapper = mountDialog({ message: 'Sure?' })
 
     await open(wrapper)
-    wrapper.find('form').element.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    wrapper
+      .find('form')
+      .element.dispatchEvent(
+        new Event('submit', { bubbles: true, cancelable: true }),
+      )
     await nextTick()
     await nextTick()
 
@@ -142,7 +172,8 @@ describe('OverlayDialog', () => {
     const event = new SubmitEvent('submit', {
       bubbles: true,
       cancelable: true,
-      submitter: wrapper.find('button[value="cancel"]').element as HTMLButtonElement,
+      submitter: wrapper.find('button[value="cancel"]')
+        .element as HTMLButtonElement,
     })
 
     wrapper.find('form').element.dispatchEvent(event)

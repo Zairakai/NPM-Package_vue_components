@@ -30,7 +30,10 @@ describe('UtilityThemeSwitcher', () => {
     listeners = []
     window.matchMedia = vi.fn().mockReturnValue({
       matches,
-      addEventListener: (_name: string, handler: (event: { matches: boolean }) => void) => listeners.push(handler),
+      addEventListener: (
+        _name: string,
+        handler: (event: { matches: boolean }) => void,
+      ) => listeners.push(handler),
       removeEventListener: vi.fn(),
     }) as unknown as typeof window.matchMedia
   }
@@ -41,12 +44,19 @@ describe('UtilityThemeSwitcher', () => {
   })
 
   it('should render the modes as toggle buttons and apply the system theme', async () => {
-    const wrapper = mount(ThemeSwitcher, { props: { id: 't', class: 'x' }, attachTo: document.body })
+    const wrapper = mount(ThemeSwitcher, {
+      props: { id: 't', class: 'x' },
+      attachTo: document.body,
+    })
 
     await nextTick()
     expect(wrapper.attributes('role')).toBe('group')
     expect(wrapper.attributes('aria-label')).toBe('Theme')
-    expect(wrapper.findAll('button').map((button) => button.text())).toEqual(['Light', 'Dark', 'System'])
+    expect(wrapper.findAll('button').map((button) => button.text())).toEqual([
+      'Light',
+      'Dark',
+      'System',
+    ])
     expect(wrapper.findAll('button')[2].attributes('aria-pressed')).toBe('true')
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
     expect(wrapper.attributes('data-theme-applied')).toBe('light')
@@ -66,11 +76,15 @@ describe('UtilityThemeSwitcher', () => {
   it('should start from what was remembered and ignore a wrong value', () => {
     window.localStorage.setItem('zk-theme', 'dark')
     expect(
-      mount(ThemeSwitcher, { attachTo: document.body }).find('[data-mode="dark"]').attributes('aria-pressed')
+      mount(ThemeSwitcher, { attachTo: document.body })
+        .find('[data-mode="dark"]')
+        .attributes('aria-pressed'),
     ).toBe('true')
     window.localStorage.setItem('zk-theme', 'blue')
     expect(
-      mount(ThemeSwitcher, { attachTo: document.body }).find('[data-mode="system"]').attributes('aria-pressed')
+      mount(ThemeSwitcher, { attachTo: document.body })
+        .find('[data-mode="system"]')
+        .attributes('aria-pressed'),
     ).toBe('true')
   })
 
@@ -103,17 +117,26 @@ describe('UtilityThemeSwitcher', () => {
   })
 
   it('should survive a blocked storage and render the mode slots', async () => {
-    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('blocked')
+    const get = vi
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation(() => {
+        throw new Error('blocked')
+      })
+    const set = vi
+      .spyOn(Storage.prototype, 'setItem')
+      .mockImplementation(() => {
+        throw new Error('blocked')
+      })
+    const wrapper = mount(ThemeSwitcher, {
+      slots: { dark: 'Night' },
+      attachTo: document.body,
     })
-    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('blocked')
-    })
-    const wrapper = mount(ThemeSwitcher, { slots: { dark: 'Night' }, attachTo: document.body })
 
     await wrapper.find('[data-mode="dark"]').trigger('click')
     expect(wrapper.find('[data-mode="dark"]').text()).toBe('Night')
-    expect(wrapper.find('[data-mode="dark"]').attributes('aria-pressed')).toBe('true')
+    expect(wrapper.find('[data-mode="dark"]').attributes('aria-pressed')).toBe(
+      'true',
+    )
     get.mockRestore()
     set.mockRestore()
   })
@@ -123,13 +146,21 @@ describe('countdown helpers', () => {
   it('should split what is left in days, hours, minutes and seconds', () => {
     const value = remaining(1000 * (86400 + 3600 * 2 + 60 * 3 + 4), 0)
 
-    expect(value).toEqual({ total: 93784, days: 1, hours: 2, minutes: 3, seconds: 4 })
+    expect(value).toEqual({
+      total: 93784,
+      days: 1,
+      hours: 2,
+      minutes: 3,
+      seconds: 4,
+    })
     expect(remaining(0, 5000).total).toBe(0)
     expect(remaining(1500, 0).total).toBe(1)
   })
 
   it('should write an ISO duration and read a target', () => {
-    expect(isoDuration(remaining(1000 * (86400 + 3600 * 2 + 60 * 3 + 4), 0))).toBe('P1DT2H3M4S')
+    expect(
+      isoDuration(remaining(1000 * (86400 + 3600 * 2 + 60 * 3 + 4), 0)),
+    ).toBe('P1DT2H3M4S')
     expect(isoDuration(remaining(5000, 0))).toBe('PT0H0M5S')
     expect(toTime(new Date(5))).toBe(5)
     expect(toTime(7)).toBe(7)
@@ -147,13 +178,17 @@ describe('UtilityCountdown', () => {
   afterEach(() => vi.useRealTimers())
 
   it('should show what is left in a time element and tick', async () => {
-    const wrapper = mount(Countdown, { props: { target: new Date('2026-10-05T10:01:05Z'), id: 'c', class: 'x' } })
+    const wrapper = mount(Countdown, {
+      props: { target: new Date('2026-10-05T10:01:05Z'), id: 'c', class: 'x' },
+    })
 
     expect(wrapper.element.tagName).toBe('TIME')
     expect(wrapper.attributes('role')).toBe('timer')
     expect(wrapper.attributes('aria-live')).toBe('off')
     expect(wrapper.attributes('datetime')).toBe('PT0H1M5S')
-    expect(wrapper.findAll('.countdown-part').map((part) => part.text())).toEqual(['00h', '01m', '05s'])
+    expect(
+      wrapper.findAll('.countdown-part').map((part) => part.text()),
+    ).toEqual(['00h', '01m', '05s'])
     await vi.advanceTimersByTimeAsync(2000)
     expect(wrapper.find('[data-unit="seconds"]').text()).toBe('03s')
     expect(wrapper.emitted('tick')).toHaveLength(2)
@@ -161,19 +196,24 @@ describe('UtilityCountdown', () => {
 
   it('should show the days when there are some or when asked, with other units', () => {
     const wrapper = mount(Countdown, {
-      props: { target: '2026-10-07T10:00:00Z', units: { days: ' days', hours: ':', minutes: ':', seconds: '' } },
+      props: {
+        target: '2026-10-07T10:00:00Z',
+        units: { days: ' days', hours: ':', minutes: ':', seconds: '' },
+      },
     })
 
     expect(wrapper.find('[data-unit="days"]').text()).toBe('2 days')
     expect(
       mount(Countdown, { props: { target: '2026-10-05T11:00:00Z' } })
         .find('[data-unit="days"]')
-        .exists()
+        .exists(),
     ).toBe(false)
     expect(
-      mount(Countdown, { props: { target: '2026-10-05T11:00:00Z', showDays: true } })
+      mount(Countdown, {
+        props: { target: '2026-10-05T11:00:00Z', showDays: true },
+      })
         .find('[data-unit="days"]')
-        .text()
+        .text(),
     ).toBe('0d')
   })
 
@@ -203,7 +243,10 @@ describe('UtilityCountdown', () => {
   it('should render the default slot with the remaining time and stop when removed', async () => {
     const wrapper = mount(Countdown, {
       props: { target: Date.now() + 90_000 },
-      slots: { default: '<template #default="{ minutes, seconds }">{{ minutes }}:{{ seconds }}</template>' },
+      slots: {
+        default:
+          '<template #default="{ minutes, seconds }">{{ minutes }}:{{ seconds }}</template>',
+      },
     })
 
     expect(wrapper.text()).toBe('1:30')
@@ -223,7 +266,9 @@ describe('UtilityShareButton', () => {
 
     vi.stubGlobal('navigator', { share, canShare: () => true })
     setSupport({ share: true })
-    const wrapper = mount(ShareButton, { props: { title: 'T', text: 'X', url: '/page', id: 's', class: 'x' } })
+    const wrapper = mount(ShareButton, {
+      props: { title: 'T', text: 'X', url: '/page', id: 's', class: 'x' },
+    })
 
     expect(wrapper.text()).toBe('Share')
     await wrapper.trigger('click')
@@ -232,20 +277,28 @@ describe('UtilityShareButton', () => {
   })
 
   it('should share the current page by default and not fail when the sheet is closed', async () => {
-    const share = vi.fn().mockRejectedValue(Object.assign(new Error('closed'), { name: 'AbortError' }))
+    const share = vi
+      .fn()
+      .mockRejectedValue(
+        Object.assign(new Error('closed'), { name: 'AbortError' }),
+      )
 
     vi.stubGlobal('navigator', { share })
     setSupport({ share: true })
     const wrapper = mount(ShareButton)
 
     await wrapper.trigger('click')
-    expect(share).toHaveBeenCalledWith(expect.objectContaining({ url: window.location.href }))
+    expect(share).toHaveBeenCalledWith(
+      expect.objectContaining({ url: window.location.href }),
+    )
     expect(wrapper.emitted('error')).toBeUndefined()
     expect(wrapper.emitted('share')).toBeUndefined()
   })
 
   it('should report a real error of the share sheet', async () => {
-    vi.stubGlobal('navigator', { share: vi.fn().mockRejectedValue(new Error('boom')) })
+    vi.stubGlobal('navigator', {
+      share: vi.fn().mockRejectedValue(new Error('boom')),
+    })
     setSupport({ share: true })
     const wrapper = mount(ShareButton)
 
@@ -256,9 +309,15 @@ describe('UtilityShareButton', () => {
   it('should copy the address when the browser cannot share data', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
 
-    vi.stubGlobal('navigator', { share: vi.fn(), canShare: () => false, clipboard: { writeText } })
+    vi.stubGlobal('navigator', {
+      share: vi.fn(),
+      canShare: () => false,
+      clipboard: { writeText },
+    })
     setSupport({ share: true, clipboard: true })
-    const wrapper = mount(ShareButton, { props: { url: '/page', copiedLabel: 'Done' } })
+    const wrapper = mount(ShareButton, {
+      props: { url: '/page', copiedLabel: 'Done' },
+    })
 
     await wrapper.trigger('click')
     await nextTick()

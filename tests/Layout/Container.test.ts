@@ -22,7 +22,7 @@ describe('LayoutContainer', () => {
       {},
       {
         default: '<p>Container content</p>',
-      }
+      },
     )
 
     expect(wrapper.html()).toContain('<p>Container content</p>')
@@ -82,7 +82,7 @@ describe('LayoutContainer', () => {
         <main>Main content</main>
         <footer>Footer</footer>
       `,
-      }
+      },
     )
 
     expect(wrapper.html()).toContain('<header>Header</header>')

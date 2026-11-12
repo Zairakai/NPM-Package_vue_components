@@ -1,46 +1,48 @@
 <script setup>
-  import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-  defineOptions({
-    name: 'NavigationBackToTop',
-  })
+defineOptions({
+  name: 'NavigationBackToTop',
+})
 
-  const emit = defineEmits(['click'])
+const emit = defineEmits(['click'])
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    // The scroll distance, in pixels, after which the button shows.
-    threshold: {
-      type: Number,
-      default: 300,
-    },
-    label: {
-      type: String,
-      default: 'Back to top',
-    },
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  // The scroll distance, in pixels, after which the button shows.
+  threshold: {
+    type: Number,
+    default: 300,
+  },
+  label: {
+    type: String,
+    default: 'Back to top',
+  },
+})
 
-  const visible = ref(false)
+const visible = ref(false)
 
-  const update = () => {
-    visible.value = window.scrollY > props.threshold
-  }
+const update = () => {
+  visible.value = window.scrollY > props.threshold
+}
 
-  function scrollTop() {
-    // Smooth, unless the visitor asked for less motion.
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+function scrollTop() {
+  // Smooth, unless the visitor asked for less motion.
+  const reduced = window.matchMedia?.(
+    '(prefers-reduced-motion: reduce)',
+  ).matches
 
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
-    emit('click')
-  }
+  window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
+  emit('click')
+}
 
-  onMounted(() => {
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-  })
+onMounted(() => {
+  update()
+  window.addEventListener('scroll', update, { passive: true })
+})
 
-  onBeforeUnmount(() => window.removeEventListener('scroll', update))
+onBeforeUnmount(() => window.removeEventListener('scroll', update))
 </script>
 
 <template>

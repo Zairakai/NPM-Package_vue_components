@@ -1,21 +1,21 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutMain',
-  })
+defineOptions({
+  name: 'LayoutMain',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  role: String,
+})
 
-  const mainProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    role: props.role,
-  }))
+const mainProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  role: props.role,
+}))
 </script>
 
 <template>

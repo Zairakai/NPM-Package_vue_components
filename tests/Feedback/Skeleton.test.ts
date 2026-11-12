@@ -14,7 +14,14 @@ describe('FeedbackSkeleton', () => {
   })
 
   it('should apply the size and the variant', () => {
-    const wrapper = mount(Skeleton, { props: { variant: 'circle', width: '3rem', height: '3rem', animated: false } })
+    const wrapper = mount(Skeleton, {
+      props: {
+        variant: 'circle',
+        width: '3rem',
+        height: '3rem',
+        animated: false,
+      },
+    })
 
     expect(wrapper.attributes('data-variant')).toBe('circle')
     expect(wrapper.attributes('data-animated')).toBeUndefined()
@@ -27,8 +34,12 @@ describe('FeedbackSkeleton', () => {
 
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.findAll('.skeleton')).toHaveLength(3)
-    expect(wrapper.findAll('.skeleton')[2].attributes('style')).toContain('width: 60%')
-    expect(wrapper.findAll('.skeleton')[0].attributes('style') ?? '').not.toContain('60%')
+    expect(wrapper.findAll('.skeleton')[2].attributes('style')).toContain(
+      'width: 60%',
+    )
+    expect(
+      wrapper.findAll('.skeleton')[0].attributes('style') ?? '',
+    ).not.toContain('60%')
   })
 
   it('should render a single placeholder for the other variants whatever the lines', () => {
@@ -39,7 +50,11 @@ describe('FeedbackSkeleton', () => {
   })
 
   it('should validate the variant', () => {
-    const { variant } = (Skeleton as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { variant } = (
+      Skeleton as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(variant.validator('rect')).toBe(true)
     expect(variant.validator('blob')).toBe(false)

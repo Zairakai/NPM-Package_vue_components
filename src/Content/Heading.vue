@@ -1,33 +1,30 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'ContentHeading',
-  })
+defineOptions({
+  name: 'ContentHeading',
+})
 
-  const props = defineProps({
-    level: {
-      type: Number,
-      default: 1,
-      validator(value) {
-        return 1 <= value && 6 >= value
-      },
+const props = defineProps({
+  level: {
+    type: Number,
+    default: 1,
+    validator(value) {
+      return value >= 1 && value <= 6
     },
-    id: String,
-    class: String,
-  })
+  },
+  id: String,
+  class: String,
+})
 
-  const headingProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-  }))
+const headingProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+}))
 </script>
 
 <template>
-  <component
-    :is="`h${level}`"
-    v-bind="headingProps"
-  >
+  <component :is="`h${level}`" v-bind="headingProps">
     <slot />
   </component>
 </template>

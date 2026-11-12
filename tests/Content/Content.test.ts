@@ -34,7 +34,9 @@ describe('ContentHeading', () => {
   })
 
   it('passes id and class props', () => {
-    const wrapper = mount(Heading, { props: { level: 2, id: 'title', class: 'bold' } })
+    const wrapper = mount(Heading, {
+      props: { level: 2, id: 'title', class: 'bold' },
+    })
     const h2 = wrapper.find('h2')
     expect(h2.attributes('id')).toBe('title')
     expect(h2.attributes('class')).toBe('bold')
@@ -49,7 +51,9 @@ describe('ContentParagraph', () => {
   })
 
   it('renders HTML via html prop instead of slot', () => {
-    const wrapper = mount(Paragraph, { props: { html: '<strong>Bold</strong>' } })
+    const wrapper = mount(Paragraph, {
+      props: { html: '<strong>Bold</strong>' },
+    })
     expect(wrapper.find('p strong').exists()).toBe(true)
   })
 })

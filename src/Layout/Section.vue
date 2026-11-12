@@ -1,25 +1,25 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  import LayoutContainer from '@layout/Container.vue'
+import LayoutContainer from '@layout/Container.vue'
 
-  defineOptions({
-    name: 'LayoutSection',
-  })
+defineOptions({
+  name: 'LayoutSection',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    lang: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  lang: String,
+  role: String,
+})
 
-  const sectionProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    lang: props.lang,
-    role: props.role,
-  }))
+const sectionProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  lang: props.lang,
+  role: props.role,
+}))
 </script>
 
 <template>

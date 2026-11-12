@@ -2,10 +2,10 @@
 # Inherits the full shared template from @zairakai/js-dev-tools.
 
 include:
-  - project: "zairakai/npm-packages/js-dev-tools"
-    ref: 3.18.0
-    file: ".gitlab/ci/pipeline-js-package.yml"
+  - project: 'zairakai/npm-packages/js-dev-tools'
+    ref: 4.1.0
+    file: '.gitlab/ci/pipeline-js-package.yml'
 
 variables:
-  CACHE_KEY: "vue-components-v1"
-  NPM_PACKAGE_NAME: "@zairakai/vue-components"
+  CACHE_KEY: 'vue-components-v1'
+  NPM_PACKAGE_NAME: '@zairakai/vue-components'

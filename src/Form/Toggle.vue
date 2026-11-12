@@ -1,30 +1,30 @@
 <script>
-  import FormCheckbox from './Checkbox.vue'
-  import FormLabel from './Label.vue'
+import FormCheckbox from './Checkbox.vue'
+import FormLabel from './Label.vue'
 
-  export default {
-    name: 'FormToggle',
+export default {
+  name: 'FormToggle',
 
-    components: {
-      FormCheckbox,
-      FormLabel,
+  components: {
+    FormCheckbox,
+    FormLabel,
+  },
+
+  inheritAttrs: false,
+
+  props: {
+    label: {
+      type: String,
+      required: true,
     },
-
-    inheritAttrs: false,
-
-    props: {
-      label: {
-        type: String,
-        required: true,
-      },
-      switchBefore: {
-        type: Boolean,
-        default: false,
-      },
+    switchBefore: {
+      type: Boolean,
+      default: false,
     },
+  },
 
-    emits: ['input'],
-  }
+  emits: ['input'],
+}
 </script>
 
 <template>

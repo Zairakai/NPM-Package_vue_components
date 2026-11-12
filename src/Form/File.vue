@@ -1,26 +1,26 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  import FormInput from '@form/Input.vue'
+import FormInput from '@form/Input.vue'
 
-  defineOptions({
-    name: 'FormInputFile',
-    inheritAttrs: false,
-  })
+defineOptions({
+  name: 'FormInputFile',
+  inheritAttrs: false,
+})
 
-  const emit = defineEmits(['update:modelValue', 'isValid'])
+const emit = defineEmits(['update:modelValue', 'isValid'])
 
-  const localValue = computed({
-    get: () => props.modelValue,
-    set: (newValue) => emit('update:modelValue', newValue),
-  })
+const localValue = computed({
+  get: () => props.modelValue,
+  set: (newValue) => emit('update:modelValue', newValue),
+})
 
-  const props = defineProps({
-    modelValue: {
-      type: [String, Number, Boolean, null],
-      default: null,
-    },
-  })
+const props = defineProps({
+  modelValue: {
+    type: [String, Number, Boolean, null],
+    default: null,
+  },
+})
 </script>
 
 <template>

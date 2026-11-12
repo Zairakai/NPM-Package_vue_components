@@ -27,7 +27,9 @@ describe('splitLines', () => {
 
 describe('ContentCodeBlock', () => {
   beforeEach(() => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
     setSupport({ clipboard: true })
   })
 
@@ -38,7 +40,13 @@ describe('ContentCodeBlock', () => {
 
   it('should render a figure with the language, the title and one span per line', () => {
     const wrapper = mount(CodeBlock, {
-      props: { code: 'const a = 1\nconst b = 2\n', language: 'js', title: 'app.js', id: 'c', class: 'x' },
+      props: {
+        code: 'const a = 1\nconst b = 2\n',
+        language: 'js',
+        title: 'app.js',
+        id: 'c',
+        class: 'x',
+      },
     })
 
     expect(wrapper.element.tagName).toBe('FIGURE')
@@ -57,7 +65,7 @@ describe('ContentCodeBlock', () => {
     expect(
       mount(CodeBlock, { slots: { default: 'echo hi' } })
         .find('pre')
-        .text()
+        .text(),
     ).toBe('echo hi')
   })
 
@@ -65,7 +73,7 @@ describe('ContentCodeBlock', () => {
     expect(
       mount(CodeBlock, { props: { code: 'x' } })
         .find('pre')
-        .attributes('tabindex')
+        .attributes('tabindex'),
     ).toBe('0')
   })
 
@@ -73,36 +81,48 @@ describe('ContentCodeBlock', () => {
     expect(
       mount(CodeBlock, { props: { code: 'x' } })
         .find('code')
-        .classes()
+        .classes(),
     ).toEqual([])
   })
 
   it('should mark the line numbers, the wrapping and the highlighted lines', () => {
     const wrapper = mount(CodeBlock, {
-      props: { code: 'a\nb\nc', lineNumbers: true, wrap: true, highlightLines: '2-3' },
+      props: {
+        code: 'a\nb\nc',
+        lineNumbers: true,
+        wrap: true,
+        highlightLines: '2-3',
+      },
     })
 
     expect(wrapper.attributes('data-line-numbers')).toBeDefined()
     expect(wrapper.attributes('data-wrap')).toBeDefined()
-    expect(wrapper.find('pre').attributes('style')).toContain('white-space: pre-wrap')
-    expect(wrapper.findAll('.code-line').map((line) => line.attributes('data-highlighted') !== undefined)).toEqual([
-      false,
-      true,
-      true,
-    ])
+    expect(wrapper.find('pre').attributes('style')).toContain(
+      'white-space: pre-wrap',
+    )
+    expect(
+      wrapper
+        .findAll('.code-line')
+        .map((line) => line.attributes('data-highlighted') !== undefined),
+    ).toEqual([false, true, true])
   })
 
   it('should limit the height', () => {
     expect(
       mount(CodeBlock, { props: { code: 'x', maxHeight: '10rem' } })
         .find('pre')
-        .attributes('style')
+        .attributes('style'),
     ).toContain('max-height: 10rem')
   })
 
   it('should render highlighted HTML from the highlighter', () => {
-    const highlighter = vi.fn((code: string, language: string) => `<span class="k">${language}:${code}</span>`)
-    const wrapper = mount(CodeBlock, { props: { code: 'x', language: 'ts', highlighter } })
+    const highlighter = vi.fn(
+      (code: string, language: string) =>
+        `<span class="k">${language}:${code}</span>`,
+    )
+    const wrapper = mount(CodeBlock, {
+      props: { code: 'x', language: 'ts', highlighter },
+    })
 
     expect(highlighter).toHaveBeenCalledWith('x', 'ts')
     expect(wrapper.find('code .k').text()).toBe('ts:x')
@@ -110,7 +130,9 @@ describe('ContentCodeBlock', () => {
   })
 
   it('should copy the code and confirm it', async () => {
-    const wrapper = mount(CodeBlock, { props: { code: 'npm i', copyLabel: 'Copier', copiedLabel: 'Copié' } })
+    const wrapper = mount(CodeBlock, {
+      props: { code: 'npm i', copyLabel: 'Copier', copiedLabel: 'Copié' },
+    })
 
     expect(wrapper.find('.code-block-copy').text()).toBe('Copier')
 
@@ -120,7 +142,9 @@ describe('ContentCodeBlock', () => {
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('npm i')
     expect(wrapper.find('.code-block-copy').text()).toBe('Copié')
-    expect(wrapper.find('.code-block-copy').attributes('data-copied')).toBeDefined()
+    expect(
+      wrapper.find('.code-block-copy').attributes('data-copied'),
+    ).toBeDefined()
     expect(wrapper.find('.code-block-status').text()).toBe('Copié')
   })
 

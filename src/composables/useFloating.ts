@@ -2,7 +2,8 @@ import { type Ref, onBeforeUnmount, ref, watch } from 'vue'
 
 type FloatingSide = 'top' | 'bottom' | 'left' | 'right'
 type FloatingAlign = 'start' | 'center' | 'end'
-export type FloatingPlacement = FloatingSide | `${FloatingSide}-${Exclude<FloatingAlign, 'center'>}`
+export type FloatingPlacement =
+  FloatingSide | `${FloatingSide}-${Exclude<FloatingAlign, 'center'>}`
 
 export interface FloatingSize {
   width: number
@@ -27,8 +28,14 @@ const OPPOSITE: Record<FloatingSide, FloatingSide> = {
   right: 'left',
 }
 
-function parse(placement: FloatingPlacement): { side: FloatingSide; align: FloatingAlign } {
-  const [side, align] = placement.split('-') as [FloatingSide, FloatingAlign | undefined]
+function parse(placement: FloatingPlacement): {
+  side: FloatingSide
+  align: FloatingAlign
+} {
+  const [side, align] = placement.split('-') as [
+    FloatingSide,
+    FloatingAlign | undefined,
+  ]
 
   return { side, align: align ?? 'center' }
 }
@@ -38,27 +45,33 @@ function coordinates(
   size: FloatingSize,
   side: FloatingSide,
   align: FloatingAlign,
-  offset: number
+  offset: number,
 ): { x: number; y: number } {
-  const vertical = 'top' === side || 'bottom' === side
+  const vertical = side === 'top' || side === 'bottom'
 
   let x: number
   let y: number
 
   if (vertical) {
-    y = 'top' === side ? anchor.top - size.height - offset : anchor.bottom + offset
+    y =
+      side === 'top'
+        ? anchor.top - size.height - offset
+        : anchor.bottom + offset
     x =
-      'start' === align
+      align === 'start'
         ? anchor.left
-        : 'end' === align
+        : align === 'end'
           ? anchor.right - size.width
           : anchor.left + anchor.width / 2 - size.width / 2
   } else {
-    x = 'left' === side ? anchor.left - size.width - offset : anchor.right + offset
+    x =
+      side === 'left'
+        ? anchor.left - size.width - offset
+        : anchor.right + offset
     y =
-      'start' === align
+      align === 'start'
         ? anchor.top
-        : 'end' === align
+        : align === 'end'
           ? anchor.bottom - size.height
           : anchor.top + anchor.height / 2 - size.height / 2
   }
@@ -66,14 +79,20 @@ function coordinates(
   return { x, y }
 }
 
-function overflows(x: number, y: number, size: FloatingSize, viewport: FloatingViewport, side: FloatingSide): boolean {
+function overflows(
+  x: number,
+  y: number,
+  size: FloatingSize,
+  viewport: FloatingViewport,
+  side: FloatingSide,
+): boolean {
   switch (side) {
     case 'top':
-      return 0 > y
+      return y < 0
     case 'bottom':
       return y + size.height > viewport.height
     case 'left':
-      return 0 > x
+      return x < 0
     default:
       return x + size.width > viewport.width
   }
@@ -92,7 +111,7 @@ export function computePosition(
   viewport: FloatingViewport,
   placement: FloatingPlacement = 'bottom',
   offset = 8,
-  padding = 4
+  padding = 4,
 ): FloatingPosition {
   const { side, align } = parse(placement)
 
@@ -109,7 +128,7 @@ export function computePosition(
     }
   }
 
-  const vertical = 'top' === usedSide || 'bottom' === usedSide
+  const vertical = usedSide === 'top' || usedSide === 'bottom'
 
   if (vertical) {
     x = Math.max(padding, Math.min(x, viewport.width - size.width - padding))
@@ -117,7 +136,9 @@ export function computePosition(
     y = Math.max(padding, Math.min(y, viewport.height - size.height - padding))
   }
 
-  const usedPlacement = ('center' === align ? usedSide : `${usedSide}-${align}`) as FloatingPlacement
+  const usedPlacement = (
+    align === 'center' ? usedSide : `${usedSide}-${align}`
+  ) as FloatingPlacement
 
   return { x: Math.round(x), y: Math.round(y), placement: usedPlacement }
 }
@@ -136,9 +157,13 @@ export function useFloating(
   anchor: Ref<HTMLElement | null>,
   floating: Ref<HTMLElement | null>,
   open: Ref<boolean>,
-  options: UseFloatingOptions = {}
+  options: UseFloatingOptions = {},
 ) {
-  const style = ref<Record<string, string>>({ position: 'fixed', left: '0px', top: '0px' })
+  const style = ref<Record<string, string>>({
+    position: 'fixed',
+    left: '0px',
+    top: '0px',
+  })
   const placement = ref<FloatingPlacement>(options.placement ?? 'bottom')
 
   function update(): void {
@@ -147,16 +172,29 @@ export function useFloating(
     }
 
     const rect = anchor.value.getBoundingClientRect()
-    const size = { width: floating.value.offsetWidth, height: floating.value.offsetHeight }
+    const size = {
+      width: floating.value.offsetWidth,
+      height: floating.value.offsetHeight,
+    }
     const viewport = { width: window.innerWidth, height: window.innerHeight }
-    const position = computePosition(rect, size, viewport, options.placement ?? 'bottom', options.offset ?? 8)
+    const position = computePosition(
+      rect,
+      size,
+      viewport,
+      options.placement ?? 'bottom',
+      options.offset ?? 8,
+    )
 
     placement.value = position.placement
-    style.value = { position: 'fixed', left: `${position.x}px`, top: `${position.y}px` }
+    style.value = {
+      position: 'fixed',
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+    }
   }
 
   // On the server there is no window: nothing to listen to, and nothing to place.
-  const browser = 'undefined' !== typeof window
+  const browser = typeof window !== 'undefined'
 
   function listen(): void {
     if (!browser) {
@@ -187,7 +225,7 @@ export function useFloating(
         unlisten()
       }
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   onBeforeUnmount(unlisten)

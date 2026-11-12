@@ -30,8 +30,11 @@ describe('DisplayDivider', () => {
   })
 
   it('should validate the orientation', () => {
-    const { orientation } = (Divider as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
-      .props
+    const { orientation } = (
+      Divider as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(orientation.validator('vertical')).toBe(true)
     expect(orientation.validator('diagonal')).toBe(false)

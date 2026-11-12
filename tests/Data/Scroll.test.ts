@@ -4,13 +4,18 @@ import { nextTick } from 'vue'
 import InfiniteScroll from '../../src/Data/InfiniteScroll.vue'
 import VirtualScroll from '../../src/Data/VirtualScroll.vue'
 
-const items = Array.from({ length: 1000 }, (_, index) => ({ id: index, label: `Row ${index}` }))
+const items = Array.from({ length: 1000 }, (_, index) => ({
+  id: index,
+  label: `Row ${index}`,
+}))
 
 describe('DataVirtualScroll', () => {
   const mountList = (props: Record<string, unknown> = {}) =>
     mount(VirtualScroll, {
       props: { items, itemHeight: 20, height: 100, ...props },
-      slots: { default: `<template #default="{ item, index }">{{ index }}:{{ item.label }}</template>` },
+      slots: {
+        default: `<template #default="{ item, index }">{{ index }}:{{ item.label }}</template>`,
+      },
       attachTo: document.body,
     })
 
@@ -22,7 +27,9 @@ describe('DataVirtualScroll', () => {
     expect(wrapper.attributes('aria-label')).toBe('Rows')
     expect(wrapper.attributes('tabindex')).toBe('0')
     expect(wrapper.attributes('style')).toContain('height: 100px')
-    expect(wrapper.find('.virtual-scroll > div').attributes('style')).toContain('height: 20000px')
+    expect(wrapper.find('.virtual-scroll > div').attributes('style')).toContain(
+      'height: 20000px',
+    )
     expect(wrapper.findAll('.virtual-scroll-item')).toHaveLength(8)
     expect(wrapper.findAll('.virtual-scroll-item')[0].text()).toBe('0:Row 0')
   })
@@ -42,7 +49,9 @@ describe('DataVirtualScroll', () => {
     ;(wrapper.element as HTMLElement).scrollTop = 2000
     await wrapper.trigger('scroll')
 
-    const texts = wrapper.findAll('.virtual-scroll-item').map((entry) => entry.text())
+    const texts = wrapper
+      .findAll('.virtual-scroll-item')
+      .map((entry) => entry.text())
 
     expect(texts[0]).toBe('97:Row 97')
     expect(texts.at(-1)).toBe('107:Row 107')
@@ -52,23 +61,33 @@ describe('DataVirtualScroll', () => {
   it('should use a key from the items when given and scroll to an index', async () => {
     const wrapper = mountList({ itemKey: 'id' })
 
-    ;(wrapper.vm as unknown as { scrollToIndex: (index: number) => void }).scrollToIndex(500)
+    ;(
+      wrapper.vm as unknown as { scrollToIndex: (index: number) => void }
+    ).scrollToIndex(500)
     await nextTick()
 
     expect((wrapper.element as HTMLElement).scrollTop).toBe(10000)
-    expect(wrapper.findAll('.virtual-scroll-item')[3].text()).toBe('500:Row 500')
+    expect(wrapper.findAll('.virtual-scroll-item')[3].text()).toBe(
+      '500:Row 500',
+    )
 
-    ;(wrapper.vm as unknown as { scrollToIndex: (index: number) => void }).scrollToIndex(99999)
+    ;(
+      wrapper.vm as unknown as { scrollToIndex: (index: number) => void }
+    ).scrollToIndex(99999)
     await nextTick()
     expect((wrapper.element as HTMLElement).scrollTop).toBe(19980)
 
-    ;(wrapper.vm as unknown as { scrollToIndex: (index: number) => void }).scrollToIndex(-5)
+    ;(
+      wrapper.vm as unknown as { scrollToIndex: (index: number) => void }
+    ).scrollToIndex(-5)
     await nextTick()
     expect((wrapper.element as HTMLElement).scrollTop).toBe(0)
   })
 
   it('should render nothing for an empty list', () => {
-    expect(mountList({ items: [] }).findAll('.virtual-scroll-item')).toHaveLength(0)
+    expect(
+      mountList({ items: [] }).findAll('.virtual-scroll-item'),
+    ).toHaveLength(0)
   })
 })
 
@@ -90,7 +109,7 @@ describe('DataInfiniteScroll', () => {
         }
         observe = observe
         disconnect = disconnect
-      }
+      },
     )
   })
 
@@ -146,7 +165,8 @@ describe('DataInfiniteScroll', () => {
 
   it('should do nothing in a browser without IntersectionObserver', () => {
     vi.unstubAllGlobals()
-    delete (globalThis as unknown as { IntersectionObserver?: unknown }).IntersectionObserver
+    delete (globalThis as unknown as { IntersectionObserver?: unknown })
+      .IntersectionObserver
 
     expect(() => mount(InfiniteScroll).unmount()).not.toThrow()
   })

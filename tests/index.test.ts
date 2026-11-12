@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@js/Services/Pinia', () => {
   return {
@@ -88,17 +88,19 @@ describe('main exports', () => {
 
     // Check that components have expected Vue component structure
     if (formExports.FormButton) {
-      expect(formExports.FormButton.__name || formExports.FormButton.name).toBeDefined()
+      expect(
+        formExports.FormButton.__name ?? formExports.FormButton.name,
+      ).toBeDefined()
     }
 
     if (formExports.FormInput) {
       expect(typeof formExports.FormInput).toBe('object')
       // Vue components should have setup or render functions, or be SFC objects
       expect(
-        formExports.FormInput.setup ||
-          formExports.FormInput.render ||
-          formExports.FormInput.template ||
-          formExports.FormInput.__file // SFC indicator
+        formExports.FormInput.setup ??
+          formExports.FormInput.render ??
+          formExports.FormInput.template ??
+          formExports.FormInput.__file, // SFC indicator
       ).toBeDefined()
     }
   })

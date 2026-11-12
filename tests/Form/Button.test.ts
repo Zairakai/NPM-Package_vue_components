@@ -63,7 +63,7 @@ describe('FormButton', () => {
       {},
       {
         default: '<span class="icon">🚀</span> Launch',
-      }
+      },
     )
 
     expect(wrapper.html()).toContain('<span class="icon">🚀</span> Launch')
@@ -73,7 +73,9 @@ describe('FormButton', () => {
     const wrapper = createWrapper({
       fieldClass: 'custom-field-class',
     })
-    expect(wrapper.find('.form-field').classes()).toContain('custom-field-class')
+    expect(wrapper.find('.form-field').classes()).toContain(
+      'custom-field-class',
+    )
   })
 
   it('should validate button type prop', () => {

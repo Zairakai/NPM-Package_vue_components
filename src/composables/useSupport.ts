@@ -38,7 +38,8 @@ export interface PlatformSupport {
 
 type Env = Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 
-const has = (proto: unknown, member: string): boolean => 'object' === typeof proto && null !== proto && member in proto
+const has = (proto: unknown, member: string): boolean =>
+  typeof proto === 'object' && proto !== null && member in proto
 
 const prototypeOf = (env: Env, name: string): unknown => env[name]?.prototype
 
@@ -79,17 +80,23 @@ export function detectSupport(env: Env = globalThis as Env): PlatformSupport {
     dialogClosedBy: has(dialog, 'closedBy'),
     dialogRequestClose: has(dialog, 'requestClose'),
     popover: has(element, 'popover'),
-    invokerCommands: has(prototypeOf(env, 'HTMLButtonElement'), 'commandForElement'),
-    anchorPositioning: 'function' === typeof css?.supports && css.supports('anchor-name: --a'),
+    invokerCommands: has(
+      prototypeOf(env, 'HTMLButtonElement'),
+      'commandForElement',
+    ),
+    anchorPositioning:
+      typeof css?.supports === 'function' && css.supports('anchor-name: --a'),
     hiddenUntilFound: has(element, 'onbeforematch'),
     detailsName: has(prototypeOf(env, 'HTMLDetailsElement'), 'name'),
     inert: has(element, 'inert'),
     // An unknown element is an HTMLUnknownElement: <search> is only known where it is supported.
-    search: 'function' === typeof unknown && !(env['document'].createElement('search') instanceof unknown),
-    viewTransitions: 'function' === typeof env['document'].startViewTransition,
+    search:
+      typeof unknown === 'function' &&
+      !(env['document'].createElement('search') instanceof unknown),
+    viewTransitions: typeof env['document'].startViewTransition === 'function',
     navigationApi: 'navigation' in env,
-    clipboard: 'function' === typeof env['navigator']?.clipboard?.writeText,
-    share: 'function' === typeof env['navigator']?.share,
+    clipboard: typeof env['navigator']?.clipboard?.writeText === 'function',
+    share: typeof env['navigator']?.share === 'function',
     showPicker: has(prototypeOf(env, 'HTMLInputElement'), 'showPicker'),
   }
 }

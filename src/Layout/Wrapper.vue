@@ -1,19 +1,19 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutWrapper',
-  })
+defineOptions({
+  name: 'LayoutWrapper',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+})
 
-  const sectionProps = computed(() => ({
-    id: props.id,
-    class: `wrapper ${props.class ?? ''}`.trim(),
-  }))
+const sectionProps = computed(() => ({
+  id: props.id,
+  class: `wrapper ${props.class ?? ''}`.trim(),
+}))
 </script>
 
 <template>

@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope } from 'vue'
 import { useControllable } from '../../src/composables/useControllable'
 import {
-  type QueryAdapter,
   QUERY_CHANGE_EVENT,
+  type QueryAdapter,
   historyAdapter,
   queryBoolean,
   queryList,
@@ -147,7 +147,11 @@ describe('useQueryParam', () => {
   })
 
   it('should serialize with a custom function', () => {
-    const flag = useQueryParam('on', { default: false, parse: queryBoolean, serialize: (value) => (value ? '1' : '0') })
+    const flag = useQueryParam('on', {
+      default: false,
+      parse: queryBoolean,
+      serialize: (value) => (value ? '1' : '0'),
+    })
 
     flag.value = true
 
@@ -207,7 +211,10 @@ describe('useControllable with a query parameter', () => {
 
   it('should keep the uncontrolled value in the URL and emit', () => {
     const emit = vi.fn()
-    const page = useControllable<number>({}, 'modelValue', emit, 1, { param: 'page', parse: queryNumber(1) })
+    const page = useControllable<number>({}, 'modelValue', emit, 1, {
+      param: 'page',
+      parse: queryNumber(1),
+    })
 
     page.value = 3
 
@@ -217,23 +224,34 @@ describe('useControllable with a query parameter', () => {
 
   it('should read the initial value from the URL', () => {
     setUrl('/?page=7')
-    const page = useControllable<number>({}, 'modelValue', vi.fn(), 1, { param: 'page', parse: queryNumber(1) })
+    const page = useControllable<number>({}, 'modelValue', vi.fn(), 1, {
+      param: 'page',
+      parse: queryNumber(1),
+    })
 
     expect(page.value).toBe(7)
   })
 
   it('should let the prop win over the URL', () => {
     setUrl('/?page=7')
-    const page = useControllable<number>({ modelValue: 2 }, 'modelValue', vi.fn(), 1, {
-      param: 'page',
-      parse: queryNumber(1),
-    })
+    const page = useControllable<number>(
+      { modelValue: 2 },
+      'modelValue',
+      vi.fn(),
+      1,
+      {
+        param: 'page',
+        parse: queryNumber(1),
+      },
+    )
 
     expect(page.value).toBe(2)
   })
 
   it('should ignore the query options without a parameter name', () => {
-    const page = useControllable<number>({}, 'modelValue', vi.fn(), 1, { param: undefined })
+    const page = useControllable<number>({}, 'modelValue', vi.fn(), 1, {
+      param: undefined,
+    })
 
     page.value = 5
 

@@ -18,14 +18,18 @@ describe('DisplayCard', () => {
 
     expect(titled.find('.card-header').text()).toBe('Profile')
 
-    const slotted = mount(Card, { slots: { header: '<h2>Head</h2>', footer: '<button>OK</button>' } })
+    const slotted = mount(Card, {
+      slots: { header: '<h2>Head</h2>', footer: '<button>OK</button>' },
+    })
 
     expect(slotted.find('.card-header h2').exists()).toBe(true)
     expect(slotted.find('.card-footer button').exists()).toBe(true)
   })
 
   it('should change the root element and keep the custom class and id', () => {
-    const wrapper = mount(Card, { props: { as: 'section', class: 'wide', id: 'c1' } })
+    const wrapper = mount(Card, {
+      props: { as: 'section', class: 'wide', id: 'c1' },
+    })
 
     expect(wrapper.element.tagName).toBe('SECTION')
     expect(wrapper.classes()).toEqual(['card', 'wide'])

@@ -1,159 +1,156 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  import FormAdditional from './Additional.vue'
-  import FormField from './Field.vue'
-  import FormLabel from './Label.vue'
+import { computed, ref } from 'vue'
+import FormAdditional from './Additional.vue'
+import FormField from './Field.vue'
+import FormLabel from './Label.vue'
 
-  defineOptions({
-    name: 'FormInput',
-  })
+defineOptions({
+  name: 'FormInput',
+})
 
-  const emit = defineEmits(['update:modelValue', 'isValid', 'focus', 'blur'])
+const emit = defineEmits(['update:modelValue', 'isValid', 'focus', 'blur'])
 
-  const inputRef = ref()
-  const isValid = ref(true)
+const inputRef = ref()
+const isValid = ref(true)
 
-  const localValue = computed({
-    get: () => props.value ?? props.modelValue,
-    set: (newValue) => {
-      if (inputRef.value?.checkValidity()) {
-        isValid.value = true
-      } else {
-        isValid.value = false
-      }
+const localValue = computed({
+  get: () => props.value ?? props.modelValue,
+  set: (newValue) => {
+    if (inputRef.value?.checkValidity()) {
+      isValid.value = true
+    } else {
+      isValid.value = false
+    }
 
-      if (null === props.value) {
-        emit('update:modelValue', newValue)
-      }
+    if (props.value === null) {
+      emit('update:modelValue', newValue)
+    }
 
-      emit('isValid', isValid.value)
-    },
-  })
+    emit('isValid', isValid.value)
+  },
+})
 
-  const props = defineProps({
-    type: {
-      type: String,
-      default: 'text',
-    },
-    id: String,
-    form: String,
-    value: {
-      type: [String, Number, Boolean],
-      default: null,
-    },
-    modelValue: {
-      type: [String, Number, Boolean, null],
-      default: null,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    placeholder: String,
-    list: String,
-    required: {
-      type: Boolean,
-      default: false,
-    },
-    autocomplete: String,
-    pattern: String,
-    min: String,
-    max: String,
-    step: String,
-    maxlength: Number,
-    minlength: Number,
-    accept: String,
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
-    autofocus: {
-      type: Boolean,
-      default: false,
-    },
-    class: String,
-    width: String,
-    height: String,
-    size: Number,
-    label: String,
-    labelAfter: {
-      type: Boolean,
-      default: false,
-    },
-    fieldClass: {
-      type: String,
-    },
-    field: {
-      type: Boolean,
-      default: true,
-    },
-    iconBefore: String,
-    iconAfter: String,
-    prefix: String,
-    suffix: String,
-    errorMessage: {
-      type: String,
-    },
-  })
+const props = defineProps({
+  type: {
+    type: String,
+    default: 'text',
+  },
+  id: String,
+  form: String,
+  value: {
+    type: [String, Number, Boolean],
+    default: null,
+  },
+  modelValue: {
+    type: [String, Number, Boolean, null],
+    default: null,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  placeholder: String,
+  list: String,
+  required: {
+    type: Boolean,
+    default: false,
+  },
+  autocomplete: String,
+  pattern: String,
+  min: String,
+  max: String,
+  step: String,
+  maxlength: Number,
+  minlength: Number,
+  accept: String,
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  multiple: {
+    type: Boolean,
+    default: false,
+  },
+  autofocus: {
+    type: Boolean,
+    default: false,
+  },
+  class: String,
+  width: String,
+  height: String,
+  size: Number,
+  label: String,
+  labelAfter: {
+    type: Boolean,
+    default: false,
+  },
+  fieldClass: {
+    type: String,
+  },
+  field: {
+    type: Boolean,
+    default: true,
+  },
+  iconBefore: String,
+  iconAfter: String,
+  prefix: String,
+  suffix: String,
+  errorMessage: {
+    type: String,
+  },
+})
 
-  const inputProps = computed(() => ({
-    type: props.type,
-    id: props.id,
-    form: props.form,
-    name: props.name,
-    placeholder: props.placeholder ?? '',
-    list: props.list,
-    required: props.required,
-    autocomplete: props.autocomplete,
-    pattern: props.pattern,
-    min: props.min,
-    max: props.max,
-    step: props.step,
-    maxlength: props.maxlength,
-    minlength: props.minlength,
-    accept: props.accept,
-    disabled: props.disabled,
-    readonly: props.readonly,
-    multiple: props.multiple,
-    autofocus: props.autofocus,
-    class: props.class,
-    style: {
-      ...(props.width ? { width: props.width } : {}),
-      ...(props.height ? { height: props.height } : {}),
-    },
-    size: props.size,
-  }))
+const inputProps = computed(() => ({
+  type: props.type,
+  id: props.id,
+  form: props.form,
+  name: props.name,
+  placeholder: props.placeholder ?? '',
+  list: props.list,
+  required: props.required,
+  autocomplete: props.autocomplete,
+  pattern: props.pattern,
+  min: props.min,
+  max: props.max,
+  step: props.step,
+  maxlength: props.maxlength,
+  minlength: props.minlength,
+  accept: props.accept,
+  disabled: props.disabled,
+  readonly: props.readonly,
+  multiple: props.multiple,
+  autofocus: props.autofocus,
+  class: props.class,
+  style: {
+    ...(props.width ? { width: props.width } : {}),
+    ...(props.height ? { height: props.height } : {}),
+  },
+  size: props.size,
+}))
 
-  const labelProps = computed(() => ({
-    // Fall back to name when no explicit id — mirrors Blade component behavior
-    id: props.id ?? props.name,
-    label: props.label,
-    fieldClass: props.fieldClass,
-    iconBefore: props.iconBefore,
-    iconAfter: props.iconAfter,
-    prefix: props.prefix,
-    suffix: props.suffix,
-  }))
+const labelProps = computed(() => ({
+  // Fall back to name when no explicit id: mirrors Blade component behavior
+  id: props.id ?? props.name,
+  label: props.label,
+  fieldClass: props.fieldClass,
+  iconBefore: props.iconBefore,
+  iconAfter: props.iconAfter,
+  prefix: props.prefix,
+  suffix: props.suffix,
+}))
 </script>
 
 <template>
-  <FormField
-    :field="field"
-    :name="name"
-  >
+  <FormField :field="field" :name="name">
     <template v-if="field && label && !labelAfter">
       <FormLabel v-bind="labelProps" />
     </template>
 
-    <template v-if="'hidden' === props.type">
+    <template v-if="props.type === 'hidden'">
       <input
         ref="inputRef"
         v-bind="inputProps"
@@ -165,17 +162,15 @@
     <template v-else>
       <div data-input>
         <span
-          v-if="iconBefore"
+          v-if="iconBefore || $slots['icon-before']"
           data-leading-icon
           class="msr"
-          v-html="iconBefore"
-        />
+          ><slot name="icon-before">{{ iconBefore }}</slot></span
+        >
 
-        <span
-          v-if="prefix"
-          data-prefix
-          v-html="prefix"
-        />
+        <span v-if="prefix || $slots['prefix']" data-prefix
+          ><slot name="prefix">{{ prefix }}</slot></span
+        >
 
         <input
           ref="inputRef"
@@ -185,23 +180,21 @@
           @blur="emit('blur', $event)"
         />
 
-        <span
-          v-if="suffix"
-          data-suffix
-          v-html="suffix"
-        />
+        <span v-if="suffix || $slots['suffix']" data-suffix
+          ><slot name="suffix">{{ suffix }}</slot></span
+        >
 
         <span
-          v-if="iconAfter"
+          v-if="iconAfter || $slots['icon-after']"
           data-trailing-icon
           class="msr"
-          v-html="iconAfter"
-        />
+          ><slot name="icon-after">{{ iconAfter }}</slot></span
+        >
 
         <!--
           Unlike iconBefore/iconAfter (also mirrored into FormLabel's
-          labelProps below), this slot renders strictly inside [data-input]
-          — the box around the input alone, never the label and never
+          labelProps below), this slot renders strictly inside [data-input]:
+          the box around the input alone, never the label and never
           affected by an error message rendered after this component (see
           FormAdditional below, a sibling of [data-input], not a child of
           it). Use it for interactive content (buttons) that a plain
@@ -215,9 +208,6 @@
       <FormLabel v-bind="labelProps" />
     </template>
 
-    <FormAdditional
-      v-if="errorMessage"
-      :text="errorMessage"
-    />
+    <FormAdditional v-if="errorMessage" :text="errorMessage" />
   </FormField>
 </template>
