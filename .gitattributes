@@ -1,0 +1,8 @@
+# Default: treat everything as text and normalize the line endings to LF
+* text=auto eol=lf
+
+# Markdown files: readable diffs
+*.md diff=markdown
+
+# Binary files (SVG is text: it keeps its diffs)
+*.png binary
