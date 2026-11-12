@@ -1,4 +1,8 @@
-# @zairakai/vue-components
+<p align="center">
+  <img src="https://gitlab.com/zairakai/npm-packages/vue-components/-/raw/main/assets/icon.png" alt="Vue Components" width="160">
+</p>
+
+# Vue Components
 
 [![Main][pipeline-main-badge]][pipeline-main-link]
 [![Develop][pipeline-develop-badge]][pipeline-develop-link]
@@ -13,7 +17,7 @@
 [![ESLint][eslint-badge]][eslint]
 [![Prettier][prettier-badge]][prettier]
 
-Collection of reusable Vue 3 components — TypeScript, v-model, WAI-ARIA.
+Collection of reusable Vue 3 components: TypeScript, v-model, WAI-ARIA.
 
 **Documentation: [vue-components-46b2bb.gitlab.io][docs]**
 
@@ -49,12 +53,17 @@ app.use(VueComponentsPlugin, { prefix: 'Zk' })
 
 ### Import by category
 
+<details>
+<summary>Imports of each category</summary>
+
 ```typescript
 import { FormInput, FormButton } from '@zairakai/vue-components/Form'
 import { LayoutContainer, LayoutRow } from '@zairakai/vue-components/Layout'
 import { ContentHeading, ContentParagraph } from '@zairakai/vue-components/Content'
 import { MediaImage, MediaVideo } from '@zairakai/vue-components/Medias'
 ```
+
+</details>
 
 ---
 
@@ -68,18 +77,23 @@ The components ship no style: they give the markup, the WAI-ARIA, the keyboard a
 
 ## Categories
 
-| Category     | Components                                                                                |
+<details>
+<summary>The components of each category</summary>
+
+| Category | Components |
 | ------------ | ----------------------------------------------------------------------------------------- |
-| `Form`       | Inputs, Select, Combobox, MultiSelect, DatePicker, Calendar, Otp, TagsInput, FileDropzone |
-| `Layout`     | Container, Grid, Flex, AppBar, BottomNavigation, Splitter, Sticky                         |
-| `Content`    | Heading, Paragraph, Link, List, CodeBlock, Terminal, JsonViewer, Diff, Markdown           |
-| `Medias`     | Image, LazyImage, Carousel, Lightbox, Player, Audio, Video                                |
-| `Display`    | Card, Badge, Avatar, Accordion, Chip, List, Timeline, Rating, Stat                        |
-| `Feedback`   | Alert, Toast, Progress, Skeleton, Banner, CookieBanner                                    |
-| `Navigation` | Tabs, Pagination, Breadcrumb, Stepper, TreeView, CommandPalette, SkipLink, BackToTop      |
-| `Overlay`    | Modal, Dialog, Drawer, Popover, Dropdown, Tooltip, ContextMenu                            |
-| `Data`       | DataTable (sort, filters, server mode), VirtualScroll, InfiniteScroll, SortableList       |
-| `Utility`    | ThemeSwitcher, ShareButton, Countdown                                                     |
+| `Form` | Inputs, Select, Combobox, MultiSelect, DatePicker, Calendar, Otp, TagsInput, FileDropzone |
+| `Layout` | Container, Grid, Flex, AppBar, BottomNavigation, Splitter, Sticky |
+| `Content` | Heading, Paragraph, Link, List, CodeBlock, Terminal, JsonViewer, Diff, Markdown |
+| `Medias` | Image, LazyImage, Carousel, Lightbox, Player, Audio, Video |
+| `Display` | Card, Badge, Avatar, Accordion, Chip, List, Timeline, Rating, Stat |
+| `Feedback` | Alert, Toast, Progress, Skeleton, Banner, CookieBanner |
+| `Navigation` | Tabs, Pagination, Breadcrumb, Stepper, TreeView, CommandPalette, SkipLink, BackToTop |
+| `Overlay` | Modal, Dialog, Drawer, Popover, Dropdown, Tooltip, ContextMenu |
+| `Data` | DataTable (sort, filters, server mode), VirtualScroll, InfiniteScroll, SortableList |
+| `Utility` | ThemeSwitcher, ShareButton, Countdown |
+
+</details>
 
 ---
 
