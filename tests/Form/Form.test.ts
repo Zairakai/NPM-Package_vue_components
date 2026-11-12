@@ -18,7 +18,15 @@ const FormInputMock = {
 
 const FormLabelMock = {
   template: '<label />',
-  props: ['id', 'label', 'class', 'iconBefore', 'iconAfter', 'prefix', 'suffix'],
+  props: [
+    'id',
+    'label',
+    'class',
+    'iconBefore',
+    'iconAfter',
+    'prefix',
+    'suffix',
+  ],
 }
 
 const FormAdditionalMock = {
@@ -26,7 +34,7 @@ const FormAdditionalMock = {
   props: ['text'],
 }
 
-describe('FormCheckbox (field=false — raw input)', () => {
+describe('FormCheckbox (field=false: raw input)', () => {
   it('renders a raw checkbox input when field=false', () => {
     const wrapper = mount(Checkbox, {
       props: { field: false, modelValue: false, name: 'agree' },
@@ -45,7 +53,7 @@ describe('FormCheckbox (field=false — raw input)', () => {
   })
 })
 
-describe('FormCheckbox (field=true — uses FormInput)', () => {
+describe('FormCheckbox (field=true: uses FormInput)', () => {
   it('renders via FormInput stub when field=true', () => {
     const wrapper = mount(Checkbox, {
       props: { field: true, modelValue: false },

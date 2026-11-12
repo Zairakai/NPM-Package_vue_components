@@ -1,50 +1,60 @@
 <script setup>
-  import { childPath, contains, display, entriesOf, kindOf } from '@content/json'
-  import { computed } from 'vue'
+import { childPath, contains, display, entriesOf, kindOf } from '@content/json'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'ContentJsonNode',
-  })
+defineOptions({
+  name: 'ContentJsonNode',
+})
 
-  const props = defineProps({
-    name: {
-      type: String,
-      default: '',
-    },
-    value: {
-      type: null,
-      default: null,
-    },
-    path: {
-      type: String,
-      default: '',
-    },
-    depth: {
-      type: Number,
-      default: 0,
-    },
-    expand: {
-      type: Number,
-      default: 1,
-    },
-    search: {
-      type: String,
-      default: '',
-    },
-  })
+const props = defineProps({
+  name: {
+    type: String,
+    default: '',
+  },
+  value: {
+    type: null,
+    default: null,
+  },
+  path: {
+    type: String,
+    default: '',
+  },
+  depth: {
+    type: Number,
+    default: 0,
+  },
+  expand: {
+    type: Number,
+    default: 1,
+  },
+  search: {
+    type: String,
+    default: '',
+  },
+})
 
-  const emit = defineEmits(['select'])
+const emit = defineEmits(['select'])
 
-  const kind = computed(() => kindOf(props.value))
-  const branch = computed(() => 'object' === kind.value || 'array' === kind.value)
-  const children = computed(() => entriesOf(props.value))
-  const matches = computed(() => '' !== props.search && contains(props.value, props.search, props.name))
-  // A branch opens by default down to a depth, and for every match of the search.
-  const open = computed(() => props.depth < props.expand || matches.value)
-  const label = computed(() => ('array' === kind.value ? `[${children.value.length}]` : `{${children.value.length}}`))
-  const ownMatch = computed(() => '' !== props.search && props.name.toLowerCase().includes(props.search.toLowerCase()))
+const kind = computed(() => kindOf(props.value))
+const branch = computed(() => kind.value === 'object' || kind.value === 'array')
+const children = computed(() => entriesOf(props.value))
+const matches = computed(
+  () => props.search !== '' && contains(props.value, props.search, props.name),
+)
+// A branch opens by default down to a depth, and for every match of the search.
+const open = computed(() => props.depth < props.expand || matches.value)
+const label = computed(() =>
+  kind.value === 'array'
+    ? `[${children.value.length}]`
+    : `{${children.value.length}}`,
+)
+const ownMatch = computed(
+  () =>
+    props.search !== '' &&
+    props.name.toLowerCase().includes(props.search.toLowerCase()),
+)
 
-  const select = () => emit('select', { path: props.path, value: props.value })
+const select = () => emit('select', { path: props.path, value: props.value })
 </script>
 
 <template>
@@ -54,19 +64,10 @@
     :data-path="path"
     :data-match="matches ? '' : undefined"
   >
-    <button
-      v-if="'' !== name"
-      type="button"
-      class="json-key"
-      @click="select"
-    >
+    <button v-if="name !== ''" type="button" class="json-key" @click="select">
       {{ name }}
     </button>
-    <span
-      class="json-value"
-      :data-type="kind"
-      >{{ display(value) }}</span
-    >
+    <span class="json-value" :data-type="kind">{{ display(value) }}</span>
   </li>
   <li
     v-else
@@ -77,18 +78,14 @@
     <details :open="open">
       <summary>
         <button
-          v-if="'' !== name"
+          v-if="name !== ''"
           type="button"
           class="json-key"
           @click.prevent="select"
         >
           {{ name }}
         </button>
-        <span
-          class="json-count"
-          :data-type="kind"
-          >{{ label }}</span
-        >
+        <span class="json-count" :data-type="kind">{{ label }}</span>
       </summary>
       <ul class="json-children">
         <ContentJsonNode

@@ -4,8 +4,13 @@ import { vi } from 'vitest'
  * jsdom does not implement the open state of <dialog>: this gives it the
  * behaviour of a browser (open attribute, close event, returnValue, cancel).
  */
-export function installDialog(options: { closedBy?: boolean; requestClose?: boolean } = {}) {
-  const proto = HTMLDialogElement.prototype as unknown as Record<string, unknown>
+export function installDialog(
+  options: { closedBy?: boolean; requestClose?: boolean } = {},
+) {
+  const proto = HTMLDialogElement.prototype as unknown as Record<
+    string,
+    unknown
+  >
   const original = {
     showModal: proto['showModal'],
     show: proto['show'],
@@ -37,7 +42,10 @@ export function installDialog(options: { closedBy?: boolean; requestClose?: bool
   proto['close'] = close
 
   if (options.requestClose) {
-    proto['requestClose'] = vi.fn(function (this: HTMLDialogElement, value?: string) {
+    proto['requestClose'] = vi.fn(function (
+      this: HTMLDialogElement,
+      value?: string,
+    ) {
       const event = new Event('cancel', { cancelable: true })
 
       this.dispatchEvent(event)

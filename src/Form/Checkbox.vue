@@ -1,42 +1,42 @@
 <script setup>
-  import { computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 
-  import FormInput from '@form/Input.vue'
+import FormInput from '@form/Input.vue'
 
-  defineOptions({
-    name: 'FormInputCheckbox',
-    inheritAttrs: false,
-  })
+defineOptions({
+  name: 'FormInputCheckbox',
+  inheritAttrs: false,
+})
 
-  const emit = defineEmits(['update:modelValue', 'isValid'])
+const emit = defineEmits(['update:modelValue', 'isValid'])
 
-  const inputRef = ref()
-  const isValid = ref(true)
+const inputRef = ref()
+const isValid = ref(true)
 
-  const localValue = computed({
-    get: () => props.modelValue,
-    set: (newValue) => {
-      if (inputRef.value?.checkValidity()) {
-        isValid.value = true
-      } else {
-        isValid.value = false
-      }
+const localValue = computed({
+  get: () => props.modelValue,
+  set: (newValue) => {
+    if (inputRef.value?.checkValidity()) {
+      isValid.value = true
+    } else {
+      isValid.value = false
+    }
 
-      emit('update:modelValue', newValue)
-      emit('isValid', isValid.value)
-    },
-  })
+    emit('update:modelValue', newValue)
+    emit('isValid', isValid.value)
+  },
+})
 
-  const props = defineProps({
-    modelValue: {
-      type: [String, Number, Boolean, null],
-      default: null,
-    },
-    field: {
-      type: Boolean,
-      default: true,
-    },
-  })
+const props = defineProps({
+  modelValue: {
+    type: [String, Number, Boolean, null],
+    default: null,
+  },
+  field: {
+    type: Boolean,
+    default: true,
+  },
+})
 </script>
 
 <template>

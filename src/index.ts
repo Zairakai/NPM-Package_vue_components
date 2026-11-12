@@ -31,10 +31,22 @@ export { useControllable } from './composables/useControllable.js'
 export type { ControllableQuery } from './composables/useControllable.js'
 export { computePosition, useFloating } from './composables/useFloating.js'
 export type { FloatingPlacement } from './composables/useFloating.js'
-export { fetchFetcher, httpFetcher, toQuery, useRemoteData } from './composables/useRemoteData.js'
-export type { HttpClient, RemoteDataOptions } from './composables/useRemoteData.js'
+export {
+  fetchFetcher,
+  httpFetcher,
+  toQuery,
+  useRemoteData,
+} from './composables/useRemoteData.js'
+export type {
+  HttpClient,
+  RemoteDataOptions,
+} from './composables/useRemoteData.js'
 export { useToast } from './composables/useToast.js'
-export type { Toast, ToastOptions, ToastVariant } from './composables/useToast.js'
+export type {
+  Toast,
+  ToastOptions,
+  ToastVariant,
+} from './composables/useToast.js'
 export { useUid } from './composables/useUid.js'
 
 // Plugin installation options
@@ -58,7 +70,8 @@ const VueComponentsPlugin: Plugin = {
     // Provide global config to all components via inject.
     app.provide(ZK_CONFIG_KEY, {
       ...DEFAULT_ZK_CONFIG,
-      minPasswordLength: options.minPasswordLength ?? DEFAULT_ZK_CONFIG.minPasswordLength,
+      minPasswordLength:
+        options.minPasswordLength ?? DEFAULT_ZK_CONFIG.minPasswordLength,
       ...(options.queryAdapter ? { queryAdapter: options.queryAdapter } : {}),
     })
 
@@ -68,9 +81,10 @@ const VueComponentsPlugin: Plugin = {
       eager: true,
     })
 
-    for (const path in components) {
-      const component = components[path]
-      const name = (component.default.name ?? path.split('/').pop()?.replace('.vue', '') ?? '') as string
+    for (const [path, component] of Object.entries(components)) {
+      const name = (component.default.name ??
+        path.split('/').pop()?.replace('.vue', '') ??
+        '') as string
 
       if (options.prefix) {
         app.component(`${options.prefix}${name}`, component.default)

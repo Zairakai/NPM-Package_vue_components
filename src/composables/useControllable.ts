@@ -1,5 +1,9 @@
 import { type Ref, type WritableComputedRef, computed, ref } from 'vue'
-import { type QueryAdapter, type QueryWriteMode, useQueryParam } from './useQueryParam'
+import {
+  type QueryAdapter,
+  type QueryWriteMode,
+  useQueryParam,
+} from './useQueryParam'
 
 /**
  * Keep the value in a query parameter of the URL, so it can be shared,
@@ -26,7 +30,7 @@ export function useControllable<T>(
   key: string,
   emit: (event: string, value: T) => void,
   initial: T,
-  query?: ControllableQuery<T>
+  query?: ControllableQuery<T>,
 ): WritableComputedRef<T> {
   const inner: Ref<T> = query?.param
     ? useQueryParam<T>(query.param, {

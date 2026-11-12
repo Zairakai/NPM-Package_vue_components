@@ -9,7 +9,8 @@ const selections: Record<string, string | undefined> = reactive({})
 export function groupSelection(group: string): string | undefined {
   if (undefined === selections[group]) {
     try {
-      selections[group] = window.localStorage.getItem(`${STORAGE_PREFIX}${group}`) ?? undefined
+      selections[group] =
+        window.localStorage.getItem(`${STORAGE_PREFIX}${group}`) ?? undefined
     } catch {
       // Storage can be blocked (private mode): the choice only lasts for the page.
     }

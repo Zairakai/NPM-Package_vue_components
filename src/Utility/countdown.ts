@@ -21,12 +21,16 @@ export function remaining(target: number, now: number): Remaining {
 
 /** The ISO 8601 duration of a remaining time, for the datetime attribute of <time>: P1DT2H3M4S. */
 export function isoDuration(value: Remaining): string {
-  const date = 0 < value.days ? `${value.days}D` : ''
+  const date = value.days > 0 ? `${value.days}D` : ''
 
   return `P${date}T${value.hours}H${value.minutes}M${value.seconds}S`
 }
 
 /** The time of a target given as a date, a timestamp or an ISO string. NaN when it is not one. */
 export function toTime(target: Date | number | string): number {
-  return target instanceof Date ? target.getTime() : 'number' === typeof target ? target : new Date(target).getTime()
+  return target instanceof Date
+    ? target.getTime()
+    : typeof target === 'number'
+      ? target
+      : new Date(target).getTime()
 }

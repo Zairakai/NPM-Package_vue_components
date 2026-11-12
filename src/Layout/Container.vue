@@ -1,21 +1,21 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutContainer',
-  })
+defineOptions({
+  name: 'LayoutContainer',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  role: String,
+})
 
-  const containerProps = computed(() => ({
-    id: props.id,
-    class: `container ${props.class ?? ''}`.trim(),
-    role: props.role,
-  }))
+const containerProps = computed(() => ({
+  id: props.id,
+  class: `container ${props.class ?? ''}`.trim(),
+  role: props.role,
+}))
 </script>
 
 <template>

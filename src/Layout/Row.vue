@@ -1,23 +1,23 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutRow',
-  })
+defineOptions({
+  name: 'LayoutRow',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    row: {
-      type: String,
-      default: 'row',
-    },
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  row: {
+    type: String,
+    default: 'row',
+  },
+})
 
-  const rowProps = computed(() => ({
-    id: props.id,
-    class: `${props.row} ${props.class ?? ''}`.trim(),
-  }))
+const rowProps = computed(() => ({
+  id: props.id,
+  class: `${props.row} ${props.class ?? ''}`.trim(),
+}))
 </script>
 
 <template>

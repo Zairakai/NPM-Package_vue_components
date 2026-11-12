@@ -1,90 +1,86 @@
 <script setup>
-  import { useControllable } from '@/composables/useControllable'
-  import { computed } from 'vue'
+import { useControllable } from '@/composables/useControllable'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'FeedbackBanner',
-  })
+defineOptions({
+  name: 'FeedbackBanner',
+})
 
-  const emit = defineEmits(['update:modelValue', 'dismiss'])
+const emit = defineEmits(['update:modelValue', 'dismiss'])
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    // Whether it shows.
-    modelValue: {
-      type: Boolean,
-      default: undefined,
+const props = defineProps({
+  id: String,
+  class: String,
+  // Whether it shows.
+  modelValue: {
+    type: Boolean,
+    default: undefined,
+  },
+  variant: {
+    type: String,
+    default: 'info',
+    validator(value) {
+      return ['info', 'success', 'warning', 'error'].includes(value)
     },
-    variant: {
-      type: String,
-      default: 'info',
-      validator(value) {
-        return ['info', 'success', 'warning', 'error'].includes(value)
-      },
-    },
-    dismissible: {
-      type: Boolean,
-      default: false,
-    },
-    // Remember the dismissal in the browser under this key, so it does not come back at each visit.
-    storageKey: String,
-    dismissLabel: {
-      type: String,
-      default: 'Dismiss',
-    },
-  })
+  },
+  dismissible: {
+    type: Boolean,
+    default: false,
+  },
+  // Remember the dismissal in the browser under this key, so it does not come back at each visit.
+  storageKey: String,
+  dismissLabel: {
+    type: String,
+    default: 'Dismiss',
+  },
+})
 
-  function dismissed() {
-    try {
-      return Boolean(props.storageKey) && '1' === window.localStorage.getItem(props.storageKey)
-    } catch {
-      return false
-    }
+function dismissed() {
+  try {
+    return (
+      Boolean(props.storageKey) &&
+      window.localStorage.getItem(props.storageKey) === '1'
+    )
+  } catch {
+    return false
   }
+}
 
-  const state = useControllable(props, 'modelValue', emit, !dismissed())
+const state = useControllable(props, 'modelValue', emit, !dismissed())
 
-  function dismiss() {
-    state.value = false
-    emit('dismiss')
+function dismiss() {
+  state.value = false
+  emit('dismiss')
 
-    try {
-      if (props.storageKey) {
-        window.localStorage.setItem(props.storageKey, '1')
-      }
-    } catch {
-      // Storage can be blocked: it only stays hidden for the page.
+  try {
+    if (props.storageKey) {
+      window.localStorage.setItem(props.storageKey, '1')
     }
+  } catch {
+    // Storage can be blocked: it only stays hidden for the page.
   }
+}
 
-  const bannerProps = computed(() => ({
-    id: props.id,
-    class: `banner ${props.class ?? ''}`.trim(),
-    'data-variant': props.variant,
-    role: 'error' === props.variant || 'warning' === props.variant ? 'alert' : 'status',
-  }))
+const bannerProps = computed(() => ({
+  id: props.id,
+  class: `banner ${props.class ?? ''}`.trim(),
+  'data-variant': props.variant,
+  role:
+    props.variant === 'error' || props.variant === 'warning'
+      ? 'alert'
+      : 'status',
+}))
 </script>
 
 <template>
-  <div
-    v-if="state"
-    v-bind="bannerProps"
-  >
-    <div
-      v-if="$slots.icon"
-      class="banner-icon"
-      aria-hidden="true"
-    >
+  <div v-if="state" v-bind="bannerProps">
+    <div v-if="$slots.icon" class="banner-icon" aria-hidden="true">
       <slot name="icon" />
     </div>
     <div class="banner-content">
       <slot />
     </div>
-    <div
-      v-if="$slots.actions"
-      class="banner-actions"
-    >
+    <div v-if="$slots.actions" class="banner-actions">
       <slot name="actions" />
     </div>
     <button

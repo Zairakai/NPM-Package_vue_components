@@ -1,22 +1,22 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'FormFieldset',
-  })
+defineOptions({
+  name: 'FormFieldset',
+})
 
-  const props = defineProps({
-    legend: String,
-    legendBefore: {
-      type: Boolean,
-      default: false,
-    },
-    class: String,
-  })
+const props = defineProps({
+  legend: String,
+  legendBefore: {
+    type: Boolean,
+    default: false,
+  },
+  class: String,
+})
 
-  const fieldsetProps = computed(() => ({
-    class: props.class,
-  }))
+const fieldsetProps = computed(() => ({
+  class: props.class,
+}))
 </script>
 
 <template>

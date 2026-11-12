@@ -45,7 +45,9 @@ const stubs = { FormInput: FormInputStub }
 
 describe('FormLabel', () => {
   it('renders <label> element', () => {
-    const wrapper = mount(Label, { props: { label: 'My label', id: 'field-id' } })
+    const wrapper = mount(Label, {
+      props: { label: 'My label', id: 'field-id' },
+    })
     expect(wrapper.find('label').exists()).toBe(true)
   })
 
@@ -69,7 +71,9 @@ describe('FormFieldset', () => {
   })
 
   it('renders legend before slot when legendBefore=true', () => {
-    const wrapper = mount(Fieldset, { props: { legend: 'My section', legendBefore: true } })
+    const wrapper = mount(Fieldset, {
+      props: { legend: 'My section', legendBefore: true },
+    })
     const children = wrapper.find('fieldset').element.children
     expect(children[0].tagName).toBe('LEGEND')
   })

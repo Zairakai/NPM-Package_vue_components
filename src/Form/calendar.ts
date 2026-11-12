@@ -13,7 +13,11 @@ export function fromIso(value: string | undefined | null): Date | undefined {
     return undefined
   }
 
-  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+  const date = new Date(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+  )
 
   return toIso(date) === value ? date : undefined
 }
@@ -25,13 +29,25 @@ export function addDays(date: Date, days: number): Date {
 /** Move by months, staying inside the target month (31 Jan + 1 month = 28 or 29 Feb). */
 export function addMonths(date: Date, months: number): Date {
   const target = new Date(date.getFullYear(), date.getMonth() + months, 1)
-  const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()
+  const last = new Date(
+    target.getFullYear(),
+    target.getMonth() + 1,
+    0,
+  ).getDate()
 
-  return new Date(target.getFullYear(), target.getMonth(), Math.min(date.getDate(), last))
+  return new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    Math.min(date.getDate(), last),
+  )
 }
 
 /** The weeks of a month as rows of seven days, from the first day of the week (0 = Sunday, 1 = Monday). */
-export function monthGrid(year: number, month: number, weekStart = 1): Date[][] {
+export function monthGrid(
+  year: number,
+  month: number,
+  weekStart = 1,
+): Date[][] {
   const first = new Date(year, month, 1)
   const offset = (first.getDay() - weekStart + 7) % 7
   const start = addDays(first, -offset)
@@ -39,12 +55,20 @@ export function monthGrid(year: number, month: number, weekStart = 1): Date[][] 
   const rows = Math.ceil((offset + days) / 7)
 
   return Array.from({ length: rows }, (_, row) =>
-    Array.from({ length: 7 }, (_, column) => addDays(start, row * 7 + column))
+    Array.from({ length: 7 }, (_, column) => addDays(start, row * 7 + column)),
   )
 }
 
-export function isBetween(iso: string, start: string | undefined, end: string | undefined): boolean {
-  return Boolean(start && end) && start! <= iso && iso <= end!
+export function isBetween(
+  iso: string,
+  start: string | undefined,
+  end: string | undefined,
+): boolean {
+  if (!start || !end) {
+    return false
+  }
+
+  return start <= iso && iso <= end
 }
 
 /** Keep an ISO day inside optional bounds. */

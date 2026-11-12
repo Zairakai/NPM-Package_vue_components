@@ -11,14 +11,16 @@ export function toQuery(params: Record<string, unknown>): URLSearchParams {
   const query = new URLSearchParams()
 
   const add = (key: string, value: unknown): void => {
-    if (null === value || undefined === value || '' === value) {
+    if (value === null || undefined === value || value === '') {
       return
     }
 
     if (Array.isArray(value)) {
       value.forEach((item) => add(key, item))
-    } else if ('object' === typeof value) {
-      Object.entries(value as Record<string, unknown>).forEach(([name, item]) => add(`${key}[${name}]`, item))
+    } else if (typeof value === 'object') {
+      Object.entries(value as Record<string, unknown>).forEach(([name, item]) =>
+        add(`${key}[${name}]`, item),
+      )
     } else {
       query.append(key, String(value as Primitive))
     }
@@ -45,7 +47,7 @@ export interface RemoteDataOptions {
 export function useRemoteData<T, P extends Record<string, unknown>>(
   fetcher: (params: P, context: { signal: AbortSignal }) => Promise<T>,
   params: Ref<P>,
-  options: RemoteDataOptions = {}
+  options: RemoteDataOptions = {},
 ) {
   const data = ref<T | undefined>(undefined) as Ref<T | undefined>
   const error = ref<unknown>(null)
@@ -72,7 +74,10 @@ export function useRemoteData<T, P extends Record<string, unknown>>(
         data.value = result
       }
     } catch (failure) {
-      if (current === counter && !(failure instanceof DOMException && 'AbortError' === failure.name)) {
+      if (
+        current === counter &&
+        !(failure instanceof DOMException && failure.name === 'AbortError')
+      ) {
         error.value = failure
       }
     } finally {
@@ -109,7 +114,10 @@ export function useRemoteData<T, P extends Record<string, unknown>>(
 
 /** What an HTTP client needs to have to be used here: axios, `@zairakai/js-http-client`, or any client like them. */
 export interface HttpClient {
-  get: (url: string, config: { params?: URLSearchParams; signal?: AbortSignal }) => Promise<{ data: unknown }>
+  get: (
+    url: string,
+    config: { params?: URLSearchParams; signal?: AbortSignal },
+  ) => Promise<{ data: unknown }>
 }
 
 /**
@@ -117,10 +125,13 @@ export interface HttpClient {
  * of `@zairakai/js-http-client`) with the parameters as the query string and the
  * abort signal. It returns the `data` of the response, or what `select` picks in it.
  */
-export function httpFetcher<T, P extends Record<string, unknown> = Record<string, unknown>>(
+export function httpFetcher<
+  T,
+  P extends Record<string, unknown> = Record<string, unknown>,
+>(
   client: HttpClient,
   url: string,
-  select: (data: unknown) => T = (data) => data as T
+  select: (data: unknown) => T = (data) => data as T,
 ): (params: P, context: { signal: AbortSignal }) => Promise<T> {
   return async (params, { signal }) => {
     const response = await client.get(url, { params: toQuery(params), signal })
@@ -130,18 +141,24 @@ export function httpFetcher<T, P extends Record<string, unknown> = Record<string
 }
 
 /** The same with `fetch`: GET with the parameters as the query string, the JSON of the answer, an error for a status that is not ok. */
-export function fetchFetcher<T, P extends Record<string, unknown> = Record<string, unknown>>(
+export function fetchFetcher<
+  T,
+  P extends Record<string, unknown> = Record<string, unknown>,
+>(
   url: string,
   init: RequestInit = {},
-  select: (data: unknown) => T = (data) => data as T
+  select: (data: unknown) => T = (data) => data as T,
 ): (params: P, context: { signal: AbortSignal }) => Promise<T> {
   return async (params, { signal }) => {
     const query = toQuery(params).toString()
-    const response = await fetch(query ? `${url}${url.includes('?') ? '&' : '?'}${query}` : url, {
-      ...init,
-      headers: { Accept: 'application/json', ...init.headers },
-      signal,
-    })
+    const response = await fetch(
+      query ? `${url}${url.includes('?') ? '&' : '?'}${query}` : url,
+      {
+        ...init,
+        headers: { Accept: 'application/json', ...init.headers },
+        signal,
+      },
+    )
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)

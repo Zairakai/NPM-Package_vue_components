@@ -9,7 +9,15 @@ const FormFieldMock = {
 
 const FormLabelMock = {
   template: '<label>Test Label</label>',
-  props: ['id', 'label', 'fieldClass', 'iconBefore', 'iconAfter', 'prefix', 'suffix'],
+  props: [
+    'id',
+    'label',
+    'fieldClass',
+    'iconBefore',
+    'iconAfter',
+    'prefix',
+    'suffix',
+  ],
 }
 
 const FormAdditionalMock = {
@@ -79,7 +87,10 @@ describe('FormInputPassword', () => {
   })
 
   it('updates the aria-label on toggle, with i18n override props', async () => {
-    const wrapper = mountPassword({ labelShow: 'Afficher', labelHide: 'Masquer' })
+    const wrapper = mountPassword({
+      labelShow: 'Afficher',
+      labelHide: 'Masquer',
+    })
 
     const button = wrapper.find('[data-toggle-visibility]')
     expect(button.attributes('aria-label')).toBe('Afficher')

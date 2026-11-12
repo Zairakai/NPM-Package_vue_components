@@ -27,7 +27,10 @@ describe('OverlayModal with the native dialog', () => {
     resetSupport()
   })
 
-  const mountModal = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) => {
+  const mountModal = (
+    props: Record<string, unknown> = {},
+    slots: Record<string, string> = {},
+  ) => {
     const wrapper = mount(Modal, { props, slots, attachTo: document.body })
 
     mounted.push(wrapper)
@@ -38,7 +41,7 @@ describe('OverlayModal with the native dialog', () => {
   it('should render a closed dialog with its title, body and footer', () => {
     const wrapper = mountModal(
       { title: 'Settings', id: 'm', class: 'x' },
-      { default: 'Body', footer: '<button>Save</button>' }
+      { default: 'Body', footer: '<button>Save</button>' },
     )
 
     expect(wrapper.element.tagName).toBe('DIALOG')
@@ -48,8 +51,12 @@ describe('OverlayModal with the native dialog', () => {
     expect(wrapper.find('.modal-title').text()).toBe('Settings')
     expect(wrapper.find('.modal-body').text()).toBe('Body')
     expect(wrapper.find('.modal-footer button').exists()).toBe(true)
-    expect(wrapper.attributes('aria-labelledby')).toBe(wrapper.find('.modal-title').attributes('id'))
-    expect(wrapper.attributes('aria-describedby')).toBe(wrapper.find('.modal-body').attributes('id'))
+    expect(wrapper.attributes('aria-labelledby')).toBe(
+      wrapper.find('.modal-title').attributes('id'),
+    )
+    expect(wrapper.attributes('aria-describedby')).toBe(
+      wrapper.find('.modal-body').attributes('id'),
+    )
     expect(wrapper.attributes('closedby')).toBe('closerequest')
     expect(wrapper.attributes('role')).toBeUndefined()
   })
@@ -87,7 +94,9 @@ describe('OverlayModal with the native dialog', () => {
     await nextTick()
     expect((wrapper.element as HTMLDialogElement).open).toBe(true)
 
-    ;(wrapper.vm as unknown as { close: (value?: string) => void }).close('done')
+    ;(wrapper.vm as unknown as { close: (value?: string) => void }).close(
+      'done',
+    )
     await nextTick()
 
     expect((wrapper.element as HTMLDialogElement).open).toBe(false)
@@ -133,7 +142,9 @@ describe('OverlayModal with the native dialog', () => {
     await nextTick()
     await nextTick()
 
-    expect(wrapper.emitted('update:modelValue')?.map((event) => event[0])).toEqual([true, false])
+    expect(
+      wrapper.emitted('update:modelValue')?.map((event) => event[0]),
+    ).toEqual([true, false])
     expect(wrapper.emitted('close')?.[0]).toEqual(['escaped'])
     expect(document.documentElement.style.overflow).toBe('')
   })
@@ -152,7 +163,9 @@ describe('OverlayModal with the native dialog', () => {
   it('should ask to close with the close button, and the cancel event can refuse', async () => {
     const wrapper = mountModal({ modelValue: true, title: 'T' })
 
-    wrapper.element.addEventListener('cancel', (event) => event.preventDefault())
+    wrapper.element.addEventListener('cancel', (event) =>
+      event.preventDefault(),
+    )
     await wrapper.find('.modal-close').trigger('click')
 
     expect((wrapper.element as HTMLDialogElement).open).toBe(true)
@@ -160,7 +173,11 @@ describe('OverlayModal with the native dialog', () => {
   })
 
   it('should close with the close button when nothing refuses', async () => {
-    const wrapper = mountModal({ modelValue: true, title: 'T', closeLabel: 'Fermer' })
+    const wrapper = mountModal({
+      modelValue: true,
+      title: 'T',
+      closeLabel: 'Fermer',
+    })
 
     expect(wrapper.find('.modal-close').attributes('aria-label')).toBe('Fermer')
 
@@ -171,7 +188,9 @@ describe('OverlayModal with the native dialog', () => {
   })
 
   it('should hide the close button when asked', () => {
-    expect(mountModal({ closeButton: false }).find('.modal-close').exists()).toBe(false)
+    expect(
+      mountModal({ closeButton: false }).find('.modal-close').exists(),
+    ).toBe(false)
   })
 
   it('should be an alertdialog when it is an alert', () => {
@@ -184,8 +203,9 @@ describe('OverlayModal with the native dialog', () => {
       {
         header: 'Custom head',
         close: 'X',
-        footer: '<template #footer="{ close }"><button class="inner" @click="close(\'ok\')">Done</button></template>',
-      }
+        footer:
+          '<template #footer="{ close }"><button class="inner" @click="close(\'ok\')">Done</button></template>',
+      },
     )
 
     expect(wrapper.find('.modal-title').text()).toBe('Custom head')
@@ -228,7 +248,8 @@ describe('OverlayModal with the native dialog', () => {
 
     const content = wrapper.find('.modal-content').element
 
-    content.getBoundingClientRect = () => ({ left: 100, right: 200, top: 100, bottom: 200 }) as DOMRect
+    content.getBoundingClientRect = () =>
+      ({ left: 100, right: 200, top: 100, bottom: 200 }) as DOMRect
 
     await wrapper.trigger('click', { clientX: 10, clientY: 10 })
     await nextTick()
@@ -263,7 +284,9 @@ describe('OverlayModal with the native dialog', () => {
   })
 
   it('should dispatch its own cancel and close without requestClose support', async () => {
-    delete (HTMLDialogElement.prototype as unknown as Record<string, unknown>)['requestClose']
+    delete (HTMLDialogElement.prototype as unknown as Record<string, unknown>)[
+      'requestClose'
+    ]
     setSupport({ dialogRequestClose: false })
     const wrapper = mountModal({ title: 'T' })
 
@@ -306,11 +329,14 @@ describe('OverlayModal with the native dialog', () => {
         render: () =>
           h(
             Modal,
-            { modelValue: open.value, 'onUpdate:modelValue': (value: boolean) => (open.value = value) },
-            () => 'Body'
+            {
+              modelValue: open.value,
+              'onUpdate:modelValue': (value: boolean) => (open.value = value),
+            },
+            () => 'Body',
           ),
       }),
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     open.value = true
@@ -335,7 +361,11 @@ describe('OverlayModal with the native dialog', () => {
   })
 
   it('should validate the closedby values', () => {
-    const { closedby } = (Modal as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { closedby } = (
+      Modal as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(closedby.validator('any')).toBe(true)
     expect(closedby.validator('x')).toBe(false)
@@ -350,7 +380,10 @@ describe('OverlayModal without the dialog element', () => {
 
   afterEach(() => resetSupport())
 
-  const mountModal = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) => {
+  const mountModal = (
+    props: Record<string, unknown> = {},
+    slots: Record<string, string> = {},
+  ) => {
     const wrapper = mount(Modal, { props, slots, attachTo: document.body })
 
     mounted.push(wrapper)
@@ -358,9 +391,18 @@ describe('OverlayModal without the dialog element', () => {
     return wrapper
   }
 
-  const key = async (wrapper: ReturnType<typeof mountModal>, name: string, options: KeyboardEventInit = {}) => {
+  const key = async (
+    wrapper: ReturnType<typeof mountModal>,
+    name: string,
+    options: KeyboardEventInit = {},
+  ) => {
     wrapper.element.dispatchEvent(
-      new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true, ...options })
+      new KeyboardEvent('keydown', {
+        key: name,
+        bubbles: true,
+        cancelable: true,
+        ...options,
+      }),
     )
     await nextTick()
     await nextTick()
@@ -379,7 +421,9 @@ describe('OverlayModal without the dialog element', () => {
   })
 
   it('should not say it is modal when it is not', () => {
-    expect(mountModal({ modal: false }).attributes('aria-modal')).toBeUndefined()
+    expect(
+      mountModal({ modal: false }).attributes('aria-modal'),
+    ).toBeUndefined()
   })
 
   it('should show, lock the scroll, focus inside and close with the focus returned', async () => {
@@ -388,7 +432,10 @@ describe('OverlayModal without the dialog element', () => {
     document.body.append(opener)
     opener.focus()
 
-    const wrapper = mountModal({ modelValue: false, title: 'T' }, { default: '<input id="first" />' })
+    const wrapper = mountModal(
+      { modelValue: false, title: 'T' },
+      { default: '<input id="first" />' },
+    )
 
     await wrapper.setProps({ modelValue: true })
 
@@ -427,7 +474,9 @@ describe('OverlayModal without the dialog element', () => {
   it('should let a cancel listener refuse the Escape', async () => {
     const wrapper = mountModal({ modelValue: true })
 
-    wrapper.element.addEventListener('cancel', (event) => event.preventDefault())
+    wrapper.element.addEventListener('cancel', (event) =>
+      event.preventDefault(),
+    )
     await key(wrapper, 'Escape')
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
@@ -436,7 +485,10 @@ describe('OverlayModal without the dialog element', () => {
   it('should trap the focus with Tab and Shift+Tab', async () => {
     const wrapper = mountModal(
       { modelValue: true, title: 'T' },
-      { default: '<button id="b1">One</button>', footer: '<button id="b2">Two</button>' }
+      {
+        default: '<button id="b1">One</button>',
+        footer: '<button id="b2">Two</button>',
+      },
     )
     const close = wrapper.find('.modal-close').element as HTMLElement
     const last = wrapper.find('#b2').element as HTMLElement
@@ -449,7 +501,8 @@ describe('OverlayModal without the dialog element', () => {
     await key(wrapper, 'Tab', { shiftKey: true })
     expect(document.activeElement).toBe(last)
 
-    wrapper.find('#b1').element instanceof HTMLElement && (wrapper.find('#b1').element as HTMLElement).focus()
+    wrapper.find('#b1').element instanceof HTMLElement &&
+      (wrapper.find('#b1').element as HTMLElement).focus()
     await key(wrapper, 'Tab')
     expect(document.activeElement).toBe(wrapper.find('#b1').element)
   })
@@ -478,10 +531,14 @@ describe('OverlayModal without the dialog element', () => {
   it('should store the return value of a close', async () => {
     const wrapper = mountModal({ modelValue: true })
 
-    ;(wrapper.vm as unknown as { close: (value: string) => void }).close('answer')
+    ;(wrapper.vm as unknown as { close: (value: string) => void }).close(
+      'answer',
+    )
     await nextTick()
 
-    expect((wrapper.element as unknown as { returnValue: string }).returnValue).toBe('answer')
+    expect(
+      (wrapper.element as unknown as { returnValue: string }).returnValue,
+    ).toBe('answer')
   })
 
   it('should close without a return value', async () => {
@@ -490,7 +547,9 @@ describe('OverlayModal without the dialog element', () => {
     ;(wrapper.vm as unknown as { close: () => void }).close()
     await nextTick()
 
-    expect((wrapper.element as unknown as { returnValue: string }).returnValue).toBe('')
+    expect(
+      (wrapper.element as unknown as { returnValue: string }).returnValue,
+    ).toBe('')
   })
 
   it('should be mounted open', () => {
@@ -508,7 +567,9 @@ describe('OverlayModal on the server', () => {
     vi.stubGlobal('document', undefined)
 
     try {
-      const html = await renderToString(createSSRApp({ render: () => h(Modal, { title: 'T' }, () => 'Body') }))
+      const html = await renderToString(
+        createSSRApp({ render: () => h(Modal, { title: 'T' }, () => 'Body') }),
+      )
 
       expect(html).toContain('<dialog')
     } finally {

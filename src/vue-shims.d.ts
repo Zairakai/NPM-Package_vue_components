@@ -13,5 +13,8 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  glob<T = any>(pattern: string, options?: { eager?: boolean }): Record<string, T>
+  glob<T = any>(
+    pattern: string,
+    options?: { eager?: boolean },
+  ): Record<string, T>
 }

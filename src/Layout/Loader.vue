@@ -1,18 +1,18 @@
 <script setup>
-  defineOptions({
-    name: 'LayoutLoader',
-  })
+defineOptions({
+  name: 'LayoutLoader',
+})
 
-  const _props = defineProps({
-    isLoading: {
-      type: Boolean,
-      default: true,
-    },
-    status: {
-      type: String,
-      default: '',
-    },
-  })
+const _props = defineProps({
+  isLoading: {
+    type: Boolean,
+    default: true,
+  },
+  status: {
+    type: String,
+    default: '',
+  },
+})
 </script>
 
 <template>

@@ -31,8 +31,16 @@ const nodes = [
 
 describe('tree helpers', () => {
   it('should list the nodes that can be reached', () => {
-    expect(visibleNodes(nodes, []).map((entry) => entry.node.id)).toEqual(['src', 'docs', 'readme'])
-    expect(visibleNodes(nodes, ['src']).map((entry) => `${entry.node.id}:${entry.depth}:${entry.parent}`)).toEqual([
+    expect(visibleNodes(nodes, []).map((entry) => entry.node.id)).toEqual([
+      'src',
+      'docs',
+      'readme',
+    ])
+    expect(
+      visibleNodes(nodes, ['src']).map(
+        (entry) => `${entry.node.id}:${entry.depth}:${entry.parent}`,
+      ),
+    ).toEqual([
       'src:0:null',
       'a:1:src',
       'sub:1:src',
@@ -40,7 +48,11 @@ describe('tree helpers', () => {
       'docs:0:null',
       'readme:0:null',
     ])
-    expect(visibleNodes(nodes, ['sub']).map((entry) => entry.node.id)).toEqual(['src', 'docs', 'readme'])
+    expect(visibleNodes(nodes, ['sub']).map((entry) => entry.node.id)).toEqual([
+      'src',
+      'docs',
+      'readme',
+    ])
   })
 
   it('should find the branches and the ancestors of a node', () => {
@@ -53,8 +65,12 @@ describe('tree helpers', () => {
 
 describe('NavigationTreeView', () => {
   const build = (props: Record<string, unknown> = {}) =>
-    mount(TreeView, { props: { nodes, label: 'Files', ...props }, attachTo: document.body })
-  const item = (wrapper: ReturnType<typeof build>, id: string) => wrapper.find(`[data-node-id="${id}"]`)
+    mount(TreeView, {
+      props: { nodes, label: 'Files', ...props },
+      attachTo: document.body,
+    })
+  const item = (wrapper: ReturnType<typeof build>, id: string) =>
+    wrapper.find(`[data-node-id="${id}"]`)
 
   it('should render a tree with levels and the expanded state', () => {
     const wrapper = build({ id: 't', class: 'x', expanded: ['src'] })
@@ -74,7 +90,11 @@ describe('NavigationTreeView', () => {
 
     expect(wrapper.findAll('[tabindex="0"]')).toHaveLength(1)
     expect(item(wrapper, 'src').attributes('tabindex')).toBe('0')
-    expect(build({ modelValue: 'readme' }).find('[data-node-id="readme"]').attributes('tabindex')).toBe('0')
+    expect(
+      build({ modelValue: 'readme' })
+        .find('[data-node-id="readme"]')
+        .attributes('tabindex'),
+    ).toBe('0')
   })
 
   it('should select a node with a click and emit it', async () => {
@@ -153,22 +173,31 @@ describe('NavigationTreeView', () => {
     await item(wrapper, 'src').trigger('keydown', { key: 'r' })
     expect(document.activeElement).toBe(item(wrapper, 'readme').element)
     await item(wrapper, 'readme').trigger('keydown', { key: 'Control' })
-    await item(wrapper, 'readme').trigger('keydown', { key: 'z', ctrlKey: true })
+    await item(wrapper, 'readme').trigger('keydown', {
+      key: 'z',
+      ctrlKey: true,
+    })
   })
 
   it('should reveal a node by opening its ancestors', async () => {
     const wrapper = build()
 
-    ;(wrapper.vm.$ as unknown as { exposed: { reveal: (id: string) => void } }).exposed.reveal('b')
+    ;(
+      wrapper.vm.$ as unknown as { exposed: { reveal: (id: string) => void } }
+    ).exposed.reveal('b')
     await nextTick()
     expect(item(wrapper, 'b').exists()).toBe(true)
-    ;(wrapper.vm.$ as unknown as { exposed: { reveal: (id: string) => void } }).exposed.reveal('zzz')
+    ;(
+      wrapper.vm.$ as unknown as { exposed: { reveal: (id: string) => void } }
+    ).exposed.reveal('zzz')
   })
 
   it('should render the node slot', () => {
     const wrapper = mount(TreeView, {
       props: { nodes },
-      slots: { default: '<template #default="{ node }">[{{ node.label }}]</template>' },
+      slots: {
+        default: '<template #default="{ node }">[{{ node.label }}]</template>',
+      },
     })
 
     expect(wrapper.find('.tree-item-label').text()).toBe('[src]')
@@ -178,7 +207,10 @@ describe('NavigationTreeView', () => {
 describe('NavigationSkipLink', () => {
   it('should link to the target and move the focus to it', async () => {
     document.body.innerHTML = '<main id="main"></main>'
-    const wrapper = mount(SkipLink, { props: { id: 's', class: 'x' }, attachTo: document.body })
+    const wrapper = mount(SkipLink, {
+      props: { id: 's', class: 'x' },
+      attachTo: document.body,
+    })
 
     expect(wrapper.attributes('href')).toBe('#main')
     expect(wrapper.text()).toBe('Skip to the main content')
@@ -188,12 +220,18 @@ describe('NavigationSkipLink', () => {
   })
 
   it('should accept a target with a hash, a label, and keep a tabindex that exists', async () => {
-    document.body.innerHTML = '<section id="content" tabindex="0"></section><button id="btn"></button>'
-    const wrapper = mount(SkipLink, { props: { target: '#content', label: 'Go' }, attachTo: document.body })
+    document.body.innerHTML =
+      '<section id="content" tabindex="0"></section><button id="btn"></button>'
+    const wrapper = mount(SkipLink, {
+      props: { target: '#content', label: 'Go' },
+      attachTo: document.body,
+    })
 
     expect(wrapper.attributes('href')).toBe('#content')
     await wrapper.trigger('click')
-    expect(document.getElementById('content')?.getAttribute('tabindex')).toBe('0')
+    expect(document.getElementById('content')?.getAttribute('tabindex')).toBe(
+      '0',
+    )
     await mount(SkipLink, { props: { target: 'btn' } }).trigger('click')
     await mount(SkipLink, { props: { target: 'missing' } }).trigger('click')
   })
@@ -225,7 +263,9 @@ describe('NavigationBackToTop', () => {
     const scrollTo = vi.fn()
 
     window.scrollTo = scrollTo as unknown as typeof window.scrollTo
-    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+    }) as unknown as typeof window.matchMedia
     const wrapper = mount(BackToTop, {
       props: { threshold: 100, label: 'Top', id: 'b', class: 'x' },
       attachTo: document.body,
@@ -245,7 +285,9 @@ describe('NavigationBackToTop', () => {
     const scrollTo = vi.fn()
 
     window.scrollTo = scrollTo as unknown as typeof window.scrollTo
-    window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia
+    window.matchMedia = vi
+      .fn()
+      .mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia
     await scroll(500)
     const wrapper = mount(BackToTop, { attachTo: document.body })
 
@@ -280,25 +322,38 @@ describe('NavigationCommandPalette', () => {
   })
 
   const build = (props: Record<string, unknown> = {}) =>
-    mount(CommandPalette, { props: { commands, modelValue: true, ...props }, attachTo: document.body })
+    mount(CommandPalette, {
+      props: { commands, modelValue: true, ...props },
+      attachTo: document.body,
+    })
 
   it('should list the commands by group in a listbox', async () => {
     const wrapper = build({ id: 'p', class: 'x' })
 
     await nextTick()
-    expect(wrapper.find('[role="combobox"]').attributes('aria-label')).toBe('Command palette')
+    expect(wrapper.find('[role="combobox"]').attributes('aria-label')).toBe(
+      'Command palette',
+    )
     expect(wrapper.find('[role="listbox"]').exists()).toBe(true)
-    expect(wrapper.findAll('.command-palette-heading').map((heading) => heading.text())).toEqual(['File', 'View'])
+    expect(
+      wrapper
+        .findAll('.command-palette-heading')
+        .map((heading) => heading.text()),
+    ).toEqual(['File', 'View'])
     expect(wrapper.findAll('[role="option"]')).toHaveLength(5)
     expect(wrapper.find('kbd').text()).toBe('Ctrl+N')
-    expect(wrapper.findAll('[role="option"]')[0].attributes('data-active')).toBeDefined()
+    expect(
+      wrapper.findAll('[role="option"]')[0].attributes('data-active'),
+    ).toBeDefined()
   })
 
   it('should filter while typing and show the empty text', async () => {
     const wrapper = build({ emptyText: 'Nothing' })
 
     await wrapper.find('input').setValue('theme')
-    expect(wrapper.findAll('[role="option"]').map((option) => option.text())).toEqual(['Change theme'])
+    expect(
+      wrapper.findAll('[role="option"]').map((option) => option.text()),
+    ).toEqual(['Change theme'])
     expect(wrapper.emitted('search')?.[0]).toEqual(['theme'])
     await wrapper.find('input').setValue('zzz')
     expect(wrapper.find('.command-palette-empty').text()).toBe('Nothing')
@@ -309,9 +364,13 @@ describe('NavigationCommandPalette', () => {
     const input = wrapper.find('input')
 
     await input.trigger('keydown', { key: 'ArrowDown' })
-    expect(input.attributes('aria-activedescendant')).toBe(wrapper.findAll('[role="option"]')[1].attributes('id'))
+    expect(input.attributes('aria-activedescendant')).toBe(
+      wrapper.findAll('[role="option"]')[1].attributes('id'),
+    )
     await input.trigger('keydown', { key: 'End' })
-    expect(wrapper.findAll('[role="option"]')[4].attributes('data-active')).toBeDefined()
+    expect(
+      wrapper.findAll('[role="option"]')[4].attributes('data-active'),
+    ).toBeDefined()
     await input.trigger('keydown', { key: 'ArrowDown' })
     await input.trigger('keydown', { key: 'ArrowUp' })
     await input.trigger('keydown', { key: 'Home' })
@@ -326,7 +385,9 @@ describe('NavigationCommandPalette', () => {
     await wrapper.findAll('[role="option"]')[3].trigger('click')
     expect(wrapper.emitted('select')).toBeUndefined()
     await wrapper.findAll('[role="option"]')[2].trigger('mousemove')
-    expect(wrapper.findAll('[role="option"]')[2].attributes('data-active')).toBeDefined()
+    expect(
+      wrapper.findAll('[role="option"]')[2].attributes('data-active'),
+    ).toBeDefined()
     await wrapper.findAll('[role="option"]')[3].trigger('mousemove')
     await wrapper.findAll('[role="option"]')[2].trigger('click')
     expect(wrapper.emitted('select')?.[0][0]).toMatchObject({ id: 'theme' })
@@ -335,10 +396,22 @@ describe('NavigationCommandPalette', () => {
   it('should open and close with the shortcut', async () => {
     const wrapper = build({ modelValue: undefined })
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'k',
+        ctrlKey: true,
+        cancelable: true,
+      }),
+    )
     await nextTick()
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'K', metaKey: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'K',
+        metaKey: true,
+        cancelable: true,
+      }),
+    )
     await nextTick()
     expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([false])
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k' }))
@@ -348,10 +421,15 @@ describe('NavigationCommandPalette', () => {
   it('should have no shortcut when empty, keep remote commands as they are and stop listening when removed', async () => {
     const none = build({ shortcut: '', modelValue: undefined })
 
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }),
+    )
     expect(none.emitted('update:modelValue')).toBeUndefined()
 
-    const remote = build({ remote: true, commands: [{ id: 'x', label: 'Server result' }] })
+    const remote = build({
+      remote: true,
+      commands: [{ id: 'x', label: 'Server result' }],
+    })
 
     await remote.find('input').setValue('q')
     expect(remote.findAll('[role="option"]')).toHaveLength(1)
@@ -361,7 +439,10 @@ describe('NavigationCommandPalette', () => {
   it('should render the command slot', () => {
     const wrapper = mount(CommandPalette, {
       props: { commands, modelValue: true },
-      slots: { command: '<template #command="{ command }">>{{ command.id }}</template>' },
+      slots: {
+        command:
+          '<template #command="{ command }">>{{ command.id }}</template>',
+      },
       attachTo: document.body,
     })
 
@@ -434,13 +515,16 @@ describe('OverlayContextMenu', () => {
     const wrapper = mount(
       {
         components: { ContextMenu, DropdownItem },
-        template: '<ContextMenu><p>Area</p><template #menu><DropdownItem>Pick</DropdownItem></template></ContextMenu>',
+        template:
+          '<ContextMenu><p>Area</p><template #menu><DropdownItem>Pick</DropdownItem></template></ContextMenu>',
       },
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
 
     await wrapper.find('.context-menu-area').trigger('contextmenu')
-    wrapper.find('[role="menu"]').element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    wrapper
+      .find('[role="menu"]')
+      .element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
     await nextTick()
     expect(wrapper.find('[role="menu"]').exists()).toBe(true)
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))

@@ -21,22 +21,45 @@ export function parseDiff(diff: string): DiffLine[] {
   let newNumber = 0
   let inHunk = false
 
-  for (const raw of diff.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n')) {
+  for (const raw of diff
+    .replace(/\r\n?/g, '\n')
+    .replace(/\n$/, '')
+    .split('\n')) {
     const hunk = HUNK.exec(raw)
 
     if (hunk) {
       oldNumber = Number(hunk[1])
       newNumber = Number(hunk[2])
       inHunk = true
-      lines.push({ type: 'hunk', text: raw, oldNumber: undefined, newNumber: undefined })
+      lines.push({
+        type: 'hunk',
+        text: raw,
+        oldNumber: undefined,
+        newNumber: undefined,
+      })
     } else if (!inHunk || /^(diff --git|index |--- |\+\+\+ )/.test(raw)) {
       inHunk = inHunk && !raw.startsWith('diff --git')
-      lines.push({ type: 'file', text: raw, oldNumber: undefined, newNumber: undefined })
+      lines.push({
+        type: 'file',
+        text: raw,
+        oldNumber: undefined,
+        newNumber: undefined,
+      })
     } else if (raw.startsWith('+')) {
-      lines.push({ type: 'add', text: raw.slice(1), oldNumber: undefined, newNumber })
+      lines.push({
+        type: 'add',
+        text: raw.slice(1),
+        oldNumber: undefined,
+        newNumber,
+      })
       newNumber += 1
     } else if (raw.startsWith('-')) {
-      lines.push({ type: 'del', text: raw.slice(1), oldNumber, newNumber: undefined })
+      lines.push({
+        type: 'del',
+        text: raw.slice(1),
+        oldNumber,
+        newNumber: undefined,
+      })
       oldNumber += 1
     } else {
       lines.push({ type: 'context', text: raw.slice(1), oldNumber, newNumber })
@@ -55,7 +78,11 @@ export function splitRows(lines: DiffLine[]): DiffRow[] {
   let added: DiffLine[] = []
 
   const flush = (): void => {
-    for (let index = 0; index < Math.max(removed.length, added.length); index += 1) {
+    for (
+      let index = 0;
+      index < Math.max(removed.length, added.length);
+      index += 1
+    ) {
       rows.push({ left: removed[index], right: added[index] })
     }
 
@@ -64,13 +91,17 @@ export function splitRows(lines: DiffLine[]): DiffRow[] {
   }
 
   for (const line of lines) {
-    if ('del' === line.type) {
+    if (line.type === 'del') {
       removed.push(line)
-    } else if ('add' === line.type) {
+    } else if (line.type === 'add') {
       added.push(line)
     } else {
       flush()
-      rows.push('context' === line.type ? { left: line, right: line } : { left: line, right: line })
+      rows.push(
+        line.type === 'context'
+          ? { left: line, right: line }
+          : { left: line, right: line },
+      )
     }
   }
 

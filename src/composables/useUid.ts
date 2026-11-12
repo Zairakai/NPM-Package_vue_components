@@ -10,7 +10,7 @@ let counter = 0
 export function useUid(prefix = 'zk'): string {
   const vueUseId = (Vue as { useId?: () => string }).useId
 
-  if ('function' === typeof vueUseId) {
+  if (typeof vueUseId === 'function') {
     return `${prefix}-${vueUseId()}`
   }
 

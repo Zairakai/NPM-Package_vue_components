@@ -39,7 +39,9 @@ describe('MediaLazyImage', () => {
   })
 
   it('should load at once and with a high priority when eager', () => {
-    const img = mount(LazyImage, { props: { src: '/a.jpg', alt: 'A', eager: true, fit: 'contain' } }).find('img')
+    const img = mount(LazyImage, {
+      props: { src: '/a.jpg', alt: 'A', eager: true, fit: 'contain' },
+    }).find('img')
 
     expect(img.attributes('loading')).toBe('eager')
     expect(img.attributes('fetchpriority')).toBe('high')
@@ -47,7 +49,10 @@ describe('MediaLazyImage', () => {
   })
 
   it('should show the placeholder until it is loaded', async () => {
-    const wrapper = mount(LazyImage, { props: { src: '/a.jpg', alt: 'A' }, slots: { placeholder: 'wait' } })
+    const wrapper = mount(LazyImage, {
+      props: { src: '/a.jpg', alt: 'A' },
+      slots: { placeholder: 'wait' },
+    })
 
     expect(wrapper.find('.lazy-image-placeholder').text()).toBe('wait')
     await wrapper.find('img').trigger('load')
@@ -57,7 +62,14 @@ describe('MediaLazyImage', () => {
   })
 
   it('should use the fallback once, then show the error', async () => {
-    const wrapper = mount(LazyImage, { props: { src: '/a.jpg', alt: 'A', fallback: '/f.jpg', srcset: '/a2.jpg 2x' } })
+    const wrapper = mount(LazyImage, {
+      props: {
+        src: '/a.jpg',
+        alt: 'A',
+        fallback: '/f.jpg',
+        srcset: '/a2.jpg 2x',
+      },
+    })
 
     await wrapper.find('img').trigger('error')
     expect(wrapper.find('img').attributes('src')).toBe('/f.jpg')
@@ -71,7 +83,10 @@ describe('MediaLazyImage', () => {
   })
 
   it('should show the error at once without a fallback, with a slot, and start again with a new source', async () => {
-    const wrapper = mount(LazyImage, { props: { src: '/a.jpg', alt: 'A' }, slots: { error: 'Broken' } })
+    const wrapper = mount(LazyImage, {
+      props: { src: '/a.jpg', alt: 'A' },
+      slots: { error: 'Broken' },
+    })
 
     await wrapper.find('img').trigger('error')
     expect(wrapper.find('.lazy-image-error').text()).toBe('Broken')
@@ -87,7 +102,9 @@ describe('MediaCarousel', () => {
     mount(Carousel, { props: { items, ...props }, attachTo: document.body })
 
   beforeEach(() => {
-    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+    }) as unknown as typeof window.matchMedia
     vi.useFakeTimers()
   })
 
@@ -100,11 +117,19 @@ describe('MediaCarousel', () => {
     expect(wrapper.attributes('aria-roledescription')).toBe('carousel')
     expect(wrapper.attributes('aria-label')).toBe('Photos')
     expect(wrapper.findAll('.carousel-slide')).toHaveLength(3)
-    expect(wrapper.findAll('.carousel-slide')[1].attributes('aria-label')).toBe('2 of 3')
-    expect(wrapper.findAll('.carousel-slide')[0].attributes('aria-roledescription')).toBe('slide')
-    expect(wrapper.findAll('.carousel-slide')[0].attributes('data-active')).toBeDefined()
+    expect(wrapper.findAll('.carousel-slide')[1].attributes('aria-label')).toBe(
+      '2 of 3',
+    )
+    expect(
+      wrapper.findAll('.carousel-slide')[0].attributes('aria-roledescription'),
+    ).toBe('slide')
+    expect(
+      wrapper.findAll('.carousel-slide')[0].attributes('data-active'),
+    ).toBeDefined()
     expect(wrapper.findAll('.carousel-indicator')).toHaveLength(3)
-    expect(wrapper.findAll('.carousel-indicator')[0].attributes('aria-current')).toBe('true')
+    expect(
+      wrapper.findAll('.carousel-indicator')[0].attributes('aria-current'),
+    ).toBe('true')
     expect(wrapper.attributes('aria-live')).toBe('polite')
   })
 
@@ -121,7 +146,9 @@ describe('MediaCarousel', () => {
   it('should stop at the ends without loop', async () => {
     const wrapper = build({ loop: false })
 
-    expect(wrapper.find('.carousel-previous').attributes('disabled')).toBeDefined()
+    expect(
+      wrapper.find('.carousel-previous').attributes('disabled'),
+    ).toBeDefined()
     await wrapper.find('.carousel-indicator:last-child').trigger('click')
     expect(wrapper.find('.carousel-next').attributes('disabled')).toBeDefined()
     await wrapper.find('.carousel-next').trigger('click')
@@ -136,7 +163,9 @@ describe('MediaCarousel', () => {
     await wrapper.trigger('keydown', { key: 'Home' })
     await wrapper.trigger('keydown', { key: 'ArrowLeft' })
     await wrapper.trigger('keydown', { key: 'x' })
-    expect(wrapper.emitted('update:modelValue')?.map((event) => event[0])).toEqual([1, 2, 0, 2])
+    expect(
+      wrapper.emitted('update:modelValue')?.map((event) => event[0]),
+    ).toEqual([1, 2, 0, 2])
     await wrapper.findAll('.carousel-indicator')[1].trigger('click')
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([1])
   })
@@ -148,8 +177,13 @@ describe('MediaCarousel', () => {
 
     track.scrollTo = scrollTo as unknown as typeof track.scrollTo
     await wrapper.find('.carousel-next').trigger('click')
-    expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }))
-    Object.defineProperty(track, 'clientWidth', { value: 200, configurable: true })
+    expect(scrollTo).toHaveBeenCalledWith(
+      expect.objectContaining({ behavior: 'smooth' }),
+    )
+    Object.defineProperty(track, 'clientWidth', {
+      value: 200,
+      configurable: true,
+    })
     track.scrollLeft = 400
     await wrapper.find('.carousel-track').trigger('scroll')
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([2])
@@ -178,12 +212,16 @@ describe('MediaCarousel', () => {
   })
 
   it('should not move on by itself when the visitor prefers less motion, and react to a new autoplay', async () => {
-    window.matchMedia = vi.fn().mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia
+    window.matchMedia = vi
+      .fn()
+      .mockReturnValue({ matches: true }) as unknown as typeof window.matchMedia
     const wrapper = build({ autoplay: 500 })
 
     await vi.advanceTimersByTimeAsync(2000)
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
-    window.matchMedia = vi.fn().mockReturnValue({ matches: false }) as unknown as typeof window.matchMedia
+    window.matchMedia = vi.fn().mockReturnValue({
+      matches: false,
+    }) as unknown as typeof window.matchMedia
     await wrapper.setProps({ autoplay: 500 })
     await wrapper.setProps({ autoplay: 600 })
     await vi.advanceTimersByTimeAsync(600)
@@ -193,7 +231,9 @@ describe('MediaCarousel', () => {
   it('should render the item slot, hide the indicators and handle no items', () => {
     const wrapper = mount(Carousel, {
       props: { items, indicators: false },
-      slots: { item: '<template #item="{ item, active }">{{ item }}:{{ active }}</template>' },
+      slots: {
+        item: '<template #item="{ item, active }">{{ item }}:{{ active }}</template>',
+      },
     })
 
     expect(wrapper.findAll('.carousel-slide')[0].text()).toBe('one:true')
@@ -232,10 +272,18 @@ describe('MediaLightbox', () => {
     const wrapper = build({ id: 'l', class: 'x' })
 
     expect(wrapper.findAll('.lightbox-thumbnail')).toHaveLength(3)
-    expect(wrapper.findAll('.lightbox-thumbnail')[0].attributes('aria-label')).toBe('View A')
-    expect(wrapper.find('.lightbox-thumbnail img').attributes('src')).toBe('/a-t.jpg')
-    expect(wrapper.findAll('.lightbox-thumbnail img')[1].attributes('src')).toBe('/b.jpg')
-    expect(build({ thumbnails: false }).find('.lightbox-thumbnails').exists()).toBe(false)
+    expect(
+      wrapper.findAll('.lightbox-thumbnail')[0].attributes('aria-label'),
+    ).toBe('View A')
+    expect(wrapper.find('.lightbox-thumbnail img').attributes('src')).toBe(
+      '/a-t.jpg',
+    )
+    expect(
+      wrapper.findAll('.lightbox-thumbnail img')[1].attributes('src'),
+    ).toBe('/b.jpg')
+    expect(
+      build({ thumbnails: false }).find('.lightbox-thumbnails').exists(),
+    ).toBe(false)
   })
 
   it('should open the large view on the image that was chosen', async () => {
@@ -246,7 +294,9 @@ describe('MediaLightbox', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([true])
     expect(wrapper.emitted('update:index')?.[0]).toEqual([1])
     expect(wrapper.find('.lightbox-image').attributes('src')).toBe('/b.jpg')
-    expect(wrapper.find('.lightbox-image').attributes('srcset')).toBe('/b2.jpg 2x')
+    expect(wrapper.find('.lightbox-image').attributes('srcset')).toBe(
+      '/b2.jpg 2x',
+    )
     expect(wrapper.find('.lightbox-counter').text()).toBe('2 / 3')
   })
 
@@ -263,32 +313,47 @@ describe('MediaLightbox', () => {
   it('should move with the keyboard', async () => {
     const wrapper = build({ modelValue: true, index: 1 })
 
-    await wrapper.find('.lightbox-figure').trigger('keydown', { key: 'ArrowRight' })
-    await wrapper.find('.lightbox-figure').trigger('keydown', { key: 'ArrowLeft' })
+    await wrapper
+      .find('.lightbox-figure')
+      .trigger('keydown', { key: 'ArrowRight' })
+    await wrapper
+      .find('.lightbox-figure')
+      .trigger('keydown', { key: 'ArrowLeft' })
     await wrapper.find('.lightbox-figure').trigger('keydown', { key: 'Home' })
     await wrapper.find('.lightbox-figure').trigger('keydown', { key: 'End' })
     await wrapper.find('.lightbox-figure').trigger('keydown', { key: 'x' })
-    expect(wrapper.emitted('update:index')?.map((event) => event[0])).toEqual([2, 0, 0, 2])
+    expect(wrapper.emitted('update:index')?.map((event) => event[0])).toEqual([
+      2, 0, 0, 2,
+    ])
   })
 
   it('should stop at the ends without loop', async () => {
     const wrapper = build({ modelValue: true, loop: false, index: 0 })
 
-    expect(wrapper.find('.lightbox-previous').attributes('disabled')).toBeDefined()
+    expect(
+      wrapper.find('.lightbox-previous').attributes('disabled'),
+    ).toBeDefined()
     const last = build({ modelValue: true, loop: false, index: 2 })
 
     expect(last.find('.lightbox-next').attributes('disabled')).toBeDefined()
-    await last.find('.lightbox-figure').trigger('keydown', { key: 'ArrowRight' })
+    await last
+      .find('.lightbox-figure')
+      .trigger('keydown', { key: 'ArrowRight' })
     expect(last.emitted('update:index')?.[0]).toEqual([2])
   })
 
   it('should render the caption slot and handle no items', () => {
-    const wrapper = build({ modelValue: true, items: [{ src: '/a.jpg', alt: 'A' }] })
+    const wrapper = build({
+      modelValue: true,
+      items: [{ src: '/a.jpg', alt: 'A' }],
+    })
 
     expect(wrapper.find('.lightbox-caption').exists()).toBe(false)
     const slot = mount(Lightbox, {
       props: { items, modelValue: true },
-      slots: { caption: '<template #caption="{ item }">cap-{{ item.alt }}</template>' },
+      slots: {
+        caption: '<template #caption="{ item }">cap-{{ item.alt }}</template>',
+      },
       attachTo: document.body,
     })
 
@@ -321,17 +386,25 @@ describe('MediaPlayer', () => {
       paused = true
       this.dispatchEvent(new Event('pause'))
     })
-    Object.defineProperty(proto, 'paused', { get: () => paused, configurable: true })
+    Object.defineProperty(proto, 'paused', {
+      get: () => paused,
+      configurable: true,
+    })
   })
 
   afterEach(() => {
     proto['play'] = original.play
     proto['pause'] = original.pause
-    Object.defineProperty(proto, 'paused', original.paused!)
+    if (original.paused) {
+      Object.defineProperty(proto, 'paused', original.paused)
+    }
   })
 
   const build = (props: Record<string, unknown> = {}) =>
-    mount(Player, { props: { src: '/v.mp4', ...props }, attachTo: document.body })
+    mount(Player, {
+      props: { src: '/v.mp4', ...props },
+      attachTo: document.body,
+    })
 
   it('should use the controls of the browser by default', () => {
     const wrapper = build({
@@ -340,7 +413,9 @@ describe('MediaPlayer', () => {
       label: 'Clip',
       poster: '/p.jpg',
       loop: true,
-      tracks: [{ src: '/fr.vtt', srclang: 'fr', label: 'Français', default: true }],
+      tracks: [
+        { src: '/fr.vtt', srclang: 'fr', label: 'Français', default: true },
+      ],
     })
 
     expect(wrapper.attributes('role')).toBe('group')
@@ -384,19 +459,26 @@ describe('MediaPlayer', () => {
     const wrapper = build({ customControls: true })
     const video = wrapper.find('video').element as HTMLVideoElement
 
-    Object.defineProperty(video, 'duration', { value: 3725, configurable: true })
+    Object.defineProperty(video, 'duration', {
+      value: 3725,
+      configurable: true,
+    })
     await wrapper.find('video').trigger('loadedmetadata')
     video.currentTime = 65
     await wrapper.find('video').trigger('timeupdate')
     expect(wrapper.find('.player-time').text()).toBe('1:05 / 1:02:05')
-    expect(wrapper.find('.player-seek').attributes('aria-valuetext')).toBe('1:05 / 1:02:05')
+    expect(wrapper.find('.player-seek').attributes('aria-valuetext')).toBe(
+      '1:05 / 1:02:05',
+    )
     expect(wrapper.emitted('update:time')?.[0]).toEqual([65])
     await wrapper.find('.player-seek').setValue('120')
     expect(video.currentTime).toBe(120)
   })
 
   it('should show 0:00 before the duration is known', () => {
-    expect(build({ customControls: true }).find('.player-time').text()).toBe('0:00 / 0:00')
+    expect(build({ customControls: true }).find('.player-time').text()).toBe(
+      '0:00 / 0:00',
+    )
   })
 
   it('should mute, change the volume and the speed', async () => {
@@ -439,16 +521,29 @@ describe('MediaPlayer', () => {
   })
 
   it('should go fullscreen when the browser can', async () => {
-    Object.defineProperty(document, 'fullscreenEnabled', { value: true, configurable: true })
-    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true, writable: true })
-    document.exitFullscreen = vi.fn() as unknown as typeof document.exitFullscreen
+    Object.defineProperty(document, 'fullscreenEnabled', {
+      value: true,
+      configurable: true,
+    })
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: null,
+      configurable: true,
+      writable: true,
+    })
+    document.exitFullscreen =
+      vi.fn() as unknown as typeof document.exitFullscreen
     const wrapper = build({ customControls: true })
     const request = vi.fn()
 
-    wrapper.element.requestFullscreen = request as unknown as typeof wrapper.element.requestFullscreen
+    wrapper.element.requestFullscreen =
+      request as unknown as typeof wrapper.element.requestFullscreen
     await wrapper.find('.player-fullscreen').trigger('click')
     expect(request).toHaveBeenCalled()
-    Object.defineProperty(document, 'fullscreenElement', { value: wrapper.element, configurable: true, writable: true })
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: wrapper.element,
+      configurable: true,
+      writable: true,
+    })
     document.dispatchEvent(new Event('fullscreenchange'))
     await nextTick()
     expect(wrapper.attributes('data-fullscreen')).toBeDefined()
@@ -456,8 +551,15 @@ describe('MediaPlayer', () => {
     expect(document.exitFullscreen).toHaveBeenCalled()
     await wrapper.find('video').trigger('keydown', { key: 'f' })
     wrapper.unmount()
-    Object.defineProperty(document, 'fullscreenEnabled', { value: false, configurable: true })
-    expect(build({ customControls: true, type: 'audio' }).find('.player-fullscreen').exists()).toBe(false)
+    Object.defineProperty(document, 'fullscreenEnabled', {
+      value: false,
+      configurable: true,
+    })
+    expect(
+      build({ customControls: true, type: 'audio' })
+        .find('.player-fullscreen')
+        .exists(),
+    ).toBe(false)
   })
 
   it('should pass the events on', async () => {

@@ -6,7 +6,9 @@ import { getSupport } from './useSupport'
  * the change is made at once.
  */
 export function withViewTransition(update: () => void): void {
-  const reduced = 'undefined' !== typeof window && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const reduced =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   if (getSupport().viewTransitions && !reduced) {
     document.startViewTransition(update)

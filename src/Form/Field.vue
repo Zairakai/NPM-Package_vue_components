@@ -1,22 +1,22 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'FormField',
-  })
+defineOptions({
+  name: 'FormField',
+})
 
-  const props = defineProps({
-    class: String,
-    field: {
-      type: Boolean,
-      default: true,
-    },
-    name: String,
-  })
+const props = defineProps({
+  class: String,
+  field: {
+    type: Boolean,
+    default: true,
+  },
+  name: String,
+})
 
-  const fieldsetProps = computed(() => ({
-    class: `field ${props.class ?? ''}`.trim(),
-  }))
+const fieldsetProps = computed(() => ({
+  class: `field ${props.class ?? ''}`.trim(),
+}))
 </script>
 
 <template>

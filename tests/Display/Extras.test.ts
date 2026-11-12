@@ -24,7 +24,10 @@ describe('DisplayChip', () => {
   })
 
   it('should toggle when selectable and emit', async () => {
-    const wrapper = mount(Chip, { props: { selectable: true }, slots: { default: 'Tag' } })
+    const wrapper = mount(Chip, {
+      props: { selectable: true },
+      slots: { default: 'Tag' },
+    })
     const button = wrapper.find('button.chip-label')
 
     expect(button.attributes('aria-pressed')).toBe('false')
@@ -36,7 +39,13 @@ describe('DisplayChip', () => {
 
   it('should follow the selected prop and be removable', async () => {
     const wrapper = mount(Chip, {
-      props: { selectable: true, selected: true, removable: true, removeLabel: 'Drop', disabled: true },
+      props: {
+        selectable: true,
+        selected: true,
+        removable: true,
+        removeLabel: 'Drop',
+        disabled: true,
+      },
     })
 
     expect(wrapper.find('.chip-label').attributes('aria-pressed')).toBe('true')
@@ -59,9 +68,10 @@ describe('DisplayChipGroup', () => {
       {
         components: { ChipGroup, Chip },
         props: ['groupProps'],
-        template: '<ChipGroup v-bind="groupProps"><Chip value="a">A</Chip><Chip value="b">B</Chip></ChipGroup>',
+        template:
+          '<ChipGroup v-bind="groupProps"><Chip value="a">A</Chip><Chip value="b">B</Chip></ChipGroup>',
       },
-      { props: { groupProps: props } }
+      { props: { groupProps: props } },
     )
 
   it('should select several values', async () => {
@@ -72,7 +82,10 @@ describe('DisplayChipGroup', () => {
     expect(wrapper.find('.chip-group').attributes('aria-label')).toBe('Tags')
     await buttons[0].trigger('click')
     await buttons[1].trigger('click')
-    expect(buttons.map((button) => button.attributes('aria-pressed'))).toEqual(['true', 'true'])
+    expect(buttons.map((button) => button.attributes('aria-pressed'))).toEqual([
+      'true',
+      'true',
+    ])
     await buttons[0].trigger('click')
     expect(buttons[0].attributes('aria-pressed')).toBe('false')
   })
@@ -84,7 +97,10 @@ describe('DisplayChipGroup', () => {
     await buttons[0].trigger('click')
     await buttons[1].trigger('click')
 
-    expect(buttons.map((button) => button.attributes('aria-pressed'))).toEqual(['false', 'true'])
+    expect(buttons.map((button) => button.attributes('aria-pressed'))).toEqual([
+      'false',
+      'true',
+    ])
   })
 })
 
@@ -97,7 +113,7 @@ describe('DisplayList', () => {
         template:
           '<List v-bind="listProps"><ListItem value="a" title="A" subtitle="sub">body<template #prepend>P</template><template #append>Z</template></ListItem><ListItem value="b" title="B" disabled /><ListItem title="L" href="/x" /></List>',
       },
-      { props: { listProps: props } }
+      { props: { listProps: props } },
     )
 
   it('should render a plain list', () => {
@@ -159,30 +175,36 @@ describe('DisplayTimeline', () => {
     expect(wrapper.find('time').text()).toBe('5 Oct')
     expect(wrapper.findAll('time')[1].text()).toBe('2026-10-06')
     expect(wrapper.find('.timeline-title').text()).toBe('Done')
-    expect(wrapper.find('.timeline-marker').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.find('.timeline-marker').attributes('aria-hidden')).toBe(
+      'true',
+    )
   })
 })
 
 describe('DisplayRating', () => {
   it('should draw full, half and empty stars with a text alternative', () => {
-    const wrapper = mount(Rating, { props: { value: 3.5, id: 'r', class: 'x' } })
+    const wrapper = mount(Rating, {
+      props: { value: 3.5, id: 'r', class: 'x' },
+    })
 
     expect(wrapper.attributes('role')).toBe('img')
     expect(wrapper.attributes('aria-label')).toBe('3.5 out of 5')
-    expect(wrapper.findAll('.rating-star').map((star) => star.attributes('data-state'))).toEqual([
-      'full',
-      'full',
-      'full',
-      'half',
-      'empty',
-    ])
+    expect(
+      wrapper
+        .findAll('.rating-star')
+        .map((star) => star.attributes('data-state')),
+    ).toEqual(['full', 'full', 'full', 'half', 'empty'])
   })
 
   it('should clamp the value and use a custom max and label', () => {
-    const wrapper = mount(Rating, { props: { value: 99, max: 3, label: '{value}/{max}' } })
+    const wrapper = mount(Rating, {
+      props: { value: 99, max: 3, label: '{value}/{max}' },
+    })
 
     expect(wrapper.attributes('aria-label')).toBe('3/3')
-    expect(mount(Rating, { props: { value: -2 } }).attributes('data-value')).toBe('0')
+    expect(
+      mount(Rating, { props: { value: -2 } }).attributes('data-value'),
+    ).toBe('0')
   })
 })
 

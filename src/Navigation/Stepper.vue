@@ -1,61 +1,67 @@
 <script setup>
-  import { useControllable } from '@/composables/useControllable'
-  import { useQueryAdapter } from '@/composables/useQueryAdapter'
-  import { queryNumber } from '@/composables/useQueryParam'
-  import { computed } from 'vue'
+import { useControllable } from '@/composables/useControllable'
+import { useQueryAdapter } from '@/composables/useQueryAdapter'
+import { queryNumber } from '@/composables/useQueryParam'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'NavigationStepper',
-  })
+defineOptions({
+  name: 'NavigationStepper',
+})
 
-  const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue'])
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    // The steps: { id, label, description }.
-    steps: {
-      type: Array,
-      default: () => [],
+const props = defineProps({
+  id: String,
+  class: String,
+  // The steps: { id, label, description }.
+  steps: {
+    type: Array,
+    default: () => [],
+  },
+  // The index of the current step, starting at 0.
+  modelValue: {
+    type: Number,
+    default: undefined,
+  },
+  // In a linear stepper only the completed steps can be reached again.
+  linear: {
+    type: Boolean,
+    default: true,
+  },
+  orientation: {
+    type: String,
+    default: 'horizontal',
+    validator(value) {
+      return ['horizontal', 'vertical'].includes(value)
     },
-    // The index of the current step, starting at 0.
-    modelValue: {
-      type: Number,
-      default: undefined,
-    },
-    // In a linear stepper only the completed steps can be reached again.
-    linear: {
-      type: Boolean,
-      default: true,
-    },
-    orientation: {
-      type: String,
-      default: 'horizontal',
-      validator(value) {
-        return ['horizontal', 'vertical'].includes(value)
-      },
-    },
-    // Keep the current step in this query parameter of the URL (?step=2).
-    queryParam: String,
-    label: String,
-  })
+  },
+  // Keep the current step in this query parameter of the URL (?step=2).
+  queryParam: String,
+  label: String,
+})
 
-  const current = useControllable(props, 'modelValue', emit, 0, {
-    param: props.queryParam,
-    parse: queryNumber(0),
-    adapter: useQueryAdapter(),
-  })
+const current = useControllable(props, 'modelValue', emit, 0, {
+  param: props.queryParam,
+  parse: queryNumber(0),
+  adapter: useQueryAdapter(),
+})
 
-  const stateOf = (index) => (index < current.value ? 'complete' : index === current.value ? 'current' : 'upcoming')
+const stateOf = (index) =>
+  index < current.value
+    ? 'complete'
+    : index === current.value
+      ? 'current'
+      : 'upcoming'
 
-  const reachable = (index) => index !== current.value && (!props.linear || index < current.value)
+const reachable = (index) =>
+  index !== current.value && (!props.linear || index < current.value)
 
-  const stepperProps = computed(() => ({
-    id: props.id,
-    class: `stepper ${props.class ?? ''}`.trim(),
-    'aria-label': props.label,
-    'data-orientation': props.orientation,
-  }))
+const stepperProps = computed(() => ({
+  id: props.id,
+  class: `stepper ${props.class ?? ''}`.trim(),
+  'aria-label': props.label,
+  'data-orientation': props.orientation,
+}))
 </script>
 
 <template>
@@ -73,10 +79,7 @@
         :type="reachable(index) ? 'button' : undefined"
         @click="reachable(index) && (current = index)"
       >
-        <span
-          class="step-marker"
-          aria-hidden="true"
-        >
+        <span class="step-marker" aria-hidden="true">
           <slot
             name="marker"
             :step="step"
@@ -87,10 +90,7 @@
           </slot>
         </span>
         <span class="step-label">{{ step.label }}</span>
-        <span
-          v-if="step.description"
-          class="step-description"
-        >
+        <span v-if="step.description" class="step-description">
           {{ step.description }}
         </span>
       </component>

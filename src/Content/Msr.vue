@@ -1,20 +1,20 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'ContentMsr',
-  })
+defineOptions({
+  name: 'ContentMsr',
+})
 
-  const props = defineProps({
-    class: {
-      type: String,
-      default: '',
-    },
-  })
+const props = defineProps({
+  class: {
+    type: String,
+    default: '',
+  },
+})
 
-  const msrProps = computed(() => ({
-    class: `msr ${props.class}`.trim(),
-  }))
+const msrProps = computed(() => ({
+  class: `msr ${props.class}`.trim(),
+}))
 </script>
 
 <template>

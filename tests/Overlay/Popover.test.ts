@@ -59,7 +59,9 @@ describe('OverlayPopover with the Popover API', () => {
   })
 
   it('should generate an id when none is given', () => {
-    expect(mountPopover().find('[popover]').attributes('id')).toMatch(/^popover-/)
+    expect(mountPopover().find('[popover]').attributes('id')).toMatch(
+      /^popover-/,
+    )
   })
 
   it('should show and hide the popover when the model changes', async () => {
@@ -101,9 +103,20 @@ describe('OverlayPopover with the Popover API', () => {
     const anchor = wrapper.find('.popover-anchor').element
 
     anchor.getBoundingClientRect = () =>
-      ({ left: 100, top: 200, right: 160, bottom: 220, width: 60, height: 20 }) as DOMRect
-    Object.defineProperty(wrapper.find('[popover]').element, 'offsetWidth', { value: 80 })
-    Object.defineProperty(wrapper.find('[popover]').element, 'offsetHeight', { value: 40 })
+      ({
+        left: 100,
+        top: 200,
+        right: 160,
+        bottom: 220,
+        width: 60,
+        height: 20,
+      }) as DOMRect
+    Object.defineProperty(wrapper.find('[popover]').element, 'offsetWidth', {
+      value: 80,
+    })
+    Object.defineProperty(wrapper.find('[popover]').element, 'offsetHeight', {
+      value: 40,
+    })
 
     await wrapper.setProps({ modelValue: true })
     await Promise.resolve()
@@ -114,12 +127,18 @@ describe('OverlayPopover with the Popover API', () => {
     expect(style).toContain('position: fixed')
     expect(style).toContain('left: 100px')
     expect(style).toContain('top: 156px')
-    expect(wrapper.find('[popover]').attributes('data-placement')).toBe('top-start')
+    expect(wrapper.find('[popover]').attributes('data-placement')).toBe(
+      'top-start',
+    )
   })
 
   it('should expose open and close and an update function', async () => {
     const wrapper = mountPopover()
-    const api = wrapper.vm as unknown as { open: () => void; close: () => void; update: () => void }
+    const api = wrapper.vm as unknown as {
+      open: () => void
+      close: () => void
+      update: () => void
+    }
 
     api.open()
     await nextTick()
@@ -132,7 +151,11 @@ describe('OverlayPopover with the Popover API', () => {
   })
 
   it('should use the haspopup and role given', () => {
-    const wrapper = mountPopover({ haspopup: 'menu', role: 'menu', mode: 'manual' })
+    const wrapper = mountPopover({
+      haspopup: 'menu',
+      role: 'menu',
+      mode: 'manual',
+    })
 
     expect(wrapper.find('.trigger').attributes('aria-haspopup')).toBe('menu')
     expect(wrapper.find('[popover]').attributes('role')).toBe('menu')
@@ -140,8 +163,11 @@ describe('OverlayPopover with the Popover API', () => {
   })
 
   it('should validate the placement and the mode', () => {
-    const { placement, mode } = (Popover as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
-      .props
+    const { placement, mode } = (
+      Popover as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(placement.validator('bottom-end')).toBe(true)
     expect(placement.validator('center')).toBe(false)
@@ -182,8 +208,12 @@ describe('OverlayPopover without the Popover API', () => {
     await nextTick()
     await nextTick()
 
-    wrapper.find('.content').element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
-    wrapper.find('.trigger').element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    wrapper
+      .find('.content')
+      .element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    wrapper
+      .find('.trigger')
+      .element.dispatchEvent(new Event('pointerdown', { bubbles: true }))
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 
     outside.dispatchEvent(new Event('pointerdown', { bubbles: true }))
