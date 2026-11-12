@@ -25,7 +25,10 @@ describe('OverlayDrawer', () => {
     resetSupport()
   })
 
-  const mountDrawer = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) => {
+  const mountDrawer = (
+    props: Record<string, unknown> = {},
+    slots: Record<string, string> = {},
+  ) => {
     const wrapper = mount(Drawer, { props, slots, attachTo: document.body })
 
     mounted.push(wrapper)
@@ -34,7 +37,10 @@ describe('OverlayDrawer', () => {
   }
 
   it('should render a modal on the right with the placement as data and a light dismiss by default', () => {
-    const wrapper = mountDrawer({ title: 'Menu', class: 'x', id: 'd' }, { default: 'Content' })
+    const wrapper = mountDrawer(
+      { title: 'Menu', class: 'x', id: 'd' },
+      { default: 'Content' },
+    )
 
     expect(wrapper.element.tagName).toBe('DIALOG')
     expect(wrapper.classes()).toContain('drawer')
@@ -44,13 +50,21 @@ describe('OverlayDrawer', () => {
     expect(wrapper.attributes('id')).toBe('d')
     expect(wrapper.find('.modal-body').text()).toBe('Content')
     expect(wrapper.attributes('style')).toContain('margin: 0px 0px 0px auto')
-    expect(wrapper.attributes('style')).toContain('var(--zk-drawer-size, 24rem)')
+    expect(wrapper.attributes('style')).toContain(
+      'var(--zk-drawer-size, 24rem)',
+    )
   })
 
   it('should stick to each edge', () => {
-    expect(mountDrawer({ placement: 'left' }).attributes('style')).toContain('margin: 0px auto 0px 0px')
-    expect(mountDrawer({ placement: 'top' }).attributes('style')).toContain('margin: 0px 0px auto')
-    expect(mountDrawer({ placement: 'bottom' }).attributes('style')).toContain('margin: auto 0px 0px')
+    expect(mountDrawer({ placement: 'left' }).attributes('style')).toContain(
+      'margin: 0px auto 0px 0px',
+    )
+    expect(mountDrawer({ placement: 'top' }).attributes('style')).toContain(
+      'margin: 0px 0px auto',
+    )
+    expect(mountDrawer({ placement: 'bottom' }).attributes('style')).toContain(
+      'margin: auto 0px 0px',
+    )
   })
 
   it('should open and close with the model and pass the events', async () => {
@@ -80,7 +94,7 @@ describe('OverlayDrawer', () => {
   it('should pass the header and footer slots and the close label', () => {
     const wrapper = mountDrawer(
       { closeLabel: 'Fermer', title: 'T' },
-      { header: 'Head', footer: '<button class="f">Go</button>' }
+      { header: 'Head', footer: '<button class="f">Go</button>' },
     )
 
     expect(wrapper.find('.modal-title').text()).toBe('Head')
@@ -100,7 +114,9 @@ describe('OverlayDrawer', () => {
     const wrapper = mountDrawer({ queryParam: 'menu' })
 
     ;(
-      wrapper.findComponent({ name: 'OverlayModal' }).vm.$ as unknown as { exposed: { show: () => void } }
+      wrapper.findComponent({ name: 'OverlayModal' }).vm.$ as unknown as {
+        exposed: { show: () => void }
+      }
     ).exposed.show()
     await nextTick()
 
@@ -110,7 +126,9 @@ describe('OverlayDrawer', () => {
 
   it('should validate the placement and the closedby', () => {
     const { placement, closedby } = (
-      Drawer as unknown as { props: Record<string, { validator: (v: string) => boolean }> }
+      Drawer as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
     ).props
 
     expect(placement.validator('bottom')).toBe(true)

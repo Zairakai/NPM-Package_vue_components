@@ -1,17 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { fetchFetcher, httpFetcher, toQuery, useRemoteData } from '../../src/composables/useRemoteData'
+import {
+  fetchFetcher,
+  httpFetcher,
+  toQuery,
+  useRemoteData,
+} from '../../src/composables/useRemoteData'
 
 describe('toQuery', () => {
   it('should build a query string and leave out the empty values', () => {
     expect(
-      toQuery({ page: 2, q: 'ada lovelace', empty: '', none: null, missing: undefined, on: true }).toString()
+      toQuery({
+        page: 2,
+        q: 'ada lovelace',
+        empty: '',
+        none: null,
+        missing: undefined,
+        on: true,
+      }).toString(),
     ).toBe('page=2&q=ada+lovelace&on=true')
   })
 
   it('should repeat a parameter for an array and use brackets for an object', () => {
     expect(
-      decodeURIComponent(toQuery({ tag: ['a', 'b'], filter: { status: 'open', owner: ['x', 'y'] } }).toString())
+      decodeURIComponent(
+        toQuery({
+          tag: ['a', 'b'],
+          filter: { status: 'open', owner: ['x', 'y'] },
+        }).toString(),
+      ),
     ).toBe('tag=a&tag=b&filter[status]=open&filter[owner]=x&filter[owner]=y')
   })
 })
@@ -29,7 +46,10 @@ describe('useRemoteData', () => {
 
     await vi.runAllTimersAsync()
 
-    expect(fetcher).toHaveBeenCalledWith({ page: 1 }, expect.objectContaining({ signal: expect.any(AbortSignal) }))
+    expect(fetcher).toHaveBeenCalledWith(
+      { page: 1 },
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
+    )
     expect(data.value).toEqual(['row'])
     expect(loading.value).toBe(false)
   })
@@ -44,7 +64,9 @@ describe('useRemoteData', () => {
   })
 
   it('should load again when the parameters change, after the debounce', async () => {
-    const fetcher = vi.fn().mockImplementation(async (params: { q: string }) => params.q)
+    const fetcher = vi
+      .fn()
+      .mockImplementation(async (params: { q: string }) => params.q)
     const params = ref({ q: 'a' })
     const { data } = useRemoteData(fetcher, params, { debounce: 300 })
 
@@ -71,7 +93,7 @@ describe('useRemoteData', () => {
         new Promise<string>((resolve) => {
           signals.push(signal)
           resolvers.push(resolve)
-        })
+        }),
     )
     const params = ref({ q: 'a' })
     const { data } = useRemoteData(fetcher, params)
@@ -107,7 +129,10 @@ describe('useRemoteData', () => {
   })
 
   it('should clear the error when a new request starts', async () => {
-    const fetcher = vi.fn().mockRejectedValueOnce(new Error('x')).mockResolvedValueOnce('ok')
+    const fetcher = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('x'))
+      .mockResolvedValueOnce('ok')
     const { error, data, reload } = useRemoteData(fetcher, ref({}))
 
     await vi.runAllTimersAsync()
@@ -124,11 +149,17 @@ describe('useRemoteData', () => {
       (_params: unknown, { signal }: { signal: AbortSignal }) =>
         new Promise(() => {
           signals.push(signal)
-        })
+        }),
     )
     const scope = effectScope()
     const params = ref({ a: 1 })
-    const result = scope.run(() => useRemoteData(fetcher, params, { debounce: 100 }))!
+    const result = scope.run(() =>
+      useRemoteData(fetcher, params, { debounce: 100 }),
+    )
+
+    if (!result) {
+      throw new Error('The scope is not active')
+    }
 
     params.value = { a: 2 }
     await nextTick()
@@ -141,7 +172,9 @@ describe('useRemoteData', () => {
   })
 
   it('should let the caller cancel', async () => {
-    const fetcher = vi.fn().mockImplementation(() => new Promise(() => undefined))
+    const fetcher = vi
+      .fn()
+      .mockImplementation(() => new Promise(() => undefined))
     const { cancel, loading } = useRemoteData(fetcher, ref({}))
 
     cancel()
@@ -154,9 +187,15 @@ describe('httpFetcher and fetchFetcher', () => {
   it('should call the client with the query string and the signal, and return the data', async () => {
     const get = vi.fn().mockResolvedValue({ data: { items: [1, 2] } })
     const signal = new AbortController().signal
-    const fetcher = httpFetcher<number[]>({ get }, '/api/users', (data) => (data as { items: number[] }).items)
+    const fetcher = httpFetcher<number[]>(
+      { get },
+      '/api/users',
+      (data) => (data as { items: number[] }).items,
+    )
 
-    expect(await fetcher({ page: 2, tag: ['a', 'b'] }, { signal })).toEqual([1, 2])
+    expect(await fetcher({ page: 2, tag: ['a', 'b'] }, { signal })).toEqual([
+      1, 2,
+    ])
     expect(get).toHaveBeenCalledTimes(1)
     expect(get.mock.calls[0][0]).toBe('/api/users')
     expect(get.mock.calls[0][1].params.toString()).toBe('page=2&tag=a&tag=b')
@@ -164,21 +203,36 @@ describe('httpFetcher and fetchFetcher', () => {
   })
 
   it('should return the whole data without a selector', async () => {
-    const fetcher = httpFetcher({ get: vi.fn().mockResolvedValue({ data: 'raw' }) }, '/x')
+    const fetcher = httpFetcher(
+      { get: vi.fn().mockResolvedValue({ data: 'raw' }) },
+      '/x',
+    )
 
-    expect(await fetcher({}, { signal: new AbortController().signal })).toBe('raw')
+    expect(await fetcher({}, { signal: new AbortController().signal })).toBe(
+      'raw',
+    )
   })
 
   it('should use fetch with the query string, the headers and the signal', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ ok: 1 }) })
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: () => Promise.resolve({ ok: 1 }) })
 
     vi.stubGlobal('fetch', fetchMock)
     const signal = new AbortController().signal
 
-    expect(await fetchFetcher('/api/users', { headers: { 'X-A': '1' } })({ q: 'ada' }, { signal })).toEqual({ ok: 1 })
+    expect(
+      await fetchFetcher('/api/users', { headers: { 'X-A': '1' } })(
+        { q: 'ada' },
+        { signal },
+      ),
+    ).toEqual({ ok: 1 })
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/users?q=ada',
-      expect.objectContaining({ signal, headers: { Accept: 'application/json', 'X-A': '1' } })
+      expect.objectContaining({
+        signal,
+        headers: { Accept: 'application/json', 'X-A': '1' },
+      }),
     )
     await fetchFetcher('/api/users?v=2')({ q: 'x' }, { signal })
     expect(fetchMock.mock.calls[1][0]).toBe('/api/users?v=2&q=x')
@@ -193,12 +247,21 @@ describe('httpFetcher and fetchFetcher', () => {
       vi
         .fn()
         .mockResolvedValueOnce({ ok: false, status: 503 })
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ data: [3] }) })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => Promise.resolve({ data: [3] }),
+        }),
     )
     const signal = new AbortController().signal
 
     await expect(fetchFetcher('/x')({}, { signal })).rejects.toThrow('HTTP 503')
-    expect(await fetchFetcher('/x', {}, (data) => (data as { data: number[] }).data)({}, { signal })).toEqual([3])
+    expect(
+      await fetchFetcher(
+        '/x',
+        {},
+        (data) => (data as { data: number[] }).data,
+      )({}, { signal }),
+    ).toEqual([3])
     vi.unstubAllGlobals()
   })
 })

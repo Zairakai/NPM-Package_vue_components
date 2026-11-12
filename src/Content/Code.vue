@@ -1,19 +1,19 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'ContentCode',
-  })
+defineOptions({
+  name: 'ContentCode',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+})
 
-  const codeProps = computed(() => ({
-    id: props.id,
-    class: `code ${props.class ?? ''}`.trim(),
-  }))
+const codeProps = computed(() => ({
+  id: props.id,
+  class: `code ${props.class ?? ''}`.trim(),
+}))
 </script>
 
 <template>

@@ -16,7 +16,11 @@ afterEach(() => {
 
 beforeEach(() => setSupport({ popover: false }))
 
-function build(props: Record<string, unknown> = {}, onSelect = vi.fn(), itemProps: Record<string, unknown> = {}) {
+function build(
+  props: Record<string, unknown> = {},
+  onSelect = vi.fn(),
+  itemProps: Record<string, unknown> = {},
+) {
   const wrapper = mount(
     defineComponent({
       render: () =>
@@ -24,14 +28,30 @@ function build(props: Record<string, unknown> = {}, onSelect = vi.fn(), itemProp
           trigger: ({ attrs }: { attrs: Record<string, unknown> }) =>
             h('button', { class: 'trigger', ...attrs }, 'Menu'),
           default: () => [
-            h(DropdownItem, { onSelect: () => onSelect('edit'), ...itemProps }, () => 'Edit'),
-            h(DropdownItem, { disabled: true, onSelect: () => onSelect('hidden') }, () => 'Hidden'),
-            h(DropdownItem, { onSelect: () => onSelect('delete') }, () => 'Delete'),
-            h(DropdownItem, { onSelect: () => onSelect('duplicate'), closeOnSelect: false }, () => 'Duplicate'),
+            h(
+              DropdownItem,
+              { onSelect: () => onSelect('edit'), ...itemProps },
+              () => 'Edit',
+            ),
+            h(
+              DropdownItem,
+              { disabled: true, onSelect: () => onSelect('hidden') },
+              () => 'Hidden',
+            ),
+            h(
+              DropdownItem,
+              { onSelect: () => onSelect('delete') },
+              () => 'Delete',
+            ),
+            h(
+              DropdownItem,
+              { onSelect: () => onSelect('duplicate'), closeOnSelect: false },
+              () => 'Duplicate',
+            ),
           ],
         }),
     }),
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 
   mounted.push(wrapper)
@@ -39,7 +59,8 @@ function build(props: Record<string, unknown> = {}, onSelect = vi.fn(), itemProp
   return wrapper
 }
 
-const items = (wrapper: ReturnType<typeof build>) => wrapper.findAll('[role="menuitem"]')
+const items = (wrapper: ReturnType<typeof build>) =>
+  wrapper.findAll('[role="menuitem"]')
 
 describe('OverlayDropdown', () => {
   it('should render a menu popover opened by the trigger, with the menu semantics', async () => {
@@ -99,7 +120,11 @@ describe('OverlayDropdown', () => {
     const wrapper = build()
     const key = async (name: string) => {
       ;(document.activeElement as HTMLElement).dispatchEvent(
-        new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true })
+        new KeyboardEvent('keydown', {
+          key: name,
+          bubbles: true,
+          cancelable: true,
+        }),
       )
       await nextTick()
     }
@@ -137,7 +162,12 @@ describe('OverlayDropdown', () => {
 
     const key = (name: string, options: KeyboardEventInit = {}) =>
       (document.activeElement as HTMLElement).dispatchEvent(
-        new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true, ...options })
+        new KeyboardEvent('keydown', {
+          key: name,
+          bubbles: true,
+          cancelable: true,
+          ...options,
+        }),
       )
 
     key('d')
@@ -160,7 +190,9 @@ describe('OverlayDropdown', () => {
     await wrapper.find('.trigger').trigger('click')
     await nextTick()
     await nextTick()
-    ;(document.activeElement as HTMLElement).dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
+    )
     await nextTick()
 
     expect(wrapper.find('.trigger').attributes('aria-expanded')).toBe('false')
@@ -196,7 +228,10 @@ describe('OverlayDropdown', () => {
   })
 
   it('should work as an item outside of a dropdown', async () => {
-    const wrapper = mount(DropdownItem, { slots: { default: 'Solo' }, props: { id: 'i', class: 'y' } })
+    const wrapper = mount(DropdownItem, {
+      slots: { default: 'Solo' },
+      props: { id: 'i', class: 'y' },
+    })
 
     await wrapper.trigger('click')
 

@@ -10,4 +10,5 @@ export interface AccordionContext {
   setOpen: (id: string, open: boolean) => void
 }
 
-export const ACCORDION_KEY: InjectionKey<AccordionContext> = Symbol('zk-accordion')
+export const ACCORDION_KEY: InjectionKey<AccordionContext> =
+  Symbol('zk-accordion')

@@ -1,23 +1,23 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutArticle',
-  })
+defineOptions({
+  name: 'LayoutArticle',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    lang: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  lang: String,
+  role: String,
+})
 
-  const articleProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    lang: props.lang,
-    role: props.role,
-  }))
+const articleProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  lang: props.lang,
+  role: props.role,
+}))
 </script>
 
 <template>

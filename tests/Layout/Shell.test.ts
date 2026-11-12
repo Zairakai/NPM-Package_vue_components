@@ -38,16 +38,30 @@ describe('LayoutBottomNavigation', () => {
 
   it('should render links and buttons with the current one marked', async () => {
     const wrapper = mount(BottomNavigation, {
-      props: { items, modelValue: 'home', label: 'Bottom', id: 'b', class: 'x' },
+      props: {
+        items,
+        modelValue: 'home',
+        label: 'Bottom',
+        id: 'b',
+        class: 'x',
+      },
       slots: { 'icon-home': '<i>h</i>' },
     })
 
     expect(wrapper.element.tagName).toBe('NAV')
     expect(wrapper.attributes('aria-label')).toBe('Bottom')
-    expect(wrapper.findAll('.bottom-navigation-item')[0].element.tagName).toBe('BUTTON')
-    expect(wrapper.findAll('.bottom-navigation-item')[1].attributes('href')).toBe('/docs')
-    expect(wrapper.findAll('.bottom-navigation-item')[0].attributes('aria-current')).toBe('page')
-    expect(wrapper.findAll('.bottom-navigation-item')[1].attributes('aria-current')).toBeUndefined()
+    expect(wrapper.findAll('.bottom-navigation-item')[0].element.tagName).toBe(
+      'BUTTON',
+    )
+    expect(
+      wrapper.findAll('.bottom-navigation-item')[1].attributes('href'),
+    ).toBe('/docs')
+    expect(
+      wrapper.findAll('.bottom-navigation-item')[0].attributes('aria-current'),
+    ).toBe('page')
+    expect(
+      wrapper.findAll('.bottom-navigation-item')[1].attributes('aria-current'),
+    ).toBeUndefined()
     expect(wrapper.find('.bottom-navigation-icon i').exists()).toBe(true)
   })
 
@@ -56,7 +70,9 @@ describe('LayoutBottomNavigation', () => {
 
     await wrapper.findAll('.bottom-navigation-item')[0].trigger('click')
 
-    expect(wrapper.findAll('.bottom-navigation-item')[0].attributes('data-active')).toBeDefined()
+    expect(
+      wrapper.findAll('.bottom-navigation-item')[0].attributes('data-active'),
+    ).toBeDefined()
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['home'])
   })
 })
@@ -71,7 +87,13 @@ describe('LayoutSpacer and LayoutSticky', () => {
 
   it('should stick to an edge with an offset and another tag', () => {
     const wrapper = mount(Sticky, {
-      props: { offset: '1rem', edge: 'bottom', as: 'aside', id: 's', class: 'x' },
+      props: {
+        offset: '1rem',
+        edge: 'bottom',
+        as: 'aside',
+        id: 's',
+        class: 'x',
+      },
       slots: { default: 'S' },
     })
 

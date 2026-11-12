@@ -4,7 +4,13 @@ import { nextTick } from 'vue'
 import { resetSupport, setSupport } from '../../src/composables/useSupport'
 import { parseDiff, splitRows } from '../../src/Content/diff'
 import Diff from '../../src/Content/Diff.vue'
-import { childPath, contains, display, entriesOf, kindOf } from '../../src/Content/json'
+import {
+  childPath,
+  contains,
+  display,
+  entriesOf,
+  kindOf,
+} from '../../src/Content/json'
 import JsonViewer from '../../src/Content/JsonViewer.vue'
 import Terminal from '../../src/Content/Terminal.vue'
 
@@ -35,31 +41,46 @@ describe('parseDiff', () => {
       'context',
     ])
     expect(lines[5]).toMatchObject({ text: 'keep', oldNumber: 1, newNumber: 1 })
-    expect(lines[6]).toMatchObject({ text: 'old', oldNumber: 2, newNumber: undefined })
-    expect(lines[7]).toMatchObject({ text: 'new', oldNumber: undefined, newNumber: 2 })
+    expect(lines[6]).toMatchObject({
+      text: 'old',
+      oldNumber: 2,
+      newNumber: undefined,
+    })
+    expect(lines[7]).toMatchObject({
+      text: 'new',
+      oldNumber: undefined,
+      newNumber: 2,
+    })
     expect(lines[8]).toMatchObject({ text: 'end', oldNumber: 3, newNumber: 3 })
   })
 
   it('should read a second file after a first one', () => {
-    const lines = parseDiff(`${DIFF}diff --git a/b.txt b/b.txt\n--- a/b.txt\n+++ b/b.txt\n@@ -5 +5 @@\n-x\n+y\n`)
+    const lines = parseDiff(
+      `${DIFF}diff --git a/b.txt b/b.txt\n--- a/b.txt\n+++ b/b.txt\n@@ -5 +5 @@\n-x\n+y\n`,
+    )
 
-    expect(lines.filter((line) => 'file' === line.type)).toHaveLength(7)
+    expect(lines.filter((line) => line.type === 'file')).toHaveLength(7)
     expect(lines.at(-1)).toMatchObject({ type: 'add', text: 'y', newNumber: 5 })
   })
 
   it('should show text before any hunk as file lines and accept windows line breaks', () => {
-    expect(parseDiff('hello\r\nworld').map((line) => line.type)).toEqual(['file', 'file'])
+    expect(parseDiff('hello\r\nworld').map((line) => line.type)).toEqual([
+      'file',
+      'file',
+    ])
   })
 })
 
 describe('splitRows', () => {
   it('should pair a removal with an addition and keep the context on both sides', () => {
     const rows = splitRows(parseDiff(DIFF))
-    const changed = rows.find((row) => 'del' === row.left?.type)
+    const changed = rows.find((row) => row.left?.type === 'del')
 
     expect(changed?.left?.text).toBe('old')
     expect(changed?.right?.text).toBe('new')
-    expect(rows.find((row) => 'keep' === row.left?.text)?.right?.text).toBe('keep')
+    expect(rows.find((row) => row.left?.text === 'keep')?.right?.text).toBe(
+      'keep',
+    )
   })
 
   it('should leave a side empty when there are more removals than additions', () => {
@@ -72,7 +93,9 @@ describe('splitRows', () => {
 
 describe('ContentDiff', () => {
   it('should render a unified view with ins and del elements and line numbers', () => {
-    const wrapper = mount(Diff, { props: { diff: DIFF, title: 'a.txt', id: 'd', class: 'x' } })
+    const wrapper = mount(Diff, {
+      props: { diff: DIFF, title: 'a.txt', id: 'd', class: 'x' },
+    })
 
     expect(wrapper.classes()).toEqual(['diff', 'x'])
     expect(wrapper.attributes('data-view')).toBe('unified')
@@ -102,15 +125,23 @@ describe('ContentDiff', () => {
   })
 
   it('should show an empty cell opposite a missing line in the split view', () => {
-    const wrapper = mount(Diff, { props: { diff: '@@ -1 +1,2 @@\n a\n+b\n', view: 'split' } })
+    const wrapper = mount(Diff, {
+      props: { diff: '@@ -1 +1,2 @@\n a\n+b\n', view: 'split' },
+    })
 
-    expect(wrapper.findAll('pre')[0].find('[data-type="empty"]').exists()).toBe(true)
+    expect(wrapper.findAll('pre')[0].find('[data-type="empty"]').exists()).toBe(
+      true,
+    )
   })
 
   it('should render nothing for an empty diff and validate the view', () => {
     expect(mount(Diff).findAll('.diff-line')).toHaveLength(1)
 
-    const { view } = (Diff as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { view } = (
+      Diff as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(view.validator('split')).toBe(true)
     expect(view.validator('x')).toBe(false)
@@ -119,7 +150,9 @@ describe('ContentDiff', () => {
 
 describe('ContentTerminal', () => {
   beforeEach(() => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
     setSupport({ clipboard: true })
   })
 
@@ -128,17 +161,29 @@ describe('ContentTerminal', () => {
     vi.unstubAllGlobals()
   })
 
-  const lines = ['$ npm install', 'added 1 package', { type: 'comment', text: '# now run it' }, '> npm test']
+  const lines = [
+    '$ npm install',
+    'added 1 package',
+    { type: 'comment', text: '# now run it' },
+    '> npm test',
+  ]
 
   it('should render commands as user input, output as sample output and comments', () => {
-    const wrapper = mount(Terminal, { props: { lines, title: 'Shell', id: 't', class: 'x' } })
+    const wrapper = mount(Terminal, {
+      props: { lines, title: 'Shell', id: 't', class: 'x' },
+    })
 
     expect(wrapper.classes()).toEqual(['terminal', 'x'])
     expect(wrapper.find('.terminal-title').text()).toBe('Shell')
-    expect(wrapper.findAll('kbd').map((key) => key.text())).toEqual(['npm install', 'npm test'])
+    expect(wrapper.findAll('kbd').map((key) => key.text())).toEqual([
+      'npm install',
+      'npm test',
+    ])
     expect(wrapper.find('samp').text()).toBe('added 1 package')
     expect(wrapper.find('.terminal-comment').text()).toBe('# now run it')
-    expect(wrapper.find('.terminal-prompt').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.find('.terminal-prompt').attributes('aria-hidden')).toBe(
+      'true',
+    )
     expect(wrapper.find('.terminal-prompt').text()).toBe('$')
     expect(wrapper.find('pre').attributes('tabindex')).toBe('0')
   })
@@ -147,7 +192,7 @@ describe('ContentTerminal', () => {
     expect(
       mount(Terminal, { props: { lines: ['$ ls'], prompt: '#' } })
         .find('.terminal-prompt')
-        .text()
+        .text(),
     ).toBe('#')
   })
 
@@ -158,7 +203,9 @@ describe('ContentTerminal', () => {
     await nextTick()
     await nextTick()
 
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('npm install\nnpm test')
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      'npm install\nnpm test',
+    )
     expect(wrapper.find('.terminal-copy').text()).toBe('Done')
     expect(wrapper.find('.terminal-status').text()).toBe('Done')
   })
@@ -167,7 +214,7 @@ describe('ContentTerminal', () => {
     expect(
       mount(Terminal, { props: { lines, copyable: false } })
         .find('.terminal-header')
-        .exists()
+        .exists(),
     ).toBe(false)
   })
 })
@@ -218,7 +265,9 @@ describe('json helpers', () => {
 
 describe('ContentJsonViewer', () => {
   beforeEach(() => {
-    vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } })
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText: vi.fn().mockResolvedValue(undefined) },
+    })
     setSupport({ clipboard: true })
   })
 
@@ -237,7 +286,9 @@ describe('ContentJsonViewer', () => {
   }
 
   it('should render the tree with collapsible branches and typed values', () => {
-    const wrapper = mount(JsonViewer, { props: { value, id: 'j', class: 'x', label: 'Person' } })
+    const wrapper = mount(JsonViewer, {
+      props: { value, id: 'j', class: 'x', label: 'Person' },
+    })
 
     expect(wrapper.classes()).toEqual(['json-viewer', 'x'])
     expect(wrapper.attributes('aria-label')).toBe('Person')
@@ -255,23 +306,40 @@ describe('ContentJsonViewer', () => {
     const closed = mount(JsonViewer, { props: { value, expanded: 0 } })
     const deep = mount(JsonViewer, { props: { value, expanded: 3 } })
 
-    expect(closed.findAll('details').every((details) => !(details.element as HTMLDetailsElement).open)).toBe(true)
-    expect(deep.findAll('details').every((details) => (details.element as HTMLDetailsElement).open)).toBe(true)
+    expect(
+      closed
+        .findAll('details')
+        .every((details) => !(details.element as HTMLDetailsElement).open),
+    ).toBe(true)
+    expect(
+      deep
+        .findAll('details')
+        .every((details) => (details.element as HTMLDetailsElement).open),
+    ).toBe(true)
   })
 
   it('should open and mark what matches the search', () => {
-    const wrapper = mount(JsonViewer, { props: { value, expanded: 0, search: 'lat' } })
-    const paths = wrapper.findAll('[data-match]').map((node) => node.attributes('data-path'))
+    const wrapper = mount(JsonViewer, {
+      props: { value, expanded: 0, search: 'lat' },
+    })
+    const paths = wrapper
+      .findAll('[data-match]')
+      .map((node) => node.attributes('data-path'))
 
     expect(paths).toContain('address.geo.lat')
     expect(
-      wrapper.findAll('details').filter((details) => (details.element as HTMLDetailsElement).open).length
+      wrapper
+        .findAll('details')
+        .filter((details) => (details.element as HTMLDetailsElement).open)
+        .length,
     ).toBeGreaterThanOrEqual(3)
   })
 
   it('should give the path of every node', () => {
     const wrapper = mount(JsonViewer, { props: { value, expanded: 3 } })
-    const paths = wrapper.findAll('[data-path]').map((node) => node.attributes('data-path'))
+    const paths = wrapper
+      .findAll('[data-path]')
+      .map((node) => node.attributes('data-path'))
 
     expect(paths).toContain('langs[1]')
     expect(paths).toContain('address.city')
@@ -282,15 +350,19 @@ describe('ContentJsonViewer', () => {
 
     await wrapper
       .findAll('.json-key')
-      .find((key) => 'city' === key.text())
+      .find((key) => key.text() === 'city')
       ?.trigger('click')
-    expect(wrapper.emitted('select')?.[0]).toEqual([{ path: 'address.city', value: 'London' }])
+    expect(wrapper.emitted('select')?.[0]).toEqual([
+      { path: 'address.city', value: 'London' },
+    ])
 
     await wrapper
       .findAll('.json-key')
-      .find((key) => 'geo' === key.text())
+      .find((key) => key.text() === 'geo')
       ?.trigger('click')
-    expect(wrapper.emitted('select')?.[1]).toEqual([{ path: 'address.geo', value: { lat: 1 } }])
+    expect(wrapper.emitted('select')?.[1]).toEqual([
+      { path: 'address.geo', value: { lat: 1 } },
+    ])
   })
 
   it('should copy the formatted JSON', async () => {
@@ -300,7 +372,9 @@ describe('ContentJsonViewer', () => {
     await nextTick()
     await nextTick()
 
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(JSON.stringify({ a: 1 }, null, 2))
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      JSON.stringify({ a: 1 }, null, 2),
+    )
     expect(wrapper.find('.json-copy').attributes('data-copied')).toBeDefined()
   })
 
@@ -308,17 +382,17 @@ describe('ContentJsonViewer', () => {
     expect(
       mount(JsonViewer, { props: { value: 5, copyable: false } })
         .find('.json-copy')
-        .exists()
+        .exists(),
     ).toBe(false)
     expect(
       mount(JsonViewer, { props: { value: 5 } })
         .find('.json-value')
-        .text()
+        .text(),
     ).toBe('5')
     expect(
       mount(JsonViewer, { props: { value: [1, 2] } })
         .find('.json-count')
-        .text()
+        .text(),
     ).toBe('[2]')
   })
 })

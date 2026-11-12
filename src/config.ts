@@ -14,7 +14,9 @@ export interface ZkComponentsConfig {
  * Injection key for the global component config.
  * Components call inject(ZK_CONFIG_KEY, DEFAULT_ZK_CONFIG) to access it.
  */
-export const ZK_CONFIG_KEY: InjectionKey<ZkComponentsConfig> = Symbol('zk-components-config')
+export const ZK_CONFIG_KEY: InjectionKey<ZkComponentsConfig> = Symbol(
+  'zk-components-config',
+)
 
 /**
  * Default config used when no provider is present (e.g. tree-shaken usage).

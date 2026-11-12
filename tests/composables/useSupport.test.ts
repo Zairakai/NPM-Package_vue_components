@@ -1,20 +1,39 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { detectSupport, getSupport, resetSupport, setSupport } from '../../src/composables/useSupport'
+import {
+  detectSupport,
+  getSupport,
+  resetSupport,
+  setSupport,
+} from '../../src/composables/useSupport'
 
 class Unknown {}
 
 function env(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
-    document: { createElement: () => new Unknown(), startViewTransition: () => undefined },
+    document: {
+      createElement: () => new Unknown(),
+      startViewTransition: () => undefined,
+    },
     HTMLUnknownElement: Unknown,
-    HTMLDialogElement: { prototype: { showModal: () => undefined, closedBy: '', requestClose: () => undefined } },
-    HTMLElement: { prototype: { popover: null, inert: false, onbeforematch: null } },
+    HTMLDialogElement: {
+      prototype: {
+        showModal: () => undefined,
+        closedBy: '',
+        requestClose: () => undefined,
+      },
+    },
+    HTMLElement: {
+      prototype: { popover: null, inert: false, onbeforematch: null },
+    },
     HTMLButtonElement: { prototype: { commandForElement: null } },
     HTMLDetailsElement: { prototype: { name: '' } },
     HTMLInputElement: { prototype: { showPicker: () => undefined } },
     CSS: { supports: () => true },
     navigation: {},
-    navigator: { clipboard: { writeText: () => undefined }, share: () => undefined },
+    navigator: {
+      clipboard: { writeText: () => undefined },
+      share: () => undefined,
+    },
     ...overrides,
   }
 }
@@ -41,13 +60,15 @@ describe('detectSupport', () => {
   })
 
   it('should know the search element when it is not an unknown element', () => {
-    expect(detectSupport(env({ document: { createElement: () => ({}) } })).search).toBe(true)
+    expect(
+      detectSupport(env({ document: { createElement: () => ({}) } })).search,
+    ).toBe(true)
   })
 
   it('should detect nothing without a document (server rendering)', () => {
     const support = detectSupport({})
 
-    expect(Object.values(support).every((value) => false === value)).toBe(true)
+    expect(Object.values(support).every((value) => value === false)).toBe(true)
   })
 
   it('should detect an old browser', () => {
@@ -62,7 +83,7 @@ describe('detectSupport', () => {
         navigation: undefined,
         navigator: {},
         document: { createElement: () => new Unknown() },
-      })
+      }),
     )
 
     expect(support.dialog).toBe(false)

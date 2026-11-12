@@ -1,34 +1,34 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'MediaObject',
-  })
+defineOptions({
+  name: 'MediaObject',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    data: {
-      type: String,
-      required: true,
-    },
+const props = defineProps({
+  id: String,
+  class: String,
+  data: {
     type: String,
-    width: [String, Number],
-    height: [String, Number],
-    name: String,
-    form: String,
-  })
+    required: true,
+  },
+  type: String,
+  width: [String, Number],
+  height: [String, Number],
+  name: String,
+  form: String,
+})
 
-  const objectProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    data: props.data,
-    type: props.type,
-    width: props.width,
-    height: props.height,
-    name: props.name,
-    form: props.form,
-  }))
+const objectProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  data: props.data,
+  type: props.type,
+  width: props.width,
+  height: props.height,
+  name: props.name,
+  form: props.form,
+}))
 </script>
 
 <template>

@@ -16,7 +16,7 @@ export function visibleNodes(
   nodes: TreeNodeData[],
   expanded: string[],
   depth = 0,
-  parent: string | null = null
+  parent: string | null = null,
 ): FlatNode[] {
   return nodes.flatMap((node) => [
     { node, depth, parent },
@@ -28,17 +28,25 @@ export function visibleNodes(
 
 /** The ids of every node that has children. */
 export function branchIds(nodes: TreeNodeData[]): string[] {
-  return nodes.flatMap((node) => (node.children?.length ? [node.id, ...branchIds(node.children)] : []))
+  return nodes.flatMap((node) =>
+    node.children?.length ? [node.id, ...branchIds(node.children)] : [],
+  )
 }
 
 /** The ids that must be expanded to show a node (all its ancestors). */
-export function ancestorsOf(nodes: TreeNodeData[], id: string, path: string[] = []): string[] | undefined {
+export function ancestorsOf(
+  nodes: TreeNodeData[],
+  id: string,
+  path: string[] = [],
+): string[] | undefined {
   for (const node of nodes) {
     if (node.id === id) {
       return path
     }
 
-    const found = node.children ? ancestorsOf(node.children, id, [...path, node.id]) : undefined
+    const found = node.children
+      ? ancestorsOf(node.children, id, [...path, node.id])
+      : undefined
 
     if (found) {
       return found

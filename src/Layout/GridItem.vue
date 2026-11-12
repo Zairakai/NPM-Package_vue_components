@@ -1,19 +1,19 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutGridItem',
-  })
+defineOptions({
+  name: 'LayoutGridItem',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+})
 
-  const itemProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-  }))
+const itemProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+}))
 </script>
 
 <template>

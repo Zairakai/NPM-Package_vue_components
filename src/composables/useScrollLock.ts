@@ -6,11 +6,11 @@ let previous = ''
  * and the page scrolls again when the last one is closed.
  */
 export function lockScroll(): void {
-  if ('undefined' === typeof document) {
+  if (typeof document === 'undefined') {
     return
   }
 
-  if (0 === locks) {
+  if (locks === 0) {
     previous = document.documentElement.style.overflow
     document.documentElement.style.overflow = 'hidden'
   }
@@ -19,13 +19,13 @@ export function lockScroll(): void {
 }
 
 export function unlockScroll(): void {
-  if (0 === locks) {
+  if (locks === 0) {
     return
   }
 
   locks -= 1
 
-  if (0 === locks) {
+  if (locks === 0) {
     document.documentElement.style.overflow = previous
   }
 }

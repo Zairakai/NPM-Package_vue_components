@@ -25,7 +25,9 @@ describe('Layout wrappers', () => {
   })
 
   it('Header passes id, class and role props', () => {
-    const wrapper = mount(Header, { props: { id: 'site-header', class: 'sticky', role: 'banner' } })
+    const wrapper = mount(Header, {
+      props: { id: 'site-header', class: 'sticky', role: 'banner' },
+    })
     const el = wrapper.find('header')
     expect(el.attributes('id')).toBe('site-header')
     expect(el.attributes('class')).toBe('sticky')
@@ -120,7 +122,9 @@ describe('Layout wrappers', () => {
 
 describe('LayoutLoader', () => {
   it('shows loader when isLoading=true', () => {
-    const wrapper = mount(Loader, { props: { isLoading: true, status: 'Loading...' } })
+    const wrapper = mount(Loader, {
+      props: { isLoading: true, status: 'Loading...' },
+    })
     expect(wrapper.find('#loader').exists()).toBe(true)
     expect(wrapper.find('#loaderText').text()).toBe('Loading...')
   })

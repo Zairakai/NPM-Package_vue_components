@@ -19,21 +19,28 @@ export const QUERY_CHANGE_EVENT = 'zk:querychange'
  * browser (server rendering), where the value is just the default.
  */
 export const historyAdapter: QueryAdapter = {
-  read: () => ('undefined' === typeof window ? new URLSearchParams() : new URLSearchParams(window.location.search)),
+  read: () =>
+    typeof window === 'undefined'
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search),
   write: (params, mode) => {
-    if ('undefined' === typeof window) {
+    if (typeof window === 'undefined') {
       return
     }
 
     const search = params.toString()
     const url = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`
 
-    window.history['push' === mode ? 'pushState' : 'replaceState'](window.history.state, '', url)
+    window.history[mode === 'push' ? 'pushState' : 'replaceState'](
+      window.history.state,
+      '',
+      url,
+    )
     // pushState and replaceState do not fire popstate: tell the other users of the URL.
     window.dispatchEvent(new Event(QUERY_CHANGE_EVENT))
   },
   subscribe: (listener) => {
-    if ('undefined' === typeof window) {
+    if (typeof window === 'undefined') {
       return () => undefined
     }
 
@@ -61,15 +68,17 @@ export interface QueryParamOptions<T> {
 export const queryNumber = (fallback: number) => (raw: string) => {
   const value = Number(raw)
 
-  return '' === raw.trim() || Number.isNaN(value) ? fallback : value
+  return raw.trim() === '' || Number.isNaN(value) ? fallback : value
 }
 
 /** `true` and `1` are true, everything else is false. */
-export const queryBoolean = (raw: string): boolean => 'true' === raw || '1' === raw
+export const queryBoolean = (raw: string): boolean =>
+  raw === 'true' || raw === '1'
 
 /** A list as a comma separated value. */
 export const queryList = {
-  parse: (raw: string): string[] => raw.split(',').filter((item) => '' !== item),
+  parse: (raw: string): string[] =>
+    raw.split(',').filter((item) => item !== ''),
   serialize: (value: string[]): string => value.join(','),
 }
 
@@ -80,7 +89,10 @@ export const queryList = {
  * the default); changing the URL (back button, a link, the router) updates the
  * ref. The other parameters of the URL are kept.
  */
-export function useQueryParam<T = string>(key: string, options: QueryParamOptions<T>): Ref<T> {
+export function useQueryParam<T = string>(
+  key: string,
+  options: QueryParamOptions<T>,
+): Ref<T> {
   const adapter = options.adapter ?? historyAdapter
   const parse = options.parse ?? ((raw: string) => raw as unknown as T)
   const serialize = options.serialize ?? ((value: T) => String(value))
@@ -88,7 +100,7 @@ export function useQueryParam<T = string>(key: string, options: QueryParamOption
   const read = (): T => {
     const raw = adapter.read().get(key)
 
-    return null === raw ? options.default : parse(raw)
+    return raw === null ? options.default : parse(raw)
   }
 
   const state = ref(read()) as Ref<T>

@@ -14,7 +14,10 @@ afterEach(() => {
   resetSupport()
 })
 
-const mountTooltip = (props: Record<string, unknown> = {}, slots: Record<string, string> = {}) => {
+const mountTooltip = (
+  props: Record<string, unknown> = {},
+  slots: Record<string, string> = {},
+) => {
   const wrapper = mount(Tooltip, {
     props,
     slots: { default: '<button class="trigger">Save</button>', ...slots },
@@ -26,7 +29,8 @@ const mountTooltip = (props: Record<string, unknown> = {}, slots: Record<string,
   return wrapper
 }
 
-const tip = (wrapper: ReturnType<typeof mountTooltip>) => wrapper.find('[role="tooltip"]')
+const tip = (wrapper: ReturnType<typeof mountTooltip>) =>
+  wrapper.find('[role="tooltip"]')
 
 describe('OverlayTooltip without the Popover API', () => {
   beforeEach(() => {
@@ -47,7 +51,9 @@ describe('OverlayTooltip without the Popover API', () => {
   })
 
   it('should generate an id', () => {
-    expect(tip(mountTooltip({ text: 'x' })).attributes('id')).toMatch(/^tooltip-/)
+    expect(tip(mountTooltip({ text: 'x' })).attributes('id')).toMatch(
+      /^tooltip-/,
+    )
   })
 
   it('should show after the delay on hover and hide on leave', async () => {
@@ -115,7 +121,10 @@ describe('OverlayTooltip without the Popover API', () => {
   })
 
   it('should render the content slot and not break without a trigger element', () => {
-    const wrapper = mountTooltip({}, { content: '<b>Rich</b>', default: 'Plain text' })
+    const wrapper = mountTooltip(
+      {},
+      { content: '<b>Rich</b>', default: 'Plain text' },
+    )
 
     expect(tip(wrapper).find('b').exists()).toBe(true)
     expect(wrapper.find('.tooltip-anchor').text()).toContain('Plain text')
@@ -130,7 +139,11 @@ describe('OverlayTooltip without the Popover API', () => {
   })
 
   it('should validate the placement', () => {
-    const { placement } = (Tooltip as unknown as { props: Record<string, { validator: (v: string) => boolean }> }).props
+    const { placement } = (
+      Tooltip as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(placement.validator('left-end')).toBe(true)
     expect(placement.validator('middle')).toBe(false)

@@ -1,130 +1,144 @@
 <script setup>
-  import { useControllable } from '@/composables/useControllable'
-  import { useQueryAdapter } from '@/composables/useQueryAdapter'
-  import { queryNumber } from '@/composables/useQueryParam'
-  import { paginationRange } from '@navigation/pagination'
-  import { computed } from 'vue'
+import { useControllable } from '@/composables/useControllable'
+import { useQueryAdapter } from '@/composables/useQueryAdapter'
+import { queryNumber } from '@/composables/useQueryParam'
+import { paginationRange } from '@navigation/pagination'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'NavigationPagination',
-  })
+defineOptions({
+  name: 'NavigationPagination',
+})
 
-  const emit = defineEmits(['update:modelValue', 'change'])
+const emit = defineEmits(['update:modelValue', 'change'])
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    // The current page, starting at 1.
-    modelValue: {
-      type: Number,
-      default: undefined,
-    },
-    // Either the number of pages...
-    pages: Number,
-    // ...or the number of items and the size of a page.
-    totalItems: Number,
-    pageSize: {
-      type: Number,
-      default: 10,
-    },
-    siblings: {
-      type: Number,
-      default: 1,
-    },
-    boundaries: {
-      type: Number,
-      default: 1,
-    },
-    // Keep the page in this query parameter of the URL (?page=3). The items become real links.
-    queryParam: String,
-    // Build the link of a page yourself (a router link, another URL scheme). The items become real links.
-    hrefFor: Function,
-    label: {
-      type: String,
-      default: 'Pagination',
-    },
-    previousLabel: {
-      type: String,
-      default: 'Previous page',
-    },
-    nextLabel: {
-      type: String,
-      default: 'Next page',
-    },
-    pageLabel: {
-      type: String,
-      default: 'Page',
-    },
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  // The current page, starting at 1.
+  modelValue: {
+    type: Number,
+    default: undefined,
+  },
+  // Either the number of pages...
+  pages: Number,
+  // ...or the number of items and the size of a page.
+  totalItems: Number,
+  pageSize: {
+    type: Number,
+    default: 10,
+  },
+  siblings: {
+    type: Number,
+    default: 1,
+  },
+  boundaries: {
+    type: Number,
+    default: 1,
+  },
+  // Keep the page in this query parameter of the URL (?page=3). The items become real links.
+  queryParam: String,
+  // Build the link of a page yourself (a router link, another URL scheme). The items become real links.
+  hrefFor: Function,
+  label: {
+    type: String,
+    default: 'Pagination',
+  },
+  previousLabel: {
+    type: String,
+    default: 'Previous page',
+  },
+  nextLabel: {
+    type: String,
+    default: 'Next page',
+  },
+  pageLabel: {
+    type: String,
+    default: 'Page',
+  },
+})
 
-  const adapter = useQueryAdapter()
-  const page = useControllable(props, 'modelValue', emit, 1, {
-    param: props.queryParam,
-    parse: queryNumber(1),
-    adapter,
-  })
+const adapter = useQueryAdapter()
+const page = useControllable(props, 'modelValue', emit, 1, {
+  param: props.queryParam,
+  parse: queryNumber(1),
+  adapter,
+})
 
-  const total = computed(() => props.pages ?? Math.max(1, Math.ceil((props.totalItems ?? 0) / props.pageSize)))
+const total = computed(
+  () =>
+    props.pages ??
+    Math.max(1, Math.ceil((props.totalItems ?? 0) / props.pageSize)),
+)
 
-  const items = computed(() => paginationRange(page.value, total.value, props.siblings, props.boundaries))
+const items = computed(() =>
+  paginationRange(page.value, total.value, props.siblings, props.boundaries),
+)
 
-  // Real links work without script and can be crawled; the click is still handled here.
-  const linked = computed(() => undefined !== props.queryParam || undefined !== props.hrefFor)
+// Real links work without script and can be crawled; the click is still handled here.
+const linked = computed(
+  () => undefined !== props.queryParam || undefined !== props.hrefFor,
+)
 
-  function hrefOf(target) {
-    if (props.hrefFor) {
-      return props.hrefFor(target)
-    }
-
-    const params = adapter.read()
-
-    if (1 === target) {
-      params.delete(props.queryParam)
-    } else {
-      params.set(props.queryParam, String(target))
-    }
-
-    const search = params.toString()
-
-    return search ? `?${search}` : '?'
+function hrefOf(target) {
+  if (props.hrefFor) {
+    return props.hrefFor(target)
   }
 
-  function go(target) {
-    const next = Math.min(total.value, Math.max(1, target))
+  const params = adapter.read()
 
-    if (next === page.value) {
-      return
-    }
-
-    page.value = next
-    emit('change', next)
+  if (target === 1) {
+    params.delete(props.queryParam)
+  } else {
+    params.set(props.queryParam, String(target))
   }
 
-  // Ctrl, cmd, shift and middle click keep their native meaning (new tab or window).
-  function onLinkClick(event, target) {
-    if (
-      event.defaultPrevented ||
-      0 !== event.button ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey
-    ) {
-      return
-    }
+  const search = params.toString()
 
-    event.preventDefault()
-    go(target)
+  return search ? `?${search}` : '?'
+}
+
+function go(target) {
+  const next = Math.min(total.value, Math.max(1, target))
+
+  if (next === page.value) {
+    return
   }
 
-  const paginationProps = computed(() => ({
-    id: props.id,
-    class: `pagination ${props.class ?? ''}`.trim(),
-    'aria-label': props.label,
-  }))
+  page.value = next
+  emit('change', next)
+}
 
-  const previous = computed(() => ({ target: page.value - 1, disabled: 1 >= page.value }))
-  const next = computed(() => ({ target: page.value + 1, disabled: total.value <= page.value }))
+// Ctrl, cmd, shift and middle click keep their native meaning (new tab or window).
+function onLinkClick(event, target) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  go(target)
+}
+
+const paginationProps = computed(() => ({
+  id: props.id,
+  class: `pagination ${props.class ?? ''}`.trim(),
+  'aria-label': props.label,
+}))
+
+const previous = computed(() => ({
+  target: page.value - 1,
+  disabled: page.value <= 1,
+}))
+const next = computed(() => ({
+  target: page.value + 1,
+  disabled: total.value <= page.value,
+}))
 </script>
 
 <template>
@@ -156,10 +170,10 @@
       </li>
       <li
         v-for="item in items"
-        :key="'page' === item.type ? item.page : item.key"
+        :key="item.type === 'page' ? item.page : item.key"
       >
         <span
-          v-if="'gap' === item.type"
+          v-if="item.type === 'gap'"
           class="pagination-gap"
           aria-hidden="true"
         >

@@ -1,21 +1,21 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutNavigation',
-  })
+defineOptions({
+  name: 'LayoutNavigation',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  role: String,
+})
 
-  const navProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    role: props.role,
-  }))
+const navProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  role: props.role,
+}))
 </script>
 
 <template>

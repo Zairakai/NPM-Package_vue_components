@@ -11,14 +11,19 @@ function build(props: Record<string, unknown> = {}) {
         h(Accordion, props, () => [
           h(AccordionItem, { id: 'a', title: 'First' }, () => 'Panel A'),
           h(AccordionItem, { id: 'b', title: 'Second' }, () => 'Panel B'),
-          h(AccordionItem, { id: 'c', title: 'Third', disabled: true }, () => 'Panel C'),
+          h(
+            AccordionItem,
+            { id: 'c', title: 'Third', disabled: true },
+            () => 'Panel C',
+          ),
         ]),
     }),
-    { attachTo: document.body }
+    { attachTo: document.body },
   )
 }
 
-const detailsOf = (wrapper: ReturnType<typeof build>) => wrapper.findAll('details.accordion-item')
+const detailsOf = (wrapper: ReturnType<typeof build>) =>
+  wrapper.findAll('details.accordion-item')
 
 // The browser opens the <details> itself and fires "toggle": do the same.
 async function setOpen(details: HTMLDetailsElement, open: boolean) {
@@ -35,24 +40,32 @@ describe('DisplayAccordion', () => {
 
     expect(wrapper.find('.accordion').exists()).toBe(true)
     expect((first.element as HTMLDetailsElement).open).toBe(false)
-    expect(first.find('summary.accordion-trigger h3.accordion-header').text()).toBe('First')
+    expect(
+      first.find('summary.accordion-trigger h3.accordion-header').text(),
+    ).toBe('First')
     expect(first.find('.accordion-panel').text()).toBe('Panel A')
   })
 
   it('should share one name between the items in single mode so the browser closes the others', () => {
-    const names = detailsOf(build()).map((details) => details.attributes('name'))
+    const names = detailsOf(build()).map((details) =>
+      details.attributes('name'),
+    )
 
     expect(names[0]).toBeTruthy()
     expect(new Set(names).size).toBe(1)
   })
 
   it('should not give a name in multiple mode', () => {
-    expect(detailsOf(build({ multiple: true }))[0].attributes('name')).toBeUndefined()
+    expect(
+      detailsOf(build({ multiple: true }))[0].attributes('name'),
+    ).toBeUndefined()
   })
 
   it('should follow the browser when an item opens and closes, without v-model', async () => {
     const wrapper = build()
-    const [first, second] = detailsOf(wrapper).map((details) => details.element as HTMLDetailsElement)
+    const [first, second] = detailsOf(wrapper).map(
+      (details) => details.element as HTMLDetailsElement,
+    )
 
     await setOpen(first, true)
     expect(first.open).toBe(true)
@@ -66,7 +79,9 @@ describe('DisplayAccordion', () => {
 
   it('should keep several items open in multiple mode', async () => {
     const wrapper = build({ multiple: true })
-    const [first, second] = detailsOf(wrapper).map((details) => details.element as HTMLDetailsElement)
+    const [first, second] = detailsOf(wrapper).map(
+      (details) => details.element as HTMLDetailsElement,
+    )
 
     await setOpen(first, true)
     await setOpen(second, true)
@@ -87,13 +102,22 @@ describe('DisplayAccordion', () => {
         render: () =>
           h(
             Accordion,
-            { modelValue: model.value, 'onUpdate:modelValue': (value: string | null) => (model.value = value) },
-            () => [h(AccordionItem, { id: 'a', title: 'A' }), h(AccordionItem, { id: 'b', title: 'B' })]
+            {
+              modelValue: model.value,
+              'onUpdate:modelValue': (value: string | null) =>
+                (model.value = value),
+            },
+            () => [
+              h(AccordionItem, { id: 'a', title: 'A' }),
+              h(AccordionItem, { id: 'b', title: 'B' }),
+            ],
           ),
       }),
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
-    const [a, b] = wrapper.findAll('details').map((details) => details.element as HTMLDetailsElement)
+    const [a, b] = wrapper
+      .findAll('details')
+      .map((details) => details.element as HTMLDetailsElement)
 
     expect(b.open).toBe(true)
 
@@ -118,12 +142,17 @@ describe('DisplayAccordion', () => {
               modelValue: model.value,
               'onUpdate:modelValue': (value: string[]) => (model.value = value),
             },
-            () => [h(AccordionItem, { id: 'a', title: 'A' }), h(AccordionItem, { id: 'b', title: 'B' })]
+            () => [
+              h(AccordionItem, { id: 'a', title: 'A' }),
+              h(AccordionItem, { id: 'b', title: 'B' }),
+            ],
           ),
       }),
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
-    const [, b] = wrapper.findAll('details').map((details) => details.element as HTMLDetailsElement)
+    const [, b] = wrapper
+      .findAll('details')
+      .map((details) => details.element as HTMLDetailsElement)
 
     await setOpen(b, true)
 
@@ -134,11 +163,13 @@ describe('DisplayAccordion', () => {
     const wrapper = mount(
       defineComponent({
         render: () =>
-          h(Accordion, { modelValue: null, 'onUpdate:modelValue': () => undefined }, () => [
-            h(AccordionItem, { id: 'a', title: 'A' }),
-          ]),
+          h(
+            Accordion,
+            { modelValue: null, 'onUpdate:modelValue': () => undefined },
+            () => [h(AccordionItem, { id: 'a', title: 'A' })],
+          ),
       }),
-      { attachTo: document.body }
+      { attachTo: document.body },
     )
     const details = wrapper.find('details').element as HTMLDetailsElement
 
@@ -171,9 +202,13 @@ describe('DisplayAccordion', () => {
 
   it('should move the focus with the arrow keys, Home and End and skip disabled items', async () => {
     const wrapper = build()
-    const [first, second] = wrapper.findAll('summary').map((summary) => summary.element as HTMLElement)
+    const [first, second] = wrapper
+      .findAll('summary')
+      .map((summary) => summary.element as HTMLElement)
     const keydown = async (target: HTMLElement, key: string) => {
-      target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+      target.dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+      )
       await Promise.resolve()
     }
 
@@ -227,8 +262,11 @@ describe('DisplayAccordion', () => {
   })
 
   it('should validate the heading level', () => {
-    const { level } = (AccordionItem as unknown as { props: Record<string, { validator: (v: number) => boolean }> })
-      .props
+    const { level } = (
+      AccordionItem as unknown as {
+        props: Record<string, { validator: (v: number) => boolean }>
+      }
+    ).props
 
     expect(level.validator(3)).toBe(true)
     expect(level.validator(1)).toBe(false)

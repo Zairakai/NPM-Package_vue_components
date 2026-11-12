@@ -11,7 +11,8 @@ import {
   validateFiles,
 } from '../../src/Form/inputs'
 
-const file = (name: string, type: string, size = 10) => new File([new Uint8Array(size)], name, { type })
+const file = (name: string, type: string, size = 10) =>
+  new File([new Uint8Array(size)], name, { type })
 
 describe('form input helpers', () => {
   it('should snap a value to a step inside the bounds', () => {
@@ -27,7 +28,13 @@ describe('form input helpers', () => {
     expect(splitTags('a, b;;c ,')).toEqual(['a', 'b', 'c'])
     expect(splitTags('a b|c', ['|'])).toEqual(['a b', 'c'])
     expect(splitTags('a\nb')).toEqual(['a', 'b'])
-    expect(splitTags('a]b^c-d\\e', [']', '^', '-', '\\'])).toEqual(['a', 'b', 'c', 'd', 'e'])
+    expect(splitTags('a]b^c-d\\e', [']', '^', '-', '\\'])).toEqual([
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+    ])
     expect(splitTags('  ')).toEqual([])
   })
 
@@ -67,8 +74,12 @@ describe('form input helpers', () => {
   it('should match the accept rules', () => {
     expect(matchesAccept(file('a.PNG', 'image/png'), '.png')).toBe(true)
     expect(matchesAccept(file('a.png', 'image/png'), 'image/*')).toBe(true)
-    expect(matchesAccept(file('a.png', 'image/png'), 'application/pdf, image/png')).toBe(true)
-    expect(matchesAccept(file('a.txt', 'text/plain'), 'image/*,.pdf')).toBe(false)
+    expect(
+      matchesAccept(file('a.png', 'image/png'), 'application/pdf, image/png'),
+    ).toBe(true)
+    expect(matchesAccept(file('a.txt', 'text/plain'), 'image/*,.pdf')).toBe(
+      false,
+    )
     expect(matchesAccept(file('a.txt', 'text/plain'), '')).toBe(true)
   })
 
@@ -86,11 +97,17 @@ describe('form input helpers', () => {
         accept: 'image/*',
         maxSize: 1000,
         maxFiles: 2,
-      }
+      },
     )
 
     expect(result.accepted.map((item) => item.name)).toEqual(['a.png'])
-    expect(result.rejected.map((item) => item.reason)).toEqual(['type', 'size', 'count'])
-    expect(validateFiles([], [file('a.txt', 'text/plain')], {}).accepted).toHaveLength(1)
+    expect(result.rejected.map((item) => item.reason)).toEqual([
+      'type',
+      'size',
+      'count',
+    ])
+    expect(
+      validateFiles([], [file('a.txt', 'text/plain')], {}).accepted,
+    ).toHaveLength(1)
   })
 })

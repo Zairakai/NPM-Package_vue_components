@@ -8,4 +8,5 @@ export interface ChipGroupContext {
   toggle: (value: string) => void
 }
 
-export const CHIP_GROUP_KEY: InjectionKey<ChipGroupContext> = Symbol('zk-chip-group')
+export const CHIP_GROUP_KEY: InjectionKey<ChipGroupContext> =
+  Symbol('zk-chip-group')

@@ -1,11 +1,18 @@
 const escapeHtml = (text: string): string =>
-  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+  text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 
 /** A link target that is safe to put in href: http, https, mailto, relative or an anchor. */
 export function safeUrl(url: string): string | undefined {
   const trimmed = url.trim()
 
-  return /^(https?:|mailto:|\/|#|\.\.?\/|[^:]*$)/i.test(trimmed) ? trimmed : undefined
+  return /^(https?:|mailto:|\/|#|\.\.?\/|[^:]*$)/i.test(trimmed)
+    ? trimmed
+    : undefined
 }
 
 /** The inline marks: code, bold, italic, links. Everything is escaped first. */
@@ -13,20 +20,29 @@ function inline(text: string): string {
   const codes: string[] = []
   let out = escapeHtml(text).replace(
     /`([^`]+)`/g,
-    (_match, code: string) => `\u0000${codes.push(`<code>${code}</code>`) - 1}\u0000`
+    (_match, code: string) =>
+      `\u0000${codes.push(`<code>${code}</code>`) - 1}\u0000`,
   )
 
   out = out
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')
-    .replace(/\[([^\]]+)\]\(((?:[^()\s]|\([^()\s]*\))+)\)/g, (_match, label: string, url: string) => {
-      const safe = safeUrl(url.replace(/&amp;/g, '&'))
+    .replace(
+      /\[([^\]]+)\]\(((?:[^()\s]|\([^()\s]*\))+)\)/g,
+      (_match, label: string, url: string) => {
+        const safe = safeUrl(url.replace(/&amp;/g, '&'))
 
-      return safe ? `<a href="${escapeHtml(safe)}" rel="noopener noreferrer">${label}</a>` : label
-    })
+        return safe
+          ? `<a href="${escapeHtml(safe)}" rel="noopener noreferrer">${label}</a>`
+          : label
+      },
+    )
 
-  // eslint-disable-next-line no-control-regex
-  return out.replace(/\u0000(\d+)\u0000/g, (_match, index: string) => codes[Number(index)])
+  return out.replace(
+    // eslint-disable-next-line no-control-regex
+    /\u0000(\d+)\u0000/g,
+    (_match, index: string) => codes[Number(index)] ?? '',
+  )
 }
 
 /**
@@ -40,12 +56,16 @@ export function renderMarkdown(source: string): string {
   const html: string[] = []
   let index = 0
 
-  const startsBlock = (line: string): boolean => /^(#{1,6}\s|```|>\s?|[-*+]\s|\d+\.\s|(-{3,}|\*{3,})\s*$)/.test(line)
+  // The line at a position, which is always inside the source here
+  const at = (position: number): string => lines[position] ?? ''
+
+  const startsBlock = (line: string): boolean =>
+    /^(#{1,6}\s|```|>\s?|[-*+]\s|\d+\.\s|(-{3,}|\*{3,})\s*$)/.test(line)
 
   while (index < lines.length) {
-    const line = lines[index]
+    const line = at(index)
 
-    if ('' === line.trim()) {
+    if (line.trim() === '') {
       index += 1
     } else if (line.startsWith('```')) {
       const language = line
@@ -56,19 +76,21 @@ export function renderMarkdown(source: string): string {
 
       index += 1
 
-      while (index < lines.length && !lines[index].startsWith('```')) {
-        code.push(lines[index])
+      while (index < lines.length && !at(index).startsWith('```')) {
+        code.push(at(index))
         index += 1
       }
 
       index += 1
       html.push(
-        `<pre><code${language ? ` class="language-${language}"` : ''}>${escapeHtml(code.join('\n'))}</code></pre>`
+        `<pre><code${language ? ` class="language-${language}"` : ''}>${escapeHtml(code.join('\n'))}</code></pre>`,
       )
     } else if (/^#{1,6}\s/.test(line)) {
       const level = line.indexOf(' ')
 
-      html.push(`<h${level}>${inline(line.slice(level + 1).trim())}</h${level}>`)
+      html.push(
+        `<h${level}>${inline(line.slice(level + 1).trim())}</h${level}>`,
+      )
       index += 1
     } else if (/^(-{3,}|\*{3,})\s*$/.test(line)) {
       html.push('<hr>')
@@ -76,8 +98,8 @@ export function renderMarkdown(source: string): string {
     } else if (/^>\s?/.test(line)) {
       const quote: string[] = []
 
-      while (index < lines.length && /^>\s?/.test(lines[index])) {
-        quote.push(lines[index].replace(/^>\s?/, ''))
+      while (index < lines.length && /^>\s?/.test(at(index))) {
+        quote.push(at(index).replace(/^>\s?/, ''))
         index += 1
       }
 
@@ -86,21 +108,29 @@ export function renderMarkdown(source: string): string {
       const ordered = /^\d+\./.test(line)
       const items: string[] = []
 
-      while (index < lines.length && /^([-*+]|\d+\.)\s/.test(lines[index]) && ordered === /^\d+\./.test(lines[index])) {
-        items.push(`<li>${inline(lines[index].replace(/^([-*+]|\d+\.)\s/, ''))}</li>`)
+      while (
+        index < lines.length &&
+        /^([-*+]|\d+\.)\s/.test(at(index)) &&
+        ordered === /^\d+\./.test(at(index))
+      ) {
+        items.push(
+          `<li>${inline(at(index).replace(/^([-*+]|\d+\.)\s/, ''))}</li>`,
+        )
         index += 1
       }
 
-      html.push(`<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`)
+      html.push(
+        `<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`,
+      )
     } else {
       const paragraph: string[] = []
 
       while (
         index < lines.length &&
-        '' !== lines[index].trim() &&
-        (0 === paragraph.length || !startsBlock(lines[index]))
+        at(index).trim() !== '' &&
+        (paragraph.length === 0 || !startsBlock(at(index)))
       ) {
-        paragraph.push(lines[index])
+        paragraph.push(at(index))
         index += 1
       }
 

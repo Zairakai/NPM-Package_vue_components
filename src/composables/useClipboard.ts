@@ -16,7 +16,8 @@ export function useClipboard(timeout = 2000) {
 
     field.value = text
     field.setAttribute('readonly', '')
-    field.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none'
+    field.style.cssText =
+      'position:fixed;top:0;left:0;opacity:0;pointer-events:none'
     document.body.append(field)
     field.select()
 
@@ -39,7 +40,7 @@ export function useClipboard(timeout = 2000) {
       }
     }
 
-    if (!done && 'undefined' !== typeof document) {
+    if (!done && typeof document !== 'undefined') {
       done = legacyCopy(text)
     }
 

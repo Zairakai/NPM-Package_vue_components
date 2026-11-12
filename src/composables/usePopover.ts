@@ -17,7 +17,7 @@ export function usePopover(
   open: Ref<boolean>,
   setOpen: (value: boolean) => void,
   mode: PopoverMode = 'auto',
-  anchor?: Ref<HTMLElement | null>
+  anchor?: Ref<HTMLElement | null>,
 ) {
   let shown = false
   let opener: Element | null = null
@@ -31,7 +31,7 @@ export function usePopover(
   }
 
   const onKeydown = (event: KeyboardEvent): void => {
-    if ('Escape' === event.key) {
+    if (event.key === 'Escape') {
       setOpen(false)
     }
   }
@@ -67,7 +67,7 @@ export function usePopover(
 
     target.hidden = !isOpen
 
-    if (isOpen && 'auto' === mode) {
+    if (isOpen && mode === 'auto') {
       opener = document.activeElement
       listen()
     } else {
@@ -83,13 +83,15 @@ export function usePopover(
   watch(open, apply, { flush: 'post' })
 
   function onToggle(event: Event): void {
-    shown = 'open' === (event as ToggleEvent).newState
+    shown = (event as ToggleEvent).newState === 'open'
     setOpen(shown)
   }
 
   /** The attributes to put on the element that opens it. */
   function triggerAttributes(panelId: string): Record<string, unknown> {
-    return getSupport().popover ? { popovertarget: panelId } : { onClick: () => setOpen(!open.value) }
+    return getSupport().popover
+      ? { popovertarget: panelId }
+      : { onClick: () => setOpen(!open.value) }
   }
 
   onBeforeUnmount(unlisten)

@@ -52,7 +52,12 @@ describe('useToast', () => {
     warning('w')
     error('e', { dismissible: false })
 
-    expect(toasts.value.map((toast) => toast.variant)).toEqual(['info', 'success', 'warning', 'error'])
+    expect(toasts.value.map((toast) => toast.variant)).toEqual([
+      'info',
+      'success',
+      'warning',
+      'error',
+    ])
     expect(toasts.value[0].title).toBe('Info')
     expect(toasts.value[3].dismissible).toBe(false)
   })
@@ -138,7 +143,9 @@ describe('FeedbackToastContainer', () => {
   })
 
   it('should center the container horizontally', () => {
-    const wrapper = mount(ToastContainer, { props: { position: 'bottom-center' } })
+    const wrapper = mount(ToastContainer, {
+      props: { position: 'bottom-center' },
+    })
 
     expect(wrapper.attributes('style')).toContain('bottom: 1rem')
     expect(wrapper.attributes('style')).toContain('left: 50%')
@@ -208,8 +215,11 @@ describe('FeedbackToastContainer', () => {
   })
 
   it('should validate the position', () => {
-    const { position } = (ToastContainer as unknown as { props: Record<string, { validator: (v: string) => boolean }> })
-      .props
+    const { position } = (
+      ToastContainer as unknown as {
+        props: Record<string, { validator: (v: string) => boolean }>
+      }
+    ).props
 
     expect(position.validator('top-left')).toBe(true)
     expect(position.validator('middle')).toBe(false)

@@ -1,31 +1,31 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutGrid',
-  })
+defineOptions({
+  name: 'LayoutGrid',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    columns: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  columns: String,
+})
 
-  const gridProps = computed(() => {
-    const result = {}
+const gridProps = computed(() => {
+  const result = {}
 
-    if (props.id) {
-      result.id = props.id
-    }
+  if (props.id) {
+    result.id = props.id
+  }
 
-    result.class = props.class ?? 'grid'
+  result.class = props.class ?? 'grid'
 
-    if (undefined !== props.columns) {
-      result.class += ` grid-cols-${props.columns}`
-    }
+  if (undefined !== props.columns) {
+    result.class += ` grid-cols-${props.columns}`
+  }
 
-    return result
-  })
+  return result
+})
 </script>
 
 <template>

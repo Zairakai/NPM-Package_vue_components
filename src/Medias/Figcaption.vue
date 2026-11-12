@@ -1,7 +1,7 @@
 <script setup>
-  defineOptions({
-    name: 'MediaFigcaption',
-  })
+defineOptions({
+  name: 'MediaFigcaption',
+})
 </script>
 
 <template>

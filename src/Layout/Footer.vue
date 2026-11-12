@@ -1,21 +1,21 @@
 <script setup>
-  import { computed } from 'vue'
+import { computed } from 'vue'
 
-  defineOptions({
-    name: 'LayoutFooter',
-  })
+defineOptions({
+  name: 'LayoutFooter',
+})
 
-  const props = defineProps({
-    id: String,
-    class: String,
-    role: String,
-  })
+const props = defineProps({
+  id: String,
+  class: String,
+  role: String,
+})
 
-  const footerProps = computed(() => ({
-    id: props.id,
-    class: props.class,
-    role: props.role,
-  }))
+const footerProps = computed(() => ({
+  id: props.id,
+  class: props.class,
+  role: props.role,
+}))
 </script>
 
 <template>

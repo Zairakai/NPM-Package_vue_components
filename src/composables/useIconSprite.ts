@@ -2,7 +2,7 @@
  * Icon sprite injection.
  *
  * Symbols are defined once in the document and referenced anywhere via
- * <svg><use href="#icon-name" /></svg> — call ensureIconSprite() from any
+ * <svg><use href="#icon-name" /></svg>: call ensureIconSprite() from any
  * component's setup() that needs an icon from the sprite; it is idempotent
  * (guarded by element id) so mounting the same component multiple times, or
  * several different components that share the sprite, never injects more
@@ -23,7 +23,7 @@ const SPRITE_MARKUP = `
 `
 
 export function ensureIconSprite(): void {
-  if ('undefined' === typeof document) {
+  if (typeof document === 'undefined') {
     return
   }
 

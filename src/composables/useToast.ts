@@ -21,7 +21,10 @@ export interface Toast {
 }
 
 const toasts: Ref<Toast[]> = ref([])
-const timers = new Map<number, { handle: ReturnType<typeof setTimeout>; started: number; remaining: number }>()
+const timers = new Map<
+  number,
+  { handle: ReturnType<typeof setTimeout>; started: number; remaining: number }
+>()
 
 let nextId = 0
 
@@ -56,7 +59,7 @@ function add(options: ToastOptions): number {
 
   toasts.value = [...toasts.value, toast]
 
-  if (0 < toast.duration) {
+  if (toast.duration > 0) {
     schedule(toast.id, toast.duration)
   }
 
@@ -72,7 +75,10 @@ function pause(id: number): void {
   }
 
   clearTimeout(timer.handle)
-  timers.set(id, { ...timer, remaining: Math.max(0, timer.remaining - (Date.now() - timer.started)) })
+  timers.set(id, {
+    ...timer,
+    remaining: Math.max(0, timer.remaining - (Date.now() - timer.started)),
+  })
 }
 
 /** Restart the countdown with the time that was left. */
@@ -95,8 +101,10 @@ function clear(): void {
 }
 
 function shortcut(variant: ToastVariant) {
-  return (message: string, options: Omit<ToastOptions, 'message' | 'variant'> = {}): number =>
-    add({ ...options, message, variant })
+  return (
+    message: string,
+    options: Omit<ToastOptions, 'message' | 'variant'> = {},
+  ): number => add({ ...options, message, variant })
 }
 
 /**

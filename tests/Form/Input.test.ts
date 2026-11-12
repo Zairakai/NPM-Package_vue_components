@@ -10,7 +10,15 @@ const FormFieldMock = {
 
 const FormLabelMock = {
   template: '<label>Test Label</label>',
-  props: ['id', 'label', 'fieldClass', 'iconBefore', 'iconAfter', 'prefix', 'suffix'],
+  props: [
+    'id',
+    'label',
+    'fieldClass',
+    'iconBefore',
+    'iconAfter',
+    'prefix',
+    'suffix',
+  ],
 }
 
 const FormAdditionalMock = {
@@ -69,7 +77,7 @@ describe('FormInput', () => {
     // Test input changes
     await input.setValue('new value')
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
-    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['new value'])
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['new value'])
   })
 
   it('should render hidden input without wrapper elements', () => {
@@ -98,6 +106,49 @@ describe('FormInput', () => {
     expect(iconElement.exists()).toBe(true)
     expect(iconElement.html()).toContain('search')
     expect(iconElement.classes()).toContain('msr')
+  })
+
+  it('should show the icon and the prefix as text, never as HTML', () => {
+    const wrapper = createWrapper({
+      iconBefore: '<b>bold</b>',
+      prefix: '<i>$</i>',
+    })
+
+    expect(wrapper.find('[data-leading-icon] b').exists()).toBe(false)
+    expect(wrapper.find('[data-leading-icon]').text()).toBe('<b>bold</b>')
+    expect(wrapper.find('[data-prefix] i').exists()).toBe(false)
+  })
+
+  it('should take HTML through the slots of the icons, the prefix and the suffix', () => {
+    const wrapper = mount(Input, {
+      props: { name: 'test-input' },
+      slots: {
+        'icon-before': '<svg data-test="before"></svg>',
+        prefix: '<b data-test="prefix">$</b>',
+        suffix: '<b data-test="suffix">EUR</b>',
+        'icon-after': '<svg data-test="after"></svg>',
+      },
+      global: {
+        stubs: {
+          FormField: FormFieldMock,
+          FormLabel: FormLabelMock,
+          FormAdditional: FormAdditionalMock,
+        },
+      },
+    })
+
+    expect(
+      wrapper.find('[data-leading-icon] [data-test="before"]').exists(),
+    ).toBe(true)
+    expect(wrapper.find('[data-prefix] [data-test="prefix"]').exists()).toBe(
+      true,
+    )
+    expect(wrapper.find('[data-suffix] [data-test="suffix"]').exists()).toBe(
+      true,
+    )
+    expect(
+      wrapper.find('[data-trailing-icon] [data-test="after"]').exists(),
+    ).toBe(true)
   })
 
   it('should render prefix', () => {
@@ -208,7 +259,7 @@ describe('FormInput', () => {
 
     expect(mockCheckValidity).toHaveBeenCalled()
     expect(wrapper.emitted('isValid')).toBeTruthy()
-    expect(wrapper.emitted('isValid')![0]).toEqual([false])
+    expect(wrapper.emitted('isValid')?.[0]).toEqual([false])
   })
 
   it('should apply width and height styles', () => {
@@ -236,6 +287,10 @@ describe('FormInput', () => {
     const input = wrapper.find('input')
     const label = wrapper.findComponent(FormLabelMock)
     expect(label.exists()).toBe(true)
+    expect(
+      input.element.compareDocumentPosition(label.element) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
   })
 
   it('should render error message when provided', () => {
