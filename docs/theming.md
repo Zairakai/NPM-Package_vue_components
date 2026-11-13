@@ -17,7 +17,9 @@ Add your own with the `class` prop, it is kept.
 | `DisplayAvatar` | `avatar` |
 | `DisplayAccordion` | `accordion`, `accordion-item`, `accordion-header`, `accordion-trigger`, `accordion-panel` |
 | `DisplayDivider` | `divider` |
-| `FeedbackAlert` | `alert`, `alert-close` |
+| `FeedbackAlert` | `alert`, `alert-icon`, `alert-body`, `alert-content`, `alert-title`, `alert-actions`, `alert-close` |
+| `FeedbackBanner` | `banner`, `banner-icon`, `banner-content`, `banner-actions`, `banner-dismiss` |
+| `FeedbackCookieBanner` | `cookie-banner`, `cookie-banner-title`, `cookie-banner-text`, `cookie-banner-categories`, `cookie-banner-legend`, `cookie-banner-category`, `cookie-banner-description`, `cookie-banner-actions`, `cookie-banner-accept`, `cookie-banner-reject`, `cookie-banner-customize`, `cookie-banner-save` |
 | `FeedbackToastContainer` | `toast-container`, `toast`, `toast-close` |
 | `FeedbackProgress` | `progress`, `progress-bar` |
 | `FeedbackSkeleton` | `skeleton` |
@@ -25,8 +27,9 @@ Add your own with the `class` prop, it is kept.
 | `NavigationPagination` | `pagination`, `pagination-item`, `pagination-gap` |
 | `NavigationBreadcrumb` | `breadcrumb`, `breadcrumb-item` |
 | `NavigationStepper` | `stepper`, `step` |
-| `OverlayModal`, `OverlayDialog`, `OverlayDrawer` | `modal`, `dialog`, `drawer`, `modal-header`, `modal-body`, `modal-footer` |
+| `OverlayModal`, `OverlayDialog`, `OverlayDrawer` | `modal`, `dialog`, `drawer`, `modal-header`, `modal-title`, `modal-close`, `modal-body`, `modal-content`, `modal-footer` |
 | `OverlayTooltip`, `OverlayPopover`, `OverlayDropdown` | `tooltip`, `popover`, `dropdown`, `dropdown-menu`, `dropdown-item` |
+| `ContentJsonViewer` | `json-viewer`, `json-root`, `json-copy` |
 | `DataTable` | `data-table`, `data-table-sort`, `data-table-empty`, `data-table-loading` |
 | `FormCombobox`, `FormMultiSelect` | `combobox`, `combobox-list`, `combobox-option`, `multi-select-chip` |
 | `FormDatePicker` | `date-picker`, `date-picker-day` |
