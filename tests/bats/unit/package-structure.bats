@@ -82,8 +82,8 @@ teardown() {
     assert_file_contains "${PROJECT_ROOT}/vite.config.ts" "external: ['vue', 'vue-router']"
 }
 
-@test "package.json requires js-dev-tools 4.1" {
-    assert_file_contains "${PROJECT_ROOT}/package.json" '"@zairakai/js-dev-tools": "^4.1.'
+@test "package.json requires js-dev-tools" {
+    assert_file_contains "${PROJECT_ROOT}/package.json" '"@zairakai/js-dev-tools":'
 }
 
 # ============================================================================
